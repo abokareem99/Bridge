@@ -10,58 +10,63 @@
         :root {
             --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #FFD700; --w: #ffffff;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* تعديل الهيدر ليكون متناسقاً ولا يأخذ مساحة ضخمة */
+        /* الهيدر المحسن */
         .hero {
-            padding: 30px 20px; 
+            padding: 35px 20px;
             background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
             text-align: center; color: var(--w);
-            border-bottom-left-radius: 35px; border-bottom-right-radius: 35px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
-        .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 8px; }
-        .hero-subtitle { font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px; }
+        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 5px; font-weight: 800; }
+        .welcome-msg { font-size: 0.9rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.3); }
 
         .btn-auth {
             background: var(--pi-g); color: var(--pi-d); border: none;
             padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        /* تنسيق الأيقونات والبطاقات */
-        .categories { padding: 20px; flex: 1; max-width: 500px; margin: 0 auto; width: 100%; }
+        /* شبكة الأيقونات المتناسقة */
+        .categories { 
+            padding: 25px 15px; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* جعلها في صفين لملء الفراغ */
+            gap: 15px;
+            width: 100%;
+        }
+        
         .cat-card {
-            background: var(--w); margin-bottom: 12px; padding: 15px;
-            border-radius: 15px; display: flex; justify-content: space-between;
-            align-items: center; cursor: pointer; border: 1px solid #eee;
-            transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: var(--w); padding: 20px 10px;
+            border-radius: 20px; text-align: center; cursor: pointer;
+            border: 1px solid rgba(106, 27, 154, 0.1);
+            transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .cat-card:active { transform: scale(0.97); }
-        .cat-info { display: flex; align-items: center; gap: 15px; }
-        .cat-info i { color: var(--pi-g); font-size: 1.3rem; background: var(--pi-d); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-        .price-tag { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; border: 1px solid #ffe0b2; }
+        .cat-card:active { transform: scale(0.95); }
+        
+        .cat-card i { 
+            color: var(--pi-g); background: var(--pi-d); 
+            width: 50px; height: 50px; display: flex; 
+            align-items: center; justify-content: center; 
+            border-radius: 15px; font-size: 1.5rem; margin-bottom: 10px;
+        }
+        .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.9rem; margin-bottom: 5px; }
+        .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 2px 8px; border-radius: 5px; }
 
-        /* نافذة تقديم الخدمة المنبثقة (المودال) */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000;
-        }
-        .modal-content {
-            background: white; width: 90%; max-width: 400px; padding: 25px;
-            border-radius: 20px; text-align: center; position: relative;
-        }
-        .modal-content h2 { color: var(--pi-d); margin-bottom: 15px; }
-        .modal-content p { font-size: 0.95rem; color: #666; margin-bottom: 20px; line-height: 1.6; }
-        .btn-pay-now {
-            width: 100%; background: var(--pi-g); color: var(--pi-d); border: none;
-            padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
-        }
-        .close-modal { position: absolute; top: 15px; left: 15px; font-size: 1.2rem; color: #ccc; cursor: pointer; }
+        /* تذييل الصفحة للمساحات القانونية */
+        footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; color: #777; }
+        footer a { color: var(--pi-p); text-decoration: none; margin: 0 10px; font-weight: bold; }
 
         #toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #333; color: white; padding: 10px 20px; border-radius: 30px; display: none; z-index: 3000;
+            background: rgba(0,0,0,0.85); color: #fff; padding: 10px 25px; border-radius: 30px; 
+            display: none; z-index: 3000; font-size: 0.85rem; border: 1px solid var(--pi-g);
         }
     </style>
 </head>
@@ -69,86 +74,80 @@
 
     <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
-        <p class="hero-subtitle">منصة العمل الحر الموثقة عبر Pi Network</p>
+        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
+        <p style="font-size: 0.85rem; margin-bottom: 20px; opacity: 0.9;">أنجز مهامك المهنية بضغطة زر</p>
         <button id="authBtn" class="btn-auth" onclick="startApp()">توثيق الحساب للدفع</button>
     </section>
 
     <section class="categories">
-        <div class="cat-card" onclick="openService('البرمجة والتطوير', 1.0, 'نقدم لك حلولاً برمجية متكاملة تشمل تطوير المواقع والتطبيقات الذكية بأعلى جودة.')">
-            <div class="cat-info"><i class="fas fa-code"></i><span>البرمجة والتطوير</span></div>
-            <span class="price-tag">1.0 Pi</span>
+        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة والتطوير')">
+            <i class="fas fa-code"></i>
+            <span>البرمجة</span>
+            <span class="price-badge">1.0 Pi</span>
         </div>
 
-        <div class="cat-card" onclick="openService('التصميم الجرافيكي', 0.8, 'احصل على هويات بصرية وشعارات احترافية تعكس تميز مشروعك.')">
-            <div class="cat-info"><i class="fas fa-palette"></i><span>التصميم الجرافيكي</span></div>
-            <span class="price-tag">0.8 Pi</span>
+        <div class="cat-card" onclick="processPayment(0.8, 'التصميم الجرافيكي')">
+            <i class="fas fa-palette"></i>
+            <span>التصميم</span>
+            <span class="price-badge">0.8 Pi</span>
         </div>
 
-        <div class="cat-card" onclick="openService('كتابة المحتوى', 0.5, 'خدمات كتابة المقالات، الترجمة، وصناعة المحتوى الإبداعي المتوافق مع محركات البحث.')">
-            <div class="cat-info"><i class="fas fa-pen-nib"></i><span>الكتابة والترجمة</span></div>
-            <span class="price-tag">0.5 Pi</span>
+        <div class="cat-card" onclick="processPayment(0.5, 'الكتابة والترجمة')">
+            <i class="fas fa-pen-nib"></i>
+            <span>الترجمة</span>
+            <span class="price-badge">0.5 Pi</span>
+        </div>
+
+        <div class="cat-card" onclick="processPayment(0.7, 'التسويق الرقمي')">
+            <i class="fas fa-bullhorn"></i>
+            <span>التسويق</span>
+            <span class="price-badge">0.7 Pi</span>
         </div>
     </section>
 
-    <div id="serviceModal" class="modal">
-        <div class="modal-content">
-            <i class="fas fa-times close-modal" onclick="closeModal()"></i>
-            <h2 id="mTitle">اسم الخدمة</h2>
-            <p id="mDesc">وصف الخدمة سيظهر هنا بشكل مفصل ليتمكن المستخدم من معرفة ما سيحصل عليه.</p>
-            <div style="margin-bottom: 20px; font-weight: bold; color: var(--pi-p);">السعر: <span id="mPrice">0</span> Pi</div>
-            <button class="btn-pay-now" onclick="confirmPayment()">تأكيد الطلب والدفع</button>
+    <footer>
+        <div style="margin-bottom: 10px;">
+            <a href="terms.html">شروط الاستخدام</a> | <a href="privacy.html">سياسة الخصوصية</a>
         </div>
-    </div>
+        <p>&copy; 2026 Bridge Freelance - Powered by Pi Network</p>
+    </footer>
 
     <div id="toast"></div>
 
     <script>
-        let currentService = { title: '', price: 0 };
-
-        function openService(title, price, desc) {
-            currentService = { title, price };
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('mDesc').innerText = desc;
-            document.getElementById('mPrice').innerText = price;
-            document.getElementById('serviceModal').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('serviceModal').style.display = 'none'; }
+        const toast = document.getElementById('toast');
+        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 4000); }
 
         async function startApp() {
             try {
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                showMsg("تم التوثيق: " + auth.user.username);
+                showMsg("أهلاً بك " + auth.user.username);
                 document.getElementById('authBtn').innerText = "الحساب موثق ✅";
-            } catch (e) { showMsg("خطأ في التوثيق"); }
+            } catch (e) { showMsg("فشل التوثيق"); }
         }
 
-        async function confirmPayment() {
-            closeModal();
+        async function processPayment(amt, name) {
             try {
-                showMsg("جاري معالجة الدفع لـ " + currentService.title);
+                showMsg(`جاري بدء دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
-                    amount: currentService.price,
-                    memo: "طلب خدمة: " + currentService.title,
-                    metadata: { service: currentService.title }
+                    amount: amt,
+                    memo: "طلب خدمة: " + name,
+                    metadata: { service: name }
                 }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId: id, action: 'approve' })
-                    }).then(r => r.json()),
-                    onConnectedToBlockchain: (id, tx) => showMsg("نجحت العملية!"),
-                    onCancel: () => showMsg("تم إلغاء الدفع"),
+                    }),
+                    onConnectedToBlockchain: (id, tx) => showMsg("تم الدفع بنجاح!"),
+                    onReadyForServerCompletion: (id, tx) => fetch('/api/payment-handler', {
+                        method: 'POST',
+                        body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
+                    }),
+                    onCancel: () => showMsg("تم إلغاء العملية"),
                     onError: (e) => showMsg("خطأ: " + e.message)
                 });
-            } catch (e) { showMsg("عذراً، فشل الدفع"); }
-        }
-
-        function showMsg(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
+            } catch (e) { showMsg("حدث خطأ تقني"); }
         }
     </script>
 </body>
