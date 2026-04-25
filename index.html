@@ -3,52 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جسر التواصل - Pi Network</title>
+    <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
         :root {
-            --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
+            --pi-p: #6a1b9a; 
+            --pi-d: #4a148c; 
+            --pi-g: #FFD700; /* ذهبي صريح للايقونات */
+            --w: #ffffff;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f4f4f9; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; overflow-x: hidden; }
 
+        /* الهيدر المحسن */
         .hero {
             height: 38vh; 
             background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
             display: flex; align-items: center; justify-content: center; text-align: center; color: var(--w);
             padding: 10px; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(74, 20, 140, 0.3);
         }
-        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 5px; font-weight: bold; }
-        .hero-subtitle { font-size: 0.85rem; margin-bottom: 15px; opacity: 0.9; }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 5px; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .hero-subtitle { font-size: 0.95rem; margin-bottom: 20px; opacity: 0.9; font-weight: 300; }
 
         .search-bar {
-            background: var(--w); border-radius: 50px; padding: 2px;
-            display: flex; margin: 0 auto 15px; max-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: var(--w); border-radius: 50px; padding: 5px;
+            display: flex; margin: 0 auto 15px; max-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .search-bar input { flex: 1; border: none; padding: 8px; border-radius: 50px; outline: none; text-align: center; font-size: 0.85rem; }
+        .search-bar input { flex: 1; border: none; padding: 10px; border-radius: 50px; outline: none; text-align: center; font-size: 0.9rem; color: var(--pi-d); }
 
         .btn-main {
-            background: var(--pi-g); color: var(--pi-p); border: none;
-            padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem;
+            background: var(--pi-g); color: var(--pi-d); border: none;
+            padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.95rem;
+            transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .btn-main:active { transform: scale(0.95); }
 
-        .categories { padding: 15px; max-width: 500px; margin: 0 auto; }
+        /* قسم التصنيفات المطور */
+        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; }
         .cat-card {
-            background: var(--w); margin-bottom: 8px; padding: 12px 15px;
-            border-radius: 12px; display: flex; justify-content: space-between;
+            background: var(--w); margin-bottom: 12px; padding: 15px 20px;
+            border-radius: 15px; display: flex; justify-content: space-between;
             align-items: center; text-decoration: none; color: #333;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.06); border: 1px solid rgba(106, 27, 154, 0.1);
+            transition: 0.2s ease-in-out;
         }
-        .cat-info { display: flex; align-items: center; gap: 10px; }
-        .cat-info i { color: var(--pi-p); font-size: 1.1rem; width: 25px; text-align: center; }
-        .cat-info span { font-size: 0.9rem; font-weight: 500; }
-        .fa-chevron-left { color: var(--pi-g); font-size: 0.8rem; }
+        .cat-card:hover { transform: translateY(-2px); border-color: var(--pi-g); }
+        
+        .cat-info { display: flex; align-items: center; gap: 15px; }
+        
+        /* جعل الأيقونة ذهبية واضحة */
+        .cat-info i { 
+            background: var(--pi-d); /* خلفية داكنة لتبرز الذهب */
+            color: var(--pi-g); 
+            font-size: 1.2rem; 
+            width: 40px; 
+            height: 40px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+        .cat-info span { font-size: 1rem; font-weight: 600; color: var(--pi-d); }
+        .fa-chevron-left { color: #ccc; font-size: 0.9rem; }
 
         #toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.85); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; display: none; z-index: 1000;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(42, 4, 74, 0.95); color: #fff; padding: 12px 25px; border-radius: 30px; 
+            font-size: 0.85rem; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid var(--pi-g); text-align: center; min-width: 200px;
         }
     </style>
 </head>
@@ -59,35 +84,35 @@
             <h1 class="hero-title">جسر التواصل</h1>
             <p class="hero-subtitle">خدمات العمل الحر عبر Pi Network</p>
             <div class="search-bar">
-                <input type="text" placeholder="ابحث عن خدمة...">
+                <input type="text" placeholder="ما هي الخدمة التي تبحث عنها؟">
             </div>
             <button id="authBtn" class="btn-main" onclick="startApp()">دخول عبر Pi Network</button>
-            <button id="payBtn" class="btn-main" style="display:none;" onclick="makePayment()">دفع 0.1 Pi للتجربة</button>
+            <button id="payBtn" class="btn-main" style="display:none;" onclick="makePayment(0.1)">دفع 0.1 Pi للتجربة</button>
         </div>
     </section>
 
     <section class="categories">
-        <a href="services.html" class="cat-card">
+        <a href="services.html?cat=tech&price=1.0" class="cat-card">
             <div class="cat-info"><i class="fas fa-code"></i><span>البرمجة والتطوير</span></div>
             <i class="fas fa-chevron-left"></i>
         </a>
-        <a href="#" class="cat-card">
+        <a href="services.html?cat=write&price=0.5" class="cat-card">
             <div class="cat-info"><i class="fas fa-pen-nib"></i><span>الكتابة والترجمة</span></div>
             <i class="fas fa-chevron-left"></i>
         </a>
-        <a href="#" class="cat-card">
+        <a href="services.html?cat=design&price=0.8" class="cat-card">
             <div class="cat-info"><i class="fas fa-palette"></i><span>التصميم الجرافيكي</span></div>
             <i class="fas fa-chevron-left"></i>
         </a>
-        <a href="#" class="cat-card">
+        <a href="services.html?cat=marketing&price=0.7" class="cat-card">
             <div class="cat-info"><i class="fas fa-bullhorn"></i><span>التسويق والمبيعات</span></div>
             <i class="fas fa-chevron-left"></i>
         </a>
-        <a href="#" class="cat-card">
+        <a href="services.html?cat=business&price=1.5" class="cat-card">
             <div class="cat-info"><i class="fas fa-calculator"></i><span>الأعمال والمحاسبة</span></div>
             <i class="fas fa-chevron-left"></i>
         </a>
-        <a href="#" class="cat-card">
+        <a href="services.html?cat=edu&price=0.4" class="cat-card">
             <div class="cat-info"><i class="fas fa-graduation-cap"></i><span>التدريب والتعليم</span></div>
             <i class="fas fa-chevron-left"></i>
         </a>
@@ -100,12 +125,12 @@
         function showMsg(m) { 
             toast.innerText = m; 
             toast.style.display = 'block'; 
-            setTimeout(() => toast.style.display='none', 3000); 
+            setTimeout(() => toast.style.display='none', 3500); 
         }
 
         async function startApp() {
             try {
-                showMsg("جاري التوثيق...");
+                showMsg("جاري التوثيق مع Pi Network...");
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 showMsg("أهلاً بك " + auth.user.username);
@@ -116,13 +141,14 @@
             }
         }
 
-        async function makePayment() {
+        // تم جعل القيمة (amount) متغيرة لاستخدامها حسب الخدمة
+        async function makePayment(amount) {
             try {
-                showMsg("جاري إنشاء المعاملة...");
+                showMsg(`جاري إنشاء معاملة بقيمة ${amount} Pi...`);
                 await window.Pi.createPayment({
-                    amount: 0.1, 
-                    memo: "تجربة دفع جسر التواصل", 
-                    metadata: { id: "test-1" }
+                    amount: amount, 
+                    memo: "رسوم خدمة في جسر التواصل", 
+                    metadata: { id: "service-payment-" + Date.now() }
                 }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
                         method: 'POST',
@@ -130,7 +156,7 @@
                         body: JSON.stringify({ paymentId: id, action: 'approve' })
                     }).then(r => r.json()),
                     
-                    onConnectedToBlockchain: (id, tx) => showMsg("تم الدفع بنجاح!"),
+                    onConnectedToBlockchain: (id, tx) => showMsg("تم إرسال المعاملة بنجاح!"),
                     
                     onReadyForServerCompletion: (id, tx) => fetch('/api/payment-handler', {
                         method: 'POST',
@@ -138,11 +164,11 @@
                         body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
                     }).then(r => r.json()),
                     
-                    onCancel: () => showMsg("تم الإلغاء"),
-                    onError: (e) => showMsg("خطأ: " + e.message)
+                    onCancel: () => showMsg("تم إلغاء عملية الدفع"),
+                    onError: (e) => showMsg("حدث خطأ أثناء الدفع: " + e.message)
                 });
             } catch (e) { 
-                showMsg("فشل تقني: " + e.message); 
+                showMsg("عذراً، فشل تقني: " + e.message); 
             }
         }
     </script>
