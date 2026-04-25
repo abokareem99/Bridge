@@ -9,56 +9,50 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
         
+        /* واجهة abokareem الاحترافية */
         .hero { padding: 50px 20px; background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%); text-align: center; color: var(--w); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .hero-title { font-size: 2.5rem; color: var(--pi-g); margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        
-        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 14px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 10px; }
+        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; }
 
-        .categories { padding: 30px 15px; max-width: 600px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
-        .cat-card { background: var(--w); padding: 25px 15px; border-radius: 25px; text-align: center; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 20px; font-size: 1.8rem; margin-bottom: 15px; }
-        .cat-card span { font-weight: bold; color: var(--pi-d); font-size: 1.1rem; }
-        .cat-card small { color: #e65100; margin-top: 5px; font-weight: bold; background: #fff3e0; padding: 2px 8px; border-radius: 5px; }
+        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .cat-card { background: var(--w); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 15px; font-size: 1.5rem; margin-bottom: 10px; }
+        .cat-card span { font-weight: bold; color: var(--pi-d); }
+        .cat-card small { background: #eee; padding: 2px 8px; border-radius: 5px; margin-top: 5px; font-size: 0.8rem; }
 
-        footer { margin-top: auto; padding: 20px; text-align: center; color: #666; font-size: 0.9rem; border-top: 1px solid #eee; }
+        /* نافذة الطلب */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; }
+        textarea, input { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 10px; }
+        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 30px; text-align: right; }
-        textarea, input { width: 100%; padding: 15px; margin-top: 12px; border: 2px solid #f0f0f0; border-radius: 15px; font-size: 1rem; outline: none; }
-        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 18px; border-radius: 15px; margin-top: 25px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-
-        #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 30px; border-radius: 50px; display: none; z-index: 5000; text-align: center; }
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; text-align: center; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
-        <p style="margin-bottom: 25px; opacity: 0.9;">أهلاً بك في منصة abokareem للعمل الحر</p>
+        <p style="margin-bottom: 15px;">مرحباً بك في منصة abokareem 🌐</p>
         <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
     </section>
 
     <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'برمجة وتطوير')"><i class="fas fa-code"></i><span>البرمجة</span><small>1.0 Pi</small></div>
-        <div class="cat-card" onclick="processPayment(0.8, 'تصميم جرافيك')"><i class="fas fa-palette"></i><span>التصميم</span><small>0.8 Pi</small></div>
-        <div class="cat-card" onclick="processPayment(0.7, 'تسويق ومبيعات')"><i class="fas fa-bullhorn"></i><span>التسويق</span><small>0.7 Pi</small></div>
-        <div class="cat-card" onclick="processPayment(0.5, 'كتابة وترجمة')"><i class="fas fa-pen-nib"></i><span>الترجمة</span><small>0.5 Pi</small></div>
+        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة')"><i class="fas fa-code"></i><span>البرمجة</span><small>1.0 Pi</small></div>
+        <div class="cat-card" onclick="processPayment(0.8, 'التصميم')"><i class="fas fa-palette"></i><span>التصميم</span><small>0.8 Pi</small></div>
+        <div class="cat-card" onclick="processPayment(0.7, 'التسويق')"><i class="fas fa-bullhorn"></i><span>التسويق</span><small>0.7 Pi</small></div>
+        <div class="cat-card" onclick="processPayment(0.5, 'الترجمة')"><i class="fas fa-pen-nib"></i><span>الترجمة</span><small>0.5 Pi</small></div>
     </section>
-
-    <footer>
-        <p>شروط الاستخدام | سياسة الخصوصية</p>
-        <p style="margin-top: 5px;">Bridge Freelance © 2026</p>
-    </footer>
 
     <div id="reqModal" class="modal">
         <div class="modal-content" id="modalContent">
             <h2 style="text-align: center; color: var(--pi-d);">📦 مطلوبات التنفيذ</h2>
-            <textarea id="orderDetail" rows="4" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
-            <input type="text" id="contactInfo" placeholder="رقم الواتساب للتواصل">
-            <button class="btn-submit" onclick="sendOrderToEmail()">إرسال الطلب</button>
+            <textarea id="orderDetail" rows="4" placeholder="تفاصيل الخدمة المطلوبة..."></textarea>
+            <input type="text" id="contactInfo" placeholder="رقم الواتساب">
+            <button class="btn-submit" onclick="sendOrder()">إرسال الطلب</button>
         </div>
     </div>
 
@@ -83,51 +77,45 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 document.getElementById('authBtn').innerText = "تم التوثيق: " + auth.user.username;
-            } catch (e) { showMsg("يرجى المحاولة من داخل متصفح Pi"); }
+            } catch (e) { showMsg("يجب الفتح من Pi Browser"); }
         }
 
         async function processPayment(amt, name) {
             try {
-                showMsg("جاري الاتصال بـ Pi Wallet...");
+                showMsg("فتح المحفظة...");
                 const payment = await window.Pi.createPayment({
                     amount: amt,
                     memo: "خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (paymentId) => {
-                        return fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
+                    onReadyForServerApproval: async (id) => {
+                        // تعديل: تأكد من أن السيرفر يستجيب بسرعة لتجنب "انتهاء الصلاحية"
+                        const res = await fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, action: 'approve' })
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ paymentId: id, action: 'approve' })
                         });
+                        return res.json();
                     },
-                    onConnectedToBlockchain: (paymentId, txid) => {
-                        currentTxId = txid;
-                        showMsg("تم تأكيد المعاملة على البلوكشين");
-                    },
-                    onReadyForServerCompletion: (paymentId, txid) => {
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
+                    onReadyForServerCompletion: async (id, tx) => {
                         document.getElementById('reqModal').style.display = 'flex';
-                        return fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
+                        const res = await fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, txid, action: 'complete' })
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
                         });
+                        return res.json();
                     },
-                    onError: (error, payment) => {
-                        showMsg("خطأ في عملية الدفع: " + error.message);
-                        console.error(error);
-                    },
-                    onCancel: (paymentId) => { showMsg("تم إلغاء العملية"); }
+                    onError: (e) => { showMsg("فشل الدفع: انتهت المهلة"); console.error(e); }
                 });
-            } catch (e) {
-                showMsg("تأكد من تسجيل الدخول أولاً");
-            }
+            } catch (e) { showMsg("سجل الدخول أولاً"); }
         }
 
-        function sendOrderToEmail() {
+        function sendOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) { showMsg("أكمل البيانات"); return; }
+            if(!detail || !contact) return showMsg("أكمل البيانات");
 
             showMsg("جاري الإرسال...");
             emailjs.send(SERVICE_ID, TEMPLATE_ID, {
@@ -136,13 +124,7 @@
                 contact_info: contact,
                 txid: currentTxId
             }).then(() => {
-                document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center;">
-                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71;"></i>
-                        <h2>تم بنجاح!</h2>
-                        <p>تواصل مع abokareem لمتابعة طلبك.</p>
-                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
-                    </div>`;
+                document.getElementById('modalContent').innerHTML = `<h3 style="text-align:center">✅ تم إرسال طلبك بنجاح!</h3><button class="btn-submit" onclick="location.reload()">رجوع</button>`;
             });
         }
     </script>
