@@ -7,27 +7,35 @@
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* الحفاظ على واجهتك الأصلية باللون الأبيض */
-        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        
-        /* إضافة الأيقونات الذهبية كأزرار إضافية */
-        .icon-link { 
+        /* التزام تام بتصميمك الأبيض الأصلي */
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; margin: 0; }
+        .container { max-width: 400px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 5px; color: #000; }
+        p { color: #666; margin-bottom: 25px; }
+
+        /* تنسيق الأيقونات كأزرار قابلة للضغط (إضافة فقط) */
+        .service-btn {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;
-            text-decoration: none; color: #333; font-weight: bold;
+            padding: 15px 20px; margin-bottom: 12px; border: 1px solid #eee;
+            border-radius: 10px; text-decoration: none; color: #333;
+            transition: background 0.2s;
         }
-        .icon-link i { color: #d4af37; font-size: 1.2rem; } /* اللون الذهبي للأيقونة */
+        .service-btn:hover { background-color: #fafafa; border-color: #d4af37; }
+        .service-btn i { color: #d4af37; font-size: 1.3rem; } /* اللون الذهبي للأيقونة */
 
-        button { background-color: #4a148c; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
-
-        /* نافذة النجاح (الصح الأخضر) */
+        /* زر الدفع البنفسجي الخاص بك */
+        .pay-button { 
+            background-color: #4a148c; color: white; border: none; padding: 18px; 
+            border-radius: 10px; cursor: pointer; font-size: 18px; width: 100%; margin-top: 15px; 
+        }
+        
+        /* نافذة النجاح المخفية */
         #success-modal {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 30px; border-radius: 15px; text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3); z-index: 1000; width: 80%;
+            background: white; padding: 30px; border-radius: 20px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 1000; width: 80%;
         }
-        .check-icon { color: #28a745; font-size: 4rem; }
+        .check-icon { color: #28a745; font-size: 4rem; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -35,49 +43,42 @@
         <h1>جسر العمل الحر</h1>
         <p>مرحباً بك في تطبيق Bridge Freelance</p>
 
-        <a href="services.html" class="icon-link">
-            <span>تطوير البرمجيات</span>
+        <a href="services.html" class="service-btn">
             <i class="fas fa-code"></i>
-        </a>
-        <a href="services.html" class="icon-link">
-            <span>الترجمة واللغات</span>
-            <i class="fas fa-language"></i>
+            <span>تطوير البرمجيات</span>
         </a>
 
-        <button onclick="startPayment()">تجربة دفع 0.1 Pi</button>
+        <a href="services.html" class="service-btn">
+            <i class="fas fa-language"></i>
+            <span>الترجمة واللغات</span>
+        </a>
+
+        <button class="pay-button" onclick="startPayment()">تجربة دفع Pi 0.1</button>
     </div>
 
     <div id="success-modal">
         <i class="fas fa-check-circle check-icon"></i>
         <h2>تمت العملية بنجاح</h2>
-        <button onclick="document.getElementById('success-modal').style.display='none'" style="background:#eee; color:black; margin-top:10px;">إغلاق</button>
+        <button onclick="document.getElementById('success-modal').style.display='none'" style="border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">إغلاق</button>
     </div>
 
     <script>
-        const Pi = window.Pi;
-        Pi.init({ version: "2.0" });
-
+        const Pi = window.Pi; Pi.init({ version: "2.0" });
         async function startPayment() {
             try {
                 const payment = await Pi.createPayment({
-                    amount: 0.1,
-                    memo: "تجربة دفع جسر التواصل",
-                    metadata: { type: "test_payment" }
+                    amount: 0.1, memo: "تجربة دفع جسر التواصل", metadata: { type: "test" }
                 }, {
-                    onReadyForServerNotification: (paymentId) => {
-                        fetch('/api/payment-handler', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, action: 'approve' }),
+                    onReadyForServerNotification: (id) => {
+                        fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, action: 'approve' }),
                         });
                     },
-                    onComplete: (paymentId, txid) => {
-                        // إظهار علامة الصح الأخضر عند النجاح
+                    onComplete: (id, txid) => {
+                        // إظهار علامة الصح الأخضر عند اكتمال الدفع
                         document.getElementById('success-modal').style.display = 'block';
-                        fetch('/api/payment-handler', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, txid, action: 'complete' }),
+                        fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, txid: txid, action: 'complete' }),
                         });
                     },
                     onCancelled: () => {}, onIncomplete: () => {}
