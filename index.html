@@ -13,6 +13,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
 
+        /* الهيدر */
         .hero {
             padding: 30px 20px;
             background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
@@ -29,18 +30,17 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
+        /* التصنيفات */
         .categories { 
             padding: 20px 15px; max-width: 500px; margin: 0 auto; 
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
         }
-        
         .cat-card {
             background: var(--w); padding: 18px 10px; border-radius: 20px; 
             text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        
         .cat-card i { 
             color: var(--pi-g); background: var(--pi-d); width: 50px; height: 50px; 
             display: flex; align-items: center; justify-content: center; 
@@ -49,20 +49,32 @@
         .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.9rem; margin-bottom: 5px; }
         .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 2px 8px; border-radius: 5px; }
 
-        /* تعديل مكان الروابط القانونية والحقوق لتظهر بشكل أوضح */
-        .footer-content {
-            margin-top: 10px; 
-            padding: 10px 10px 30px; /* زيادة الهامش السفلي لضمان الظهور */
-            text-align: center;
+        /* نافذة المطلوبات (الجديدة) */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 4000;
         }
-        .legal-links { margin-bottom: 8px; }
-        .legal-links a { color: var(--pi-p); text-decoration: none; margin: 0 10px; font-size: 0.85rem; font-weight: 600; }
-        .copyright { font-size: 0.75rem; color: #888; }
+        .modal-content {
+            background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; text-align: right;
+        }
+        .modal-content h2 { color: var(--pi-d); font-size: 1.2rem; margin-bottom: 15px; text-align: center; }
+        .modal-content textarea, .modal-content input {
+            width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 12px; font-size: 0.9rem;
+        }
+        .btn-submit {
+            width: 100%; background: var(--pi-p); color: white; border: none; padding: 15px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer;
+        }
+
+        /* الفوتر */
+        .footer-container { margin-top: auto; padding: 15px 10px 40px; text-align: center; }
+        .legal-links { margin-bottom: 10px; }
+        .legal-links a { color: var(--pi-p); text-decoration: none; margin: 0 10px; font-size: 0.9rem; font-weight: bold; }
+        .copyright { font-size: 0.8rem; color: #777; }
 
         #toast {
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.85); color: #fff; padding: 10px 25px; border-radius: 30px; 
-            display: none; z-index: 3000; font-size: 0.85rem; border: 1px solid var(--pi-g);
+            display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g);
         }
     </style>
 </head>
@@ -77,40 +89,42 @@
 
     <section class="categories">
         <div class="cat-card" onclick="processPayment(1.0, 'البرمجة والتطوير')">
-            <i class="fas fa-code"></i>
-            <span>البرمجة</span>
-            <span class="price-badge">Pi 1.0</span>
+            <i class="fas fa-code"></i><span>البرمجة</span><span class="price-badge">Pi 1.0</span>
         </div>
         <div class="cat-card" onclick="processPayment(0.8, 'التصميم الجرافيكي')">
-            <i class="fas fa-palette"></i>
-            <span>التصميم</span>
-            <span class="price-badge">Pi 0.8</span>
+            <i class="fas fa-palette"></i><span>التصميم</span><span class="price-badge">Pi 0.8</span>
         </div>
         <div class="cat-card" onclick="processPayment(0.7, 'التسويق والمبيعات')">
-            <i class="fas fa-bullhorn"></i>
-            <span>التسويق</span>
-            <span class="price-badge">Pi 0.7</span>
+            <i class="fas fa-bullhorn"></i><span>التسويق</span><span class="price-badge">Pi 0.7</span>
         </div>
         <div class="cat-card" onclick="processPayment(0.5, 'الكتابة والترجمة')">
-            <i class="fas fa-pen-nib"></i>
-            <span>الترجمة</span>
-            <span class="price-badge">Pi 0.5</span>
+            <i class="fas fa-pen-nib"></i><span>الترجمة</span><span class="price-badge">Pi 0.5</span>
         </div>
     </section>
 
-    <div class="footer-content">
+    <div id="reqModal" class="modal">
+        <div class="modal-content">
+            <h2>📦 مطلوبات التنفيذ</h2>
+            <p style="font-size: 0.8rem; color: #666;">لقد تم الدفع بنجاح! فضلاً أدخل تفاصيل طلبك لنتواصل معك:</p>
+            <textarea id="orderDetail" rows="4" placeholder="مثلاً: أريد برمجة تطبيق متجر إلكتروني بسيط..."></textarea>
+            <input type="text" id="contactInfo" placeholder="رقم واتساب أو وسيلة تواصل">
+            <button class="btn-submit" onclick="submitOrder()">إرسال بيانات الطلب</button>
+        </div>
+    </div>
+
+    <div class="footer-container">
         <div class="legal-links">
             <a href="terms.html">شروط الاستخدام</a> | <a href="privacy.html">سياسة الخصوصية</a>
         </div>
-        <div class="copyright">
-            Bridge Freelance - Powered by Pi Network 2026 ©
-        </div>
+        <div class="copyright">Bridge Freelance - Powered by Pi Network 2026 ©</div>
     </div>
 
     <div id="toast"></div>
 
     <script>
         const toast = document.getElementById('toast');
+        let currentTxId = "";
+
         function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 4000); }
 
         async function startApp() {
@@ -119,38 +133,58 @@
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 showMsg("أهلاً بك " + auth.user.username);
                 document.getElementById('authBtn').innerText = "الحساب موثق ✅";
-            } catch (e) { showMsg("فشل التوثيق: " + e.message); }
+            } catch (e) { showMsg("فشل التوثيق"); }
         }
 
         async function processPayment(amt, name) {
             try {
-                showMsg(`جاري معالجة دفع ${amt} Pi لـ ${name}...`);
+                showMsg(`جاري معالجة دفع ${amt} Pi...`);
                 await window.Pi.createPayment({
                     amount: amt,
-                    memo: "طلب خدمة: " + name,
+                    memo: "شراء خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (paymentId) => {
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentId: id, action: 'approve' })
+                    }).then(r => r.json()),
+                    
+                    onConnectedToBlockchain: (id, tx) => {
+                        currentTxId = tx;
+                        showMsg("تم الدفع! فضلاً أكمل بيانات الطلب.");
+                    },
+                    
+                    onReadyForServerCompletion: (id, tx) => {
+                        // إظهار نافذة المطلوبات فور النجاح
+                        document.getElementById('reqModal').style.display = 'flex';
+                        
                         return fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, action: 'approve' })
+                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
                         }).then(r => r.json());
                     },
-                    onConnectedToBlockchain: (paymentId, txid) => {
-                        showMsg("تم إرسال المعاملة للبلوكشين بنجاح!");
-                    },
-                    onReadyForServerCompletion: (paymentId, txid) => {
-                        return fetch('/api/payment-handler', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, txid, action: 'complete' })
-                        }).then(r => r.json());
-                    },
-                    onCancel: () => showMsg("تم إلغاء عملية الدفع"),
-                    onError: (e) => showMsg("حدث خطأ في الدفع: " + e.message)
+                    onCancel: () => showMsg("تم الإلغاء"),
+                    onError: (e) => showMsg("خطأ في الدفع")
                 });
-            } catch (e) { showMsg("فشل تقني: " + e.message); }
+            } catch (e) { showMsg("حدث خطأ تقني"); }
+        }
+
+        function submitOrder() {
+            const detail = document.getElementById('orderDetail').value;
+            const contact = document.getElementById('contactInfo').value;
+            
+            if(!detail || !contact) {
+                showMsg("فضلاً أكمل جميع الحقول");
+                return;
+            }
+
+            // هنا يمكنك إرسال البيانات لقاعدة بياناتك أو عرض رسالة نجاح
+            showMsg("تم استلام طلبك بنجاح يافنان! سنقوم بمراجعته.");
+            setTimeout(() => {
+                document.getElementById('reqModal').style.display = 'none';
+            }, 2000);
         }
     </script>
 </body>
