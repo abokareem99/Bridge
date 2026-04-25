@@ -3,153 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - جسر العمل الحر</title>
+    <title>Bridge Freelance</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-bg: #4a148c; /* لون باي الأساسي */
-            --gold: #d4af37; /* اللون الذهبي */
-            --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #4a148c 0%, #311b92 100%);
-            color: var(--white);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* رأس الصفحة */
-        header {
-            width: 100%;
-            padding: 40px 20px;
-            text-align: center;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 30px;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2.2rem;
-            letter-spacing: 1px;
-        }
-
-        /* الحاوية الرئيسية */
-        .container {
-            width: 90%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding-bottom: 50px;
-        }
-
-        /* تصميم الفئات (Icons) */
-        .category-card {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            transition: transform 0.3s ease, background 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
-            border-color: var(--gold);
-        }
-
-        .category-card i {
-            font-size: 1.8rem;
-            color: var(--gold); /* أيقونات ذهبية */
-            width: 40px;
-            text-align: center;
-        }
-
-        .category-info h3 {
-            margin: 0;
-            font-size: 1.2rem;
-        }
-
-        /* زر الدفع الأساسي */
-        .pay-btn {
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            transition: opacity 0.3s;
-        }
-
-        .pay-btn:active {
-            transform: scale(0.98);
-        }
-
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        button { background-color: #4a148c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
-
-    <header>
-        <h1>جسر العمل الحر</h1>
-        <p>تواصل، اعمل، وانجز عبر شبكة Pi Network</p>
-    </header>
-
     <div class="container">
-        <div class="category-card">
-            <i class="fas fa-code"></i>
-            <div class="category-info">
-                <h3>تطوير البرمجيات</h3>
-            </div>
-        </div>
-
-        <div class="category-card">
-            <i class="fas fa-language"></i>
-            <div class="category-info">
-                <h3>الترجمة واللغات</h3>
-            </div>
-        </div>
-
-        <div class="category-card">
-            <i class="fas fa-paint-brush"></i>
-            <div class="category-info">
-                <h3>التصميم الجرافيكي</h3>
-            </div>
-        </div>
-
-        <div class="category-card">
-            <i class="fas fa-bullhorn"></i>
-            <div class="category-info">
-                <h3>التسويق الرقمي</h3>
-            </div>
-        </div>
-
-        <button class="pay-btn" onclick="startPayment()">
-            تجربة دفع 0.1 Pi
-        </button>
+        <h1>جسر العمل الحر</h1>
+        <p>مرحباً بك في تطبيق Bridge Freelance</p>
+        
+        <button onclick="startPayment()">تجربة دفع 0.1 Pi</button>
     </div>
 
     <script>
-        // كود الدفع (لم يتم لمسه لضمان الأمان والاستمرارية)
         const Pi = window.Pi;
         Pi.init({ version: "2.0" });
 
@@ -161,7 +31,8 @@
                     metadata: { type: "test_payment" }
                 }, {
                     onReadyForServerNotification: (paymentId) => {
-                        fetch('https://bridge-rust-seven.vercel.app/api/payment-handler', {
+                        // الربط مع المسار الجديد في Vercel
+                        fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId, action: 'approve' }),
@@ -170,7 +41,7 @@
                     onCancelled: (paymentId) => { console.log("Cancelled"); },
                     onIncomplete: (paymentId) => { console.log("Incomplete"); },
                     onComplete: (paymentId, txid) => {
-                        fetch('https://bridge-rust-seven.vercel.app/api/payment-handler', {
+                        fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId, txid, action: 'complete' }),
@@ -179,6 +50,7 @@
                 });
             } catch (err) {
                 console.error(err);
+                alert("يرجى فتح التطبيق من داخل Pi Browser");
             }
         }
     </script>
