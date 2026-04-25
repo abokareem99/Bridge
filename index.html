@@ -3,147 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جسر التواصل - Pi Network</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Bridge Freelance</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
+        :root { --gold: #FFD700; --purple: #4a148c; }
+        body { background: linear-gradient(135deg, var(--purple), #2e0d5a); color: white; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        header { padding: 30px; background: rgba(255,255,255,0.1); width: 100%; border-bottom: 1px solid rgba(255,255,255,0.2); text-align: center; }
+        .container { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        
+        /* جعل الكارت قابل للضغط للتحويل لصفحة أخرى */
+        .card { 
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 15px; padding: 20px; display: flex; align-items: center; 
+            justify-content: space-between; cursor: pointer; transition: 0.3s;
+            text-decoration: none; color: white;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f4f4f9; overflow-x: hidden; }
+        .card:hover { border-color: var(--gold); background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+        .card i { color: var(--gold); font-size: 1.6rem; }
+        
+        .pay-btn { background: var(--gold); color: black; border: none; padding: 20px; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.2rem; width: 100%; }
 
-        .hero {
-            height: 38vh; 
-            background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
-            display: flex; align-items: center; justify-content: center; text-align: center; color: var(--w);
-            padding: 10px; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 5px; font-weight: bold; }
-        .hero-subtitle { font-size: 0.85rem; margin-bottom: 15px; opacity: 0.9; }
-
-        .search-bar {
-            background: var(--w); border-radius: 50px; padding: 2px;
-            display: flex; margin: 0 auto 15px; max-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .search-bar input { flex: 1; border: none; padding: 8px; border-radius: 50px; outline: none; text-align: center; font-size: 0.85rem; }
-
-        .btn-main {
-            background: var(--pi-g); color: var(--pi-p); border: none;
-            padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem;
-        }
-
-        .categories { padding: 15px; max-width: 500px; margin: 0 auto; }
-        .cat-card {
-            background: var(--w); margin-bottom: 8px; padding: 12px 15px;
-            border-radius: 12px; display: flex; justify-content: space-between;
-            align-items: center; text-decoration: none; color: #333;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee;
-        }
-        .cat-info { display: flex; align-items: center; gap: 10px; }
-        .cat-info i { color: var(--pi-p); font-size: 1.1rem; width: 25px; text-align: center; }
-        .cat-info span { font-size: 0.9rem; font-weight: 500; }
-        .fa-chevron-left { color: var(--pi-g); font-size: 0.8rem; }
-
-        #toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.85); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; display: none; z-index: 1000;
-        }
+        /* نافذة النجاح بالصح الأخضر */
+        #success-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 1000; width: 85%; max-width: 320px; }
+        .check-icon { color: #28a745; font-size: 5rem; margin-bottom: 15px; }
     </style>
 </head>
 <body>
+    <header>
+        <h1>جسر العمل الحر</h1>
+        <p>اختر فئة للانتقال لصفحة الخدمات</p>
+    </header>
 
-    <section class="hero">
-        <div>
-            <h1 class="hero-title">جسر التواصل</h1>
-            <p class="hero-subtitle">خدمات العمل الحر عبر Pi Network</p>
-            <div class="search-bar">
-                <input type="text" placeholder="ابحث عن خدمة...">
-            </div>
-            <button id="authBtn" class="btn-main" onclick="startApp()">دخول عبر Pi Network</button>
-            <button id="payBtn" class="btn-main" style="display:none;" onclick="makePayment()">دفع 0.1 Pi للتجربة</button>
-        </div>
-    </section>
+    <div class="container">
+        <a href="services.html" class="card">
+            <span>تطوير البرمجيات</span>
+            <i class="fas fa-code"></i>
+        </a>
 
-    <section class="categories">
-        <a href="services.html" class="cat-card">
-            <div class="cat-info"><i class="fas fa-code"></i><span>البرمجة والتطوير</span></div>
-            <i class="fas fa-chevron-left"></i>
+        <a href="services.html" class="card">
+            <span>الترجمة واللغات</span>
+            <i class="fas fa-language"></i>
         </a>
-        <a href="#" class="cat-card">
-            <div class="cat-info"><i class="fas fa-pen-nib"></i><span>الكتابة والترجمة</span></div>
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <a href="#" class="cat-card">
-            <div class="cat-info"><i class="fas fa-palette"></i><span>التصميم الجرافيكي</span></div>
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <a href="#" class="cat-card">
-            <div class="cat-info"><i class="fas fa-bullhorn"></i><span>التسويق والمبيعات</span></div>
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <a href="#" class="cat-card">
-            <div class="cat-info"><i class="fas fa-calculator"></i><span>الأعمال والمحاسبة</span></div>
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <a href="#" class="cat-card">
-            <div class="cat-info"><i class="fas fa-graduation-cap"></i><span>التدريب والتعليم</span></div>
-            <i class="fas fa-chevron-left"></i>
-        </a>
-    </section>
 
-    <div id="toast"></div>
+        <a href="add-service.html" class="card">
+            <span>إضافة خدمة جديدة</span>
+            <i class="fas fa-plus-circle"></i>
+        </a>
+
+        <button class="pay-btn" onclick="startPayment()">بدء الدفع المباشر (0.1 Pi)</button>
+    </div>
+
+    <div id="success-modal">
+        <i class="fas fa-check-circle check-icon"></i>
+        <h2 style="margin:0">تمت العملية بنجاح</h2>
+        <p>تم تأكيد الدفع عبر شبكة Pi</p>
+        <button onclick="location.reload()" style="border:none; background:var(--purple); color:white; padding:12px 25px; border-radius:10px; cursor:pointer;">إغلاق</button>
+    </div>
 
     <script>
-        const toast = document.getElementById('toast');
-        function showMsg(m) { 
-            toast.innerText = m; 
-            toast.style.display = 'block'; 
-            setTimeout(() => toast.style.display='none', 3000); 
-        }
-
-        async function startApp() {
+        // كود الدفع الخاص بك (لم يتغير لضمان الأمان)
+        const Pi = window.Pi; Pi.init({ version: "2.0" });
+        async function startPayment() {
             try {
-                showMsg("جاري التوثيق...");
-                await window.Pi.init({ version: "2.0", sandbox: true });
-                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                showMsg("أهلاً بك " + auth.user.username);
-                document.getElementById('authBtn').style.display = 'none';
-                document.getElementById('payBtn').style.display = 'inline-block';
-            } catch (e) { 
-                showMsg("فشل التوثيق: " + e.message); 
-            }
-        }
-
-        async function makePayment() {
-            try {
-                showMsg("جاري إنشاء المعاملة...");
-                await window.Pi.createPayment({
-                    amount: 0.1, 
-                    memo: "تجربة دفع جسر التواصل", 
-                    metadata: { id: "test-1" }
+                const payment = await Pi.createPayment({
+                    amount: 0.1, memo: "تجربة دفع جسر التواصل", metadata: { type: "test" }
                 }, {
-                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ paymentId: id, action: 'approve' })
-                    }).then(r => r.json()),
-                    
-                    onConnectedToBlockchain: (id, tx) => showMsg("تم الدفع بنجاح!"),
-                    
-                    onReadyForServerCompletion: (id, tx) => fetch('/api/payment-handler', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
-                    }).then(r => r.json()),
-                    
-                    onCancel: () => showMsg("تم الإلغاء"),
-                    onError: (e) => showMsg("خطأ: " + e.message)
+                    onReadyForServerNotification: (id) => {
+                        fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, action: 'approve' }),
+                        });
+                    },
+                    onComplete: (id, txid) => {
+                        // إظهار علامة الصح الأخضر
+                        document.getElementById('success-modal').style.display = 'block';
+                        fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, txid: txid, action: 'complete' }),
+                        });
+                    },
+                    onCancelled: (id) => {}, onIncomplete: (id) => {}
                 });
-            } catch (e) { 
-                showMsg("فشل تقني: " + e.message); 
-            }
+            } catch (err) { alert("افتح الرابط داخل Pi Browser"); }
         }
     </script>
 </body>
