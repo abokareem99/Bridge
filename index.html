@@ -6,7 +6,6 @@
     <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
@@ -14,6 +13,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
+        /* الهيدر المحسن */
         .hero {
             padding: 40px 20px;
             background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
@@ -31,6 +31,7 @@
         }
         .btn-auth:active { transform: scale(0.95); }
 
+        /* شبكة الخدمات */
         .categories { 
             padding: 25px 15px; max-width: 500px; margin: 0 auto; 
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
@@ -51,6 +52,7 @@
         .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.95rem; margin-bottom: 6px; }
         .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 3px 10px; border-radius: 6px; }
 
+        /* نافذة المطلوبات الاحترافية */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000;
@@ -62,13 +64,14 @@
         .modal-content h2 { color: var(--pi-d); font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
         .modal-content textarea, .modal-content input {
             width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; 
-            font-size: 0.9rem; background: #f9f9f9; outline: none; text-align: right;
+            font-size: 0.9rem; background: #f9f9f9; outline: none;
         }
         .btn-submit {
             width: 100%; background: var(--pi-p); color: white; border: none; 
             padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer;
         }
 
+        /* الفوتر المحسن */
         .footer-container { margin-top: auto; padding: 20px 10px 40px; text-align: center; }
         .legal-links { margin-bottom: 12px; }
         .legal-links a { color: var(--pi-p); text-decoration: none; margin: 0 10px; font-size: 0.9rem; font-weight: bold; }
@@ -128,15 +131,8 @@
     <div id="toast"></div>
 
     <script>
-        // مفاتيح EmailJS الخاصة بك
-        const SERVICE_ID = "service_6ooge2n";
-        const TEMPLATE_ID = "template_m6rq1ab";
-        const PUBLIC_KEY = "S0iO-6kI4r2uG_rXn";
-
-        emailjs.init(PUBLIC_KEY);
         const toast = document.getElementById('toast');
         let currentTxId = ""; 
-        let currentUserName = "Pioneer";
 
         function showMsg(m) { 
             toast.innerText = m; 
@@ -149,13 +145,12 @@
                 showMsg("جاري الاتصال بالشبكة...");
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                currentUserName = auth.user.username;
-                showMsg("أهلاً بك " + currentUserName);
+                showMsg("أهلاً بك " + auth.user.username);
                 document.getElementById('authBtn').innerText = "الحساب موثق ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
                 document.getElementById('authBtn').style.color = "#fff";
             } catch (e) { 
-                showMsg("يرجى الفتح من متصفح Pi"); 
+                showMsg("فشل التوثيق: " + e.message); 
             }
         }
 
@@ -167,7 +162,7 @@
                     memo: "شراء خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (id) => fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId: id, action: 'approve' })
@@ -179,15 +174,17 @@
                     },
                     
                     onReadyForServerCompletion: (id, tx) => {
+                        // إظهار نافذة المطلوبات فور النجاح
                         document.getElementById('reqModal').style.display = 'flex';
-                        return fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
+                        
+                        return fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
                         }).then(r => r.json());
                     },
                     onCancel: () => showMsg("تم إلغاء العملية"),
-                    onError: (e) => showMsg("خطأ في الدفع أو السيرفر")
+                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
                 });
             } catch (e) { 
                 showMsg("عذراً، حدث خطأ فني"); 
@@ -203,15 +200,10 @@
                 return;
             }
 
-            showMsg("جاري إرسال طلبك للبريد...");
+            // محاكاة إرسال البيانات وحفظها
+            showMsg("جاري إرسال طلبك...");
             
-            // إرسال البيانات الفعلية عبر EmailJS
-            emailjs.send(SERVICE_ID, TEMPLATE_ID, {
-                username: currentUserName,
-                service_detail: detail,
-                txid: currentTxId,
-                email: contact
-            }).then(() => {
+            setTimeout(() => {
                 document.getElementById('modalContent').innerHTML = `
                     <div style="text-align: center; padding: 10px;">
                         <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
@@ -223,11 +215,10 @@
                         <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                     </div>
                 `;
-            }).catch((err) => {
-                showMsg("خطأ في إرسال البريد");
-                console.error(err);
-            });
+            }, 1500);
         }
     </script>
 </body>
 </html>
+
+هذا الملف الذي نجح في الدفع حتى زهور النافذة وتسجيل البيانات ونجاح . اضف له المفاتيح وارسله كاملا للنسخ بدون اي زيادات ولا نقصان
