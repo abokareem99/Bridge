@@ -10,49 +10,55 @@
     <style>
         :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         
-        /* واجهة abokareem الاحترافية */
-        .hero { padding: 50px 20px; background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%); text-align: center; color: var(--w); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 10px; }
-        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        .hero { width: 100%; padding: 40px 20px; background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%); text-align: center; color: var(--w); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 15px; }
+        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
-        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .cat-card { background: var(--w); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 15px; font-size: 1.5rem; margin-bottom: 10px; }
-        .cat-card span { font-weight: bold; color: var(--pi-d); }
-        .cat-card small { background: #eee; padding: 2px 8px; border-radius: 5px; margin-top: 5px; font-size: 0.8rem; }
+        .categories { padding: 25px 15px; max-width: 500px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .cat-card { background: var(--w); padding: 20px; border-radius: 25px; text-align: center; cursor: pointer; border: 1px solid #eee; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 18px; font-size: 1.5rem; margin: 0 auto 10px; }
+        .cat-card span { font-weight: bold; color: var(--pi-d); display: block; }
+        .cat-card small { background: #fff3e0; color: #e65100; padding: 2px 10px; border-radius: 8px; margin-top: 8px; display: inline-block; font-weight: bold; }
 
-        /* نافذة الطلب */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; }
-        textarea, input { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 10px; }
-        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; }
+        /* نافذة إدخال البيانات - تظهر بعد الدفع */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 30px; position: relative; }
+        textarea, input { width: 100%; padding: 15px; margin-top: 10px; border: 2px solid #f0f0f0; border-radius: 15px; font-size: 1rem; }
+        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 15px; border-radius: 15px; margin-top: 20px; font-weight: bold; }
 
-        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; text-align: center; font-size: 0.8rem; }
+        #toast { position: fixed; bottom: 100px; background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 10000; }
+        footer { margin-top: auto; padding: 20px; color: #888; font-size: 0.8rem; text-align: center; }
     </style>
 </head>
 <body>
 
     <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
-        <p style="margin-bottom: 15px;">مرحباً بك في منصة abokareem 🌐</p>
+        <p style="margin-bottom: 20px; opacity: 0.9;">مرحباً بك في منصة abokareem 🌐</p>
         <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
     </section>
 
     <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة')"><i class="fas fa-code"></i><span>البرمجة</span><small>1.0 Pi</small></div>
-        <div class="cat-card" onclick="processPayment(0.8, 'التصميم')"><i class="fas fa-palette"></i><span>التصميم</span><small>0.8 Pi</small></div>
-        <div class="cat-card" onclick="processPayment(0.7, 'التسويق')"><i class="fas fa-bullhorn"></i><span>التسويق</span><small>0.7 Pi</small></div>
-        <div class="cat-card" onclick="processPayment(0.5, 'الترجمة')"><i class="fas fa-pen-nib"></i><span>الترجمة</span><small>0.5 Pi</small></div>
+        <div class="cat-card" onclick="checkAuthAndPay(1.0, 'البرمجة')"><i class="fas fa-code"></i><span>البرمجة</span><small>1.0 Pi</small></div>
+        <div class="cat-card" onclick="checkAuthAndPay(0.8, 'التصميم')"><i class="fas fa-palette"></i><span>التصميم</span><small>0.8 Pi</small></div>
+        <div class="cat-card" onclick="checkAuthAndPay(0.7, 'التسويق')"><i class="fas fa-bullhorn"></i><span>التسويق</span><small>0.7 Pi</small></div>
+        <div class="cat-card" onclick="checkAuthAndPay(0.5, 'الترجمة')"><i class="fas fa-pen-nib"></i><span>الترجمة</span><small>0.5 Pi</small></div>
     </section>
+
+    <footer>
+        <p>شروط الاستخدام | سياسة الخصوصية</p>
+        <p>Bridge Freelance © 2026</p>
+    </footer>
 
     <div id="reqModal" class="modal">
         <div class="modal-content" id="modalContent">
-            <h2 style="text-align: center; color: var(--pi-d);">📦 مطلوبات التنفيذ</h2>
-            <textarea id="orderDetail" rows="4" placeholder="تفاصيل الخدمة المطلوبة..."></textarea>
-            <input type="text" id="contactInfo" placeholder="رقم الواتساب">
-            <button class="btn-submit" onclick="sendOrder()">إرسال الطلب</button>
+            <h2 style="text-align: center; color: var(--pi-d); margin-bottom: 15px;">📦 تفاصيل الطلب</h2>
+            <p style="text-align: center; font-size: 0.8rem; color: #666;">تم تأكيد الدفع بنجاح. يرجى إرسال بيانات الخدمة:</p>
+            <textarea id="orderDetail" rows="4" placeholder="اشرح الخدمة التي تحتاجها..."></textarea>
+            <input type="text" id="contactInfo" placeholder="وسيلة التواصل (واتساب/تليجرام)">
+            <button class="btn-submit" onclick="sendToEmail()">إرسال الطلب الآن</button>
         </div>
     </div>
 
@@ -62,14 +68,15 @@
         const SERVICE_ID = "service_6ooge2n";
         const TEMPLATE_ID = "template_m6rq1ab";
         const PUBLIC_KEY = "S0iO-6kI4r2uG_rXn";
-
+        
         emailjs.init(PUBLIC_KEY);
+        let userAuthenticated = false;
         let currentTxId = "";
 
-        function showMsg(m) { 
+        function showMsg(m) {
             const t = document.getElementById('toast');
-            t.innerText = m; t.style.display = 'block'; 
-            setTimeout(() => t.style.display='none', 4000); 
+            t.innerText = m; t.style.display = 'block';
+            setTimeout(() => t.style.display='none', 3500);
         }
 
         async function startApp() {
@@ -77,55 +84,72 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 document.getElementById('authBtn').innerText = "تم التوثيق: " + auth.user.username;
-            } catch (e) { showMsg("يجب الفتح من Pi Browser"); }
+                userAuthenticated = true;
+                showMsg("أهلاً " + auth.user.username);
+            } catch (e) {
+                showMsg("يرجى الفتح من داخل متصفح Pi");
+            }
+        }
+
+        async function checkAuthAndPay(amt, name) {
+            if (!userAuthenticated) {
+                // محاولة توثيق تلقائي إذا نسي المستخدم الضغط على زر الدخول
+                await startApp();
+                if (!userAuthenticated) return;
+            }
+            processPayment(amt, name);
         }
 
         async function processPayment(amt, name) {
             try {
-                showMsg("فتح المحفظة...");
+                showMsg("جاري طلب الدفع...");
                 const payment = await window.Pi.createPayment({
                     amount: amt,
-                    memo: "خدمة: " + name,
+                    memo: "شراء خدمة " + name,
                     metadata: { service: name }
                 }, {
                     onReadyForServerApproval: async (id) => {
-                        // تعديل: تأكد من أن السيرفر يستجيب بسرعة لتجنب "انتهاء الصلاحية"
-                        const res = await fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
+                        return fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
                             method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId: id, action: 'approve' })
-                        });
-                        return res.json();
+                        }).then(r => r.json());
                     },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
+                        // إظهار نافذة البيانات فوراً هنا
                         document.getElementById('reqModal').style.display = 'flex';
-                        const res = await fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
+                        return fetch('https://bridge-freelance.vercel.app/api/payment-handler', {
                             method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
-                        });
-                        return res.json();
+                        }).then(r => r.json());
                     },
-                    onError: (e) => { showMsg("فشل الدفع: انتهت المهلة"); console.error(e); }
+                    onError: (e) => { showMsg("انتهت صلاحية الدفع أو حدث خطأ"); }
                 });
-            } catch (e) { showMsg("سجل الدخول أولاً"); }
+            } catch (e) { showMsg("فشل بدء العملية"); }
         }
 
-        function sendOrder() {
+        function sendToEmail() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("أكمل البيانات");
+            if(!detail || !contact) return showMsg("يرجى إكمال البيانات");
 
-            showMsg("جاري الإرسال...");
+            showMsg("جاري إرسال طلبك...");
             emailjs.send(SERVICE_ID, TEMPLATE_ID, {
                 username: window.Pi.currentUser?.username || "Pioneer",
                 service_detail: detail,
                 contact_info: contact,
                 txid: currentTxId
             }).then(() => {
-                document.getElementById('modalContent').innerHTML = `<h3 style="text-align:center">✅ تم إرسال طلبك بنجاح!</h3><button class="btn-submit" onclick="location.reload()">رجوع</button>`;
-            });
+                document.getElementById('modalContent').innerHTML = `
+                    <div style="text-align: center; padding: 10px;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                        <h2 style="color: #333;">تم الإرسال!</h2>
+                        <p style="color: #666; margin-top: 10px;">سيتم التواصل معك عبر ${contact}</p>
+                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
+                    </div>`;
+            }).catch(() => showMsg("خطأ في الإرسال"));
         }
     </script>
 </body>
