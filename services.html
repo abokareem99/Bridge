@@ -1,0 +1,15 @@
+// الجزء المعدل في السكريبت
+onReadyForServerApproval: (paymentId) => {
+    return fetch('/api/payment-handler', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId, action: 'approve' })
+    }).then(r => r.json());
+},
+onReadyForServerCompletion: (paymentId, txid) => {
+    return fetch('/api/payment-handler', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId, txid, action: 'complete' })
+    }).then(r => r.json());
+},
