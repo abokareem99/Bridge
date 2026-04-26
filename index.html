@@ -10,7 +10,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            // المفتاح العام الخاص بك
+            // المفتاح العام الثابت الخاص بك
             emailjs.init("S0i0-6kI4r2uG_rXn");
         })();
     </script>
@@ -22,6 +22,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
+        /* الهيدر المحسن */
         .hero {
             padding: 40px 20px;
             background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
@@ -132,7 +133,6 @@
 
         async function startApp() {
             try {
-                // الكود الأصلي الخاص بك للدخول
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 document.getElementById('authBtn').innerText = "تم التوثيق: " + auth.user.username;
@@ -154,18 +154,17 @@
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: (id, tx) => {
-                        // إظهار نافذة البيانات التي كانت تعمل في ملفك
                         document.getElementById('reqModal').style.display = 'flex';
                         return fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) }).then(r => r.json());
                     },
-                    onError: (e) => showMsg("فشل في العملية")
+                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
                 });
             } catch (e) { 
-                showMsg("حدث خطأ");
+                showMsg("عذراً، حدث خطأ فني"); 
             }
         }
 
-        // الوظيفة المحدثة لتقوم بالإرسال الحقيقي للإيميل
+        // الوظيفة التي قمنا بتعديلها لتفعيل الإرسال الحقيقي بدلاً من setTimeout
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
@@ -184,7 +183,7 @@
                 transaction_id: currentTxId
             };
 
-            // استخدام المعرفات المفعلة الخاصة بك
+            // استخدام المعرف المفعل من صورتك الأخيرة
             emailjs.send("service_vuti648", "template_m6rq1ab", templateParams)
                 .then(() => {
                     document.getElementById('modalContent').innerHTML = `
@@ -199,7 +198,7 @@
                         </div>
                     `;
                 }, (error) => {
-                    showMsg("فشل إرسال الإيميل؛ تأكد من ربط Gmail");
+                    showMsg("فشل إرسال الإيميل؛ تأكد من إعدادات EmailJS");
                 });
         }
     </script>
