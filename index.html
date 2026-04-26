@@ -149,13 +149,27 @@
                         showMsg("تم تسجيل المعاملة على البلوكشين!");
                     },
                     
-                    // القسيم القديم الذي يسبب المشكلة
-onReadyForServerCompletion: async(id, tx) => {
-    document.getElementById('reqModal').style.display = 'flex'; // هذه تظهر النافذة فوراً
-    return fetch('/api/payment-handler', {
-        // ... باقي الكود
-    }).then(r => r.json());
-},
+                            onReadyForServerCompletion: async (id, tx) => {
+            try {
+                showMsg("جاري تأكيد المعاملة...");
+                const response = await fetch('/api/payment-handler', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.completed) {
+                    document.getElementById('reqModal').style.display = 'flex';
+                    showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
+                } else {
+                    showMsg("فشل التأكيد: " + (result.error || "حاول ثانية"));
+                }
+            } catch (e) {
+                showMsg("خطأ في الاتصال بالسيرفر");
+            }
+        },
 
                     onCancel: () => showMsg("تم إلغاء العملية"),
                     onError: (e) => showMsg("خطأ في الدفع: " + e.message)
