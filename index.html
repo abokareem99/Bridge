@@ -198,31 +198,40 @@
         }
 
         async function submitOrder() {
-            const detail = document.getElementById('orderDetail').value;
-            const contact = document.getElementById('contactInfo').value;
-            
-            if(!detail || !contact) {
-                showMsg("يرجى ملء جميع البيانات");
-                return;
-            }
+    const detail = document.getElementById('orderDetail').value;
+    const contact = document.getElementById('contactInfo').value;
+    
+    if(!detail || !contact) {
+        showMsg("يرجى ملء جميع البيانات");
+        return;
+    }
 
-            // محاكاة إرسال البيانات وحفظها
-            showMsg("جاري إرسال طلبك...");
-            
-            setTimeout(() => {
-                document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 10px;">
-                        <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                        <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
-                        <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
-                            رقم المعاملة: <br><small style="color:var(--pi-p)">${currentTxId.substring(0,15)}...</small>
-                        </p>
-                        <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريق abokareem قريباً.</p>
-                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
-                    </div>
-                `;
-            }, 1500);
-        }
+    showMsg("جاري إرسال طلبك...");
+
+    const templateParams = {
+        username: "abokareem", 
+        service_detail: detail, 
+        contact_info: contact,
+        order_id: currentTxId 
+    };
+
+    emailjs.send("service_vuti648", "template_m6rq1ab", templateParams)
+        .then(function() {
+            document.getElementById('modalContent').innerHTML = `
+                <div style="text-align: center; padding: 10px;">
+                    <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                    <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                        رقم المعاملة: <br><small style="color:var(--pi-p)">${currentTxId}</small>
+                    </p>
+                    <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريق abokareem قريباً.</p>
+                    <button class="btn-submit" onclick="location.reload()">إغلاق</button>
+                </div>`;
+        }, function(error) {
+            showMsg("فشل الإرسال التلقائي، حاول مرة أخرى");
+        });
+}
+
     </script>
 </body>
 </html>  
