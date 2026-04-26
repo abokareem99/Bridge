@@ -5,56 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            // المفتاح العام من حسابك
+            // المفتاح العام الخاص بك
             emailjs.init("S0i0-6kI4r2uG_rXn");
         })();
     </script>
 
     <style>
-        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
+        :root {
+            --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-        .hero { padding: 40px 20px; background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%); text-align: center; color: var(--w); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+
+        .hero {
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
+            text-align: center; color: var(--w);
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
         .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 8px; font-weight: 800; }
         .welcome-msg { font-size: 0.9rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.3); }
-        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.3s; }
-        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .cat-card { background: var(--w); padding: 20px 10px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 18px; font-size: 1.6rem; margin-bottom: 12px; }
+
+        .btn-auth {
+            background: var(--pi-g); color: var(--pi-d); border: none;
+            padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.3s;
+        }
+
+        .categories { 
+            padding: 25px 15px; max-width: 500px; margin: 0 auto; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
+        }
+        .cat-card {
+            background: var(--w); padding: 20px 10px; border-radius: 20px; 
+            text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.08);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .cat-card i { 
+            color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 18px; font-size: 1.6rem; margin-bottom: 12px;
+        }
         .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.95rem; margin-bottom: 6px; }
         .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 3px 10px; border-radius: 6px; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .modal-content textarea, .modal-content input { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 0.9rem; background: #f9f9f9; outline: none; }
-        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
-        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000;
+        }
+        .modal-content {
+            background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal-content textarea, .modal-content input {
+            width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; 
+            font-size: 0.9rem; background: #f9f9f9; outline: none;
+        }
+        .btn-submit {
+            width: 100%; background: var(--pi-p); color: white; border: none; 
+            padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer;
+        }
+
+        #toast {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; 
+            display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g);
+            text-align: center; min-width: 200px;
+        }
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <h1 class="hero-title">جسر التواصل</h1>
-        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div><br>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
+        <div>
+            <h1 class="hero-title">جسر التواصل</h1>
+            <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
+            <p style="font-size: 0.85rem; margin-bottom: 18px; opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
+            <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
+        </div>
     </section>
 
     <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة')">
+        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة والتطوير')">
             <i class="fas fa-code"></i><span>البرمجة</span><span class="price-badge">Pi 1.0</span>
         </div>
-        <div class="cat-card" onclick="processPayment(0.8, 'التصميم')">
+        <div class="cat-card" onclick="processPayment(0.8, 'التصميم الجرافيكي')">
             <i class="fas fa-palette"></i><span>التصميم</span><span class="price-badge">Pi 0.8</span>
         </div>
-        <div class="cat-card" onclick="processPayment(0.7, 'التسويق')">
+        <div class="cat-card" onclick="processPayment(0.7, 'التسويق والمبيعات')">
             <i class="fas fa-bullhorn"></i><span>التسويق</span><span class="price-badge">Pi 0.7</span>
         </div>
-        <div class="cat-card" onclick="processPayment(0.5, 'الترجمة')">
+        <div class="cat-card" onclick="processPayment(0.5, 'الكتابة والترجمة')">
             <i class="fas fa-pen-nib"></i><span>الترجمة</span><span class="price-badge">Pi 0.5</span>
         </div>
     </section>
@@ -62,10 +111,9 @@
     <div id="reqModal" class="modal">
         <div class="modal-content" id="modalContent">
             <h2 style="text-align: center;">📦 مطلوبات التنفيذ</h2>
-            <p style="text-align: center; color: #2ecc71; font-size: 0.9rem;">تم الدفع بنجاح! زودنا بالتفاصيل:</p>
-            <textarea id="orderDetail" rows="4" placeholder="اشرح الخدمة المطلوبة..."></textarea>
+            <textarea id="orderDetail" rows="4" placeholder="اشرح لنا الخدمة المطلوبة بالتفصيل..."></textarea>
             <input type="text" id="contactInfo" placeholder="رقم واتساب أو معرف تلجرام">
-            <button class="btn-submit" onclick="finalSend()">إرسال الطلب</button>
+            <button class="btn-submit" onclick="submitOrder()">إرسال بيانات الطلب</button>
         </div>
     </div>
 
@@ -73,67 +121,86 @@
 
     <script>
         const toast = document.getElementById('toast');
-        let currentTxId = "N/A"; 
+        let currentTxId = "لم يتوفر بعد"; 
         let selectedService = "";
 
-        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
+        function showMsg(m) { 
+            toast.innerText = m; 
+            toast.style.display = 'block'; 
+            setTimeout(() => toast.style.display='none', 4000); 
+        }
 
         async function startApp() {
             try {
+                // الكود الأصلي الخاص بك للدخول
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                document.getElementById('authBtn').innerText = "أهلاً: " + auth.user.username;
+                document.getElementById('authBtn').innerText = "تم التوثيق: " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#2ecc71";
-            } catch (e) { showMsg("فشل التوثيق"); }
+            } catch (e) { 
+                showMsg("خطأ: " + e.message);
+            }
         }
 
         async function processPayment(amt, name) {
             selectedService = name;
             try {
-                showMsg("جاري الاتصال بمحفظتك...");
+                showMsg(`جاري دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
                     amount: amt,
-                    memo: "طلب خدمة: " + name,
+                    memo: "شراء خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (id) => {
-                        return fetch('/api/approve', { method: 'POST', body: JSON.stringify({ paymentId: id }) }).then(r => r.json());
-                    },
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: (id, tx) => {
+                        // إظهار نافذة البيانات التي كانت تعمل في ملفك
                         document.getElementById('reqModal').style.display = 'flex';
-                        return fetch('/api/complete', { method: 'POST', body: JSON.stringify({ paymentId: id, txid: tx }) }).then(r => r.json());
+                        return fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) }).then(r => r.json());
                     },
                     onError: (e) => showMsg("فشل في العملية")
                 });
-            } catch (e) { showMsg("حدث خطأ"); }
+            } catch (e) { 
+                showMsg("حدث خطأ");
+            }
         }
 
-        function finalSend() {
+        // الوظيفة المحدثة لتقوم بالإرسال الحقيقي للإيميل
+        async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) { showMsg("يرجى إكمال البيانات"); return; }
+            
+            if(!detail || !contact) {
+                showMsg("يرجى ملء جميع البيانات");
+                return;
+            }
 
-            showMsg("جاري إرسال الإيميل...");
+            showMsg("جاري إرسال طلبك...");
 
-            const params = {
+            const templateParams = {
                 service_name: selectedService,
                 order_details: detail,
                 user_contact: contact,
                 transaction_id: currentTxId
             };
 
-            // ربط الإيميل الحقيقي باستخدام المعرف الجديد
-            emailjs.send("service_vuti648", "template_m6rq1ab", params)
+            // استخدام المعرفات المفعلة الخاصة بك
+            emailjs.send("service_vuti648", "template_m6rq1ab", templateParams)
                 .then(() => {
                     document.getElementById('modalContent').innerHTML = `
-                        <div style="text-align: center;">
-                            <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71;"></i>
-                            <h2>تم الإرسال بنجاح!</h2>
-                            <p>سنتواصل معك قريباً يا abokareem</p>
+                        <div style="text-align: center; padding: 10px;">
+                            <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                            <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
+                            <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                                رقم المعاملة: <br><small style="color:var(--pi-p)">${currentTxId.substring(0,15)}...</small>
+                            </p>
+                            <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريق abokareem قريباً.</p>
                             <button class="btn-submit" onclick="location.reload()">إغلاق</button>
-                        </div>`;
-                }, (err) => { showMsg("فشل الإرسال للإيميل"); });
+                        </div>
+                    `;
+                }, (error) => {
+                    showMsg("فشل إرسال الإيميل؛ تأكد من ربط Gmail");
+                });
         }
     </script>
 </body>
