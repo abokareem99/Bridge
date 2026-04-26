@@ -150,7 +150,7 @@
                     },
                     
                     // القسيم القديم الذي يسبب المشكلة
-onReadyForServerCompletion: (id, tx) => {
+onReadyForServerCompletion: async(id, tx) => {
     document.getElementById('reqModal').style.display = 'flex'; // هذه تظهر النافذة فوراً
     return fetch('/api/payment-handler', {
         // ... باقي الكود
