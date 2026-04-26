@@ -9,8 +9,14 @@
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("S0i0-6kI4r2uG_rXn");
+        })();
+    </script>
 
     <style>
+        /* استخدمت نفس تنسيقات ملفك الأصلي index.html2 حرفياً */
         :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
@@ -25,7 +31,7 @@
         .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 3px 10px; border-radius: 6px; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
         .modal-content { background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .modal-content textarea, .modal-content input { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 0.9rem; background: #f9f9f9; outline: none; }
+        .modal-content textarea, .modal-content input { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; }
         .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
         #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; min-width: 200px; }
     </style>
@@ -79,7 +85,6 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 document.getElementById('authBtn').innerText = "تم التوثيق: " + auth.user.username;
-                document.getElementById('authBtn').style.background = "#2ecc71";
             } catch (e) { showMsg("خطأ في التوثيق"); }
         }
 
@@ -88,9 +93,7 @@
             try {
                 showMsg(`جاري دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
-                    amount: amt,
-                    memo: "طلب خدمة: " + name,
-                    metadata: { service: name }
+                    amount: amt, memo: "طلب خدمة: " + name, metadata: { service: name }
                 }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
@@ -109,27 +112,23 @@
             
             if(!detail || !contact) { showMsg("يرجى ملء البيانات"); return; }
 
-            showMsg("جاري إرسال الطلب...");
+            showMsg("جاري الإرسال...");
 
-            // إرسال البيانات كرسالة واحدة لتجنب أخطاء القالب الفارغ في الموقع
+            // إرسال البيانات كرسالة واحدة لتجنب أخطاء القالب
             const params = {
-                to_name: "abokareem",
-                from_name: "Bridge App",
-                message: `طلب جديد:\nالخدمة: ${selectedService}\nالتفاصيل: ${detail}\nالتواصل: ${contact}\nرقم المعاملة: ${currentTxId}`
+                message: `طلب من: abokareem\nالخدمة: ${selectedService}\nالتفاصيل: ${detail}\nالتواصل: ${contact}\nرقم المعاملة: ${currentTxId}`
             };
 
-            // المفاتيح مأخوذة من صورك
             emailjs.send("service_vuti648", "template_m6rq1ab", params, "S0i0-6kI4r2uG_rXn")
                 .then(() => {
                     document.getElementById('modalContent').innerHTML = `
                         <div style="text-align: center; padding: 10px;">
                             <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71;"></i>
                             <h2>تم الإرسال بنجاح!</h2>
-                            <p style="margin-top:10px;">سيتواصل معك فريق العمل قريباً.</p>
                             <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                         </div>`;
                 }, (err) => {
-                    showMsg("فشل الإرسال؛ تأكد من تفعيل Gmail في EmailJS");
+                    showMsg("فشل الإرسال؛ تأكد من Gmail");
                 });
         }
     </script>
