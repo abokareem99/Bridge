@@ -6,14 +6,20 @@
     <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("S0i0-6kI4r2uG_rXn"); // Public Key من الصورة
+        })();
+    </script>
     <style>
         :root {
-            --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
+            --pi-p: #6a1b9a;
+            --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-        /* الهيدر المحسن */
         .hero {
             padding: 40px 20px;
             background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%);
@@ -25,19 +31,21 @@
         .welcome-msg { font-size: 0.9rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.3); }
 
         .btn-auth {
-            background: var(--pi-g); color: var(--pi-d); border: none;
+            background: var(--pi-g);
+            color: var(--pi-d); border: none;
             padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.3s;
         }
         .btn-auth:active { transform: scale(0.95); }
 
-        /* شبكة الخدمات */
         .categories { 
-            padding: 25px 15px; max-width: 500px; margin: 0 auto; 
+            padding: 25px 15px;
+            max-width: 500px; margin: 0 auto; 
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
         }
         .cat-card {
-            background: var(--w); padding: 20px 10px; border-radius: 20px; 
+            background: var(--w);
+            padding: 20px 10px; border-radius: 20px; 
             text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.08);
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -45,42 +53,47 @@
         }
         .cat-card:active { background: #f0f0f0; }
         .cat-card i { 
-            color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; 
+            color: var(--pi-g);
+            background: var(--pi-d); width: 55px; height: 55px; 
             display: flex; align-items: center; justify-content: center; 
             border-radius: 18px; font-size: 1.6rem; margin-bottom: 12px;
         }
         .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.95rem; margin-bottom: 6px; }
         .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 3px 10px; border-radius: 6px; }
 
-        /* نافذة المطلوبات الاحترافية */
         .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000;
         }
         .modal-content {
-            background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right;
+            background: white;
+            width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         .modal-content h2 { color: var(--pi-d); font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
         .modal-content textarea, .modal-content input {
-            width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; 
+            width: 100%;
+            padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; 
             font-size: 0.9rem; background: #f9f9f9; outline: none;
         }
         .btn-submit {
-            width: 100%; background: var(--pi-p); color: white; border: none; 
+            width: 100%;
+            background: var(--pi-p); color: white; border: none; 
             padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer;
         }
 
-        /* الفوتر المحسن */
         .footer-container { margin-top: auto; padding: 20px 10px 40px; text-align: center; }
         .legal-links { margin-bottom: 12px; }
         .legal-links a { color: var(--pi-p); text-decoration: none; margin: 0 10px; font-size: 0.9rem; font-weight: bold; }
         .copyright { font-size: 0.8rem; color: #888; margin-top: 5px; }
 
         #toast {
-            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            position: fixed;
+            bottom: 90px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; 
-            display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g);
+            display: none; z-index: 5000;
+            font-size: 0.85rem; border: 1px solid var(--pi-g);
             text-align: center; min-width: 200px;
         }
     </style>
@@ -133,6 +146,7 @@
     <script>
         const toast = document.getElementById('toast');
         let currentTxId = ""; 
+        let selectedService = "";
 
         function showMsg(m) { 
             toast.innerText = m; 
@@ -150,11 +164,12 @@
                 document.getElementById('authBtn').style.background = "#2ecc71";
                 document.getElementById('authBtn').style.color = "#fff";
             } catch (e) { 
-                showMsg("فشل التوثيق: " + e.message); 
+                showMsg("فشل التوثيق: " + e.message);
             }
         }
 
         async function processPayment(amt, name) {
+            selectedService = name;
             try {
                 showMsg(`جاري تهيئة دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
@@ -174,9 +189,7 @@
                     },
                     
                     onReadyForServerCompletion: (id, tx) => {
-                        // إظهار نافذة المطلوبات فور النجاح
                         document.getElementById('reqModal').style.display = 'flex';
-                        
                         return fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -187,7 +200,7 @@
                     onError: (e) => showMsg("خطأ في الدفع: " + e.message)
                 });
             } catch (e) { 
-                showMsg("عذراً، حدث خطأ فني"); 
+                showMsg("عذراً، حدث خطأ فني");
             }
         }
 
@@ -200,23 +213,33 @@
                 return;
             }
 
-            // محاكاة إرسال البيانات وحفظها
             showMsg("جاري إرسال طلبك...");
-            
-            setTimeout(() => {
-                document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 10px;">
-                        <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                        <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
-                        <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
-                            رقم المعاملة: <br><small style="color:var(--pi-p)">${currentTxId.substring(0,15)}...</small>
-                        </p>
-                        <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريق abokareem قريباً.</p>
-                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
-                    </div>
-                `;
-            }, 1500);
+
+            // إرسال البيانات عبر EmailJS باستخدام المفاتيح التي زودتني بها
+            const templateParams = {
+                service_name: selectedService,
+                order_details: detail,
+                user_contact: contact,
+                transaction_id: currentTxId
+            };
+
+            emailjs.send("service_6ooge2n", "template_m6rq1ab", templateParams)
+                .then(function(response) {
+                    document.getElementById('modalContent').innerHTML = `
+                        <div style="text-align: center; padding: 10px;">
+                            <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                            <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
+                            <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                                رقم المعاملة: <br><small style="color:var(--pi-p)">${currentTxId.substring(0,15)}...</small>
+                            </p>
+                            <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريق abokareem قريباً.</p>
+                            <button class="btn-submit" onclick="location.reload()">إغلاق</button>
+                        </div>
+                    `;
+                }, function(error) {
+                    showMsg("فشل إرسال البريد: " + JSON.stringify(error));
+                });
         }
     </script>
 </body>
-</html> 
+</html>
