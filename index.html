@@ -6,12 +6,14 @@
     <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            emailjs.init("aRCAx1NwvATaC4F-m");
+            emailjs.init("aRCAx1NwvATaC4F-m"); 
         })();
     </script>
+
     <style>
         :root {
             --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff;
@@ -34,7 +36,7 @@
         .card {
             background: var(--w); border-radius: 20px; padding: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px;
-            border: 1px solid #eee; transition: 0.3s;
+            border: 1px solid #eee; transition: 0.3s; cursor: pointer;
         }
         .card:active { transform: scale(0.98); }
         .card i { font-size: 2rem; color: var(--pi-p); margin-bottom: 15px; }
@@ -42,7 +44,6 @@
         .card p { color: #666; font-size: 0.85rem; line-height: 1.6; }
         .price { display: block; margin-top: 15px; font-weight: bold; color: var(--pi-d); font-size: 1.1rem; }
 
-        /* نافذة الطلب */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;
@@ -137,6 +138,7 @@
             } catch (e) { showMsg("فشل الاتصال بمحفظة Pi"); }
         }
 
+        // دالة الإرسال بعد إضافة مطلوبات الإيميل
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
@@ -165,8 +167,7 @@
                             <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                         </div>`;
                 }, function(error) {
-                    showMsg("فشل الإرسال، سيتواصل معك الدعم يدوياً");
-                    console.log("Error:", error);
+                    showMsg("فشل الإرسال التلقائي، سيتم التواصل معك يدوياً");
                 });
         }
     </script>
