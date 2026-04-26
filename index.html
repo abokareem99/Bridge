@@ -11,7 +11,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            // المفتاح العام الثابت الخاص بك
+            // المفتاح العام من حسابك
             emailjs.init("S0i0-6kI4r2uG_rXn");
         })();
     </script>
@@ -33,32 +33,28 @@
         .modal-content { background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .modal-content textarea, .modal-content input { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 0.9rem; background: #f9f9f9; outline: none; }
         .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
-        .footer-container { margin-top: auto; padding: 20px 10px 40px; text-align: center; }
-        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; min-width: 200px; }
+        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; }
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <div>
-            <h1 class="hero-title">جسر التواصل</h1>
-            <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-            <p style="font-size: 0.85rem; margin-bottom: 18px; opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
-            <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
-        </div>
+        <h1 class="hero-title">جسر التواصل</h1>
+        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div><br>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
     </section>
 
     <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة والتطوير')">
+        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة')">
             <i class="fas fa-code"></i><span>البرمجة</span><span class="price-badge">Pi 1.0</span>
         </div>
-        <div class="cat-card" onclick="processPayment(0.8, 'التصميم الجرافيكي')">
+        <div class="cat-card" onclick="processPayment(0.8, 'التصميم')">
             <i class="fas fa-palette"></i><span>التصميم</span><span class="price-badge">Pi 0.8</span>
         </div>
-        <div class="cat-card" onclick="processPayment(0.7, 'التسويق والمبيعات')">
+        <div class="cat-card" onclick="processPayment(0.7, 'التسويق')">
             <i class="fas fa-bullhorn"></i><span>التسويق</span><span class="price-badge">Pi 0.7</span>
         </div>
-        <div class="cat-card" onclick="processPayment(0.5, 'الكتابة والترجمة')">
+        <div class="cat-card" onclick="processPayment(0.5, 'الترجمة')">
             <i class="fas fa-pen-nib"></i><span>الترجمة</span><span class="price-badge">Pi 0.5</span>
         </div>
     </section>
@@ -66,29 +62,21 @@
     <div id="reqModal" class="modal">
         <div class="modal-content" id="modalContent">
             <h2 style="text-align: center;">📦 مطلوبات التنفيذ</h2>
-            <p style="font-size: 0.85rem; color: #666; text-align: center;">لقد تم الدفع بنجاح! فضلاً زودنا بالتفاصيل:</p>
-            <textarea id="orderDetail" rows="4" placeholder="اشرح لنا الخدمة المطلوبة بالتفصيل..."></textarea>
+            <p style="text-align: center; color: #2ecc71; font-size: 0.9rem;">تم الدفع بنجاح! زودنا بالتفاصيل:</p>
+            <textarea id="orderDetail" rows="4" placeholder="اشرح الخدمة المطلوبة..."></textarea>
             <input type="text" id="contactInfo" placeholder="رقم واتساب أو معرف تلجرام">
-            <button class="btn-submit" onclick="submitOrder()">إرسال بيانات الطلب</button>
+            <button class="btn-submit" onclick="finalSend()">إرسال الطلب</button>
         </div>
     </div>
-
-    <footer class="footer-container">
-        <div style="margin-bottom: 12px;">
-            <a href="terms.html" style="color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px;">شروط الاستخدام</a> | 
-            <a href="privacy.html" style="color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px;">سياسة الخصوصية</a>
-        </div>
-        <div style="font-size: 0.8rem; color: #888;">© Bridge Freelance - Powered by Pi Network 2026</div>
-    </footer>
 
     <div id="toast"></div>
 
     <script>
         const toast = document.getElementById('toast');
-        let currentTxId = "لم يتم الدفع"; 
+        let currentTxId = "N/A"; 
         let selectedService = "";
 
-        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 4000); }
+        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
 
         async function startApp() {
             try {
@@ -96,53 +84,57 @@
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 document.getElementById('authBtn').innerText = "أهلاً: " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#2ecc71";
-            } catch (e) { showMsg("فشل التوثيق: " + e.message); }
+            } catch (e) { showMsg("فشل التوثيق"); }
         }
 
         async function processPayment(amt, name) {
             selectedService = name;
             try {
-                showMsg(`جاري دفع ${amt} Pi لخدمة ${name}...`);
+                showMsg("جاري الاتصال بمحفظتك...");
                 await window.Pi.createPayment({
                     amount: amt,
-                    memo: "شراء خدمة: " + name,
+                    memo: "طلب خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
+                    onReadyForServerApproval: (id) => {
+                        return fetch('/api/approve', { method: 'POST', body: JSON.stringify({ paymentId: id }) }).then(r => r.json());
+                    },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: (id, tx) => {
                         document.getElementById('reqModal').style.display = 'flex';
-                        return fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) }).then(r => r.json());
+                        return fetch('/api/complete', { method: 'POST', body: JSON.stringify({ paymentId: id, txid: tx }) }).then(r => r.json());
                     },
                     onError: (e) => showMsg("فشل في العملية")
                 });
-            } catch (e) { showMsg("عذراً، حدث خطأ"); }
+            } catch (e) { showMsg("حدث خطأ"); }
         }
 
-        function submitOrder() {
+        function finalSend() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) { showMsg("يرجى ملء جميع البيانات"); return; }
+            if(!detail || !contact) { showMsg("يرجى إكمال البيانات"); return; }
 
-            const templateParams = {
+            showMsg("جاري إرسال الإيميل...");
+
+            const params = {
                 service_name: selectedService,
                 order_details: detail,
                 user_contact: contact,
                 transaction_id: currentTxId
             };
 
-            emailjs.send("service_vuti648", "template_m6rq1ab", templateParams)
+            // ربط الإيميل الحقيقي باستخدام المعرف الجديد
+            emailjs.send("service_vuti648", "template_m6rq1ab", params)
                 .then(() => {
                     document.getElementById('modalContent').innerHTML = `
-                        <div style="text-align: center; padding: 10px;">
-                            <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                            <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
-                            <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">سيتواصل معك فريق abokareem قريباً.</p>
+                        <div style="text-align: center;">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71;"></i>
+                            <h2>تم الإرسال بنجاح!</h2>
+                            <p>سنتواصل معك قريباً يا abokareem</p>
                             <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                         </div>`;
-                }, (err) => { showMsg("فشل إرسال البريد؛ تحقق من إعدادات EmailJS"); });
+                }, (err) => { showMsg("فشل الإرسال للإيميل"); });
         }
     </script>
 </body>
-    </html>
-                
+</html>
