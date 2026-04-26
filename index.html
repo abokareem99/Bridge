@@ -149,14 +149,14 @@
                         showMsg("تم تسجيل المعاملة على البلوكشين!");
                     },
                     
-                    onReadyForServerCompletion: (id, tx) => {
-                        document.getElementById('reqModal').style.display = 'flex';
-                        return fetch('/api/payment-handler', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
-                        }).then(r => r.json());
-                    },
+                    // القسيم القديم الذي يسبب المشكلة
+onReadyForServerCompletion: (id, tx) => {
+    document.getElementById('reqModal').style.display = 'flex'; // هذه تظهر النافذة فوراً
+    return fetch('/api/payment-handler', {
+        // ... باقي الكود
+    }).then(r => r.json());
+},
+
                     onCancel: () => showMsg("تم إلغاء العملية"),
                     onError: (e) => showMsg("خطأ في الدفع: " + e.message)
                 });
