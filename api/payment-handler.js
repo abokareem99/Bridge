@@ -1,54 +1,48 @@
-// ملف معالج الدفع الآمن - Bridge Freelance
-// هذا الملف يتم تشغيله على سيرفرات Vercel للتحقق من صحة معاملات Pi Network
-
 export default async function handler(req, res) {
-    // السماح فقط بطلبات POST لضمان أمن البيانات
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'الطريقة غير مسموح بها' });
+        return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { paymentId, txid, action } = req.body;
-    
-    // جلب مفتاح الـ API من متغيرات البيئة في Vercel لحماية تطبيقك
+    const { paymentId, txid, action, orderDetails } = req.body;
     const PI_API_KEY = process.env.PI_API_KEY;
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     try {
         if (action === 'approve') {
-            // الخطوة 1: إبلاغ منصة Pi بأن السيرفر يوافق على بدء هذه المعاملة
-            const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+            await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
                 method: 'POST',
-                headers: { 
-                    'Authorization': `Key ${PI_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Authorization': `Key ${PI_API_KEY}`, 'Content-Type': 'application/json' }
             });
-
-            if (!response.ok) {
-                throw new Error('فشل في الموافقة على الدفع من جهة السيرفر');
-            }
-
             return res.status(200).json({ approved: true });
         } 
         
         if (action === 'complete') {
-            // الخطوة 2: التأكيد النهائي بعد وصول العملات للبلوكشين وإغلاق المعاملة برمجياً
-            const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+            const piRes = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
                 method: 'POST',
-                headers: { 
-                    'Authorization': `Key ${PI_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Key ${PI_API_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ txid })
             });
 
-            if (!response.ok) {
-                throw new Error('فشل في إتمام المعاملة نهائياً');
+            if (piRes.ok) {
+                // حفظ الطلب في قاعدة البيانات فور نجاح الدفع
+                await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        service: orderDetails.service, // العمود الموجود في صورتك
+                        contact_info: orderDetails.contact, // يجب إضافته في Supabase
+                        transaction_id: txid
+                    })
+                });
+                return res.status(200).json({ completed: true });
             }
-
-            return res.status(200).json({ completed: true });
         }
     } catch (error) {
-        console.error("Payment Error:", error.message);
         return res.status(500).json({ error: error.message });
     }
 }
