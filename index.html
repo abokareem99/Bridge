@@ -163,4 +163,71 @@
                         showMsg("تم تسجيل المعاملة على البلوكشين!");
                     },
                     
-                    onReadyForServerCompletion: async (id, tx) =>
+                    onReadyForServerCompletion: async (id, tx) => {
+                        try {
+                            showMsg("جاري تأكيد المعاملة وحفظها...");
+                            const response = await fetch('/api/payment-handler', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ 
+                                    paymentId: id, 
+                                    txid: tx, 
+                                    action: 'complete',
+                                    orderDetails: {
+                                        service: selectedServiceName,
+                                        detail: "انتظار التفاصيل",
+                                        contact: "قيد الانتظار"
+                                    }
+                                })
+                            });
+                            const result = await response.json();
+
+                            if (response.ok && result.completed) {
+                                document.getElementById('reqModal').style.display = 'flex';
+                                showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
+                            } else {
+                                showMsg("فشل التأكيد: " + (result.error || "حاول ثانية"));
+                            }
+                        } catch (e) {
+                            showMsg("خطأ في الاتصال بالسيرفر");
+                        }
+                    },
+
+                    onCancel: () => showMsg("تم إلغاء العملية"),
+                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
+                });
+            } catch (e) { 
+                showMsg("عذراً، حدث خطأ فني");
+            }
+        }
+
+        async function submitOrder() {
+            const detail = document.getElementById('orderDetail').value;
+            const contact = document.getElementById('contactInfo').value;
+            
+            if(!detail || !contact) {
+                showMsg("يرجى ملء جميع البيانات");
+                return;
+            }
+
+            showMsg("جاري إرسال طلبك...");
+            emailjs.send("service_vuti648", "template_m6rq1ab", {
+                username: "abokareem", 
+                service_detail: detail, 
+                contact_info: contact,
+                order_id: currentTxId 
+            }).then(function() {
+                document.getElementById('modalContent').innerHTML = `
+                    <div style="text-align: center; padding: 10px;">
+                        <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                        <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
+                        <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريقنا قريباً.</p>
+                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
+                    </div>`;
+            }, function(error) {
+                showMsg("فشل الإرسال التلقائي، حاول مرة أخرى");
+            });
+        }
+    </script>
+</body>
+</html>
