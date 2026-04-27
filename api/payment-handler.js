@@ -25,7 +25,7 @@ export default async function handler(req, res) {
             });
 
             if (piRes.ok) {
-                // حفظ الطلب في قاعدة البيانات فور نجاح الدفع
+                // الربط مع الجداول التي أنشأتها في الصور
                 await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
                     method: 'POST',
                     headers: {
@@ -34,9 +34,9 @@ export default async function handler(req, res) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        service: orderDetails.service, // العمود الموجود في صورتك
-                        contact_info: orderDetails.contact, // يجب إضافته في Supabase
-                        transaction_id: txid
+                        detail: orderDetails.service, // يطابق اسم العمود 'detail' في صورتك
+                        contact: orderDetails.contact, // يطابق اسم العمود 'contact' في صورتك
+                        txid: txid                   // يطابق اسم العمود 'txid' في صورتك
                     })
                 });
                 return res.status(200).json({ completed: true });
