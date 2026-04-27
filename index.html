@@ -36,7 +36,6 @@
     </style>
 </head>
 <body>
-
     <section class="hero">
         <div>
             <h1 class="hero-title">جسر التواصل</h1>
@@ -85,7 +84,7 @@
     <script>
         const toast = document.getElementById('toast');
         let currentTxId = ""; 
-        let selectedService = ""; 
+        let selectedServiceName = ""; 
 
         function showMsg(m) { 
             toast.innerText = m; 
@@ -101,49 +100,31 @@
                 showMsg("أهلاً بك " + auth.user.username);
                 document.getElementById('authBtn').innerText = "الحساب موثق ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
-            } catch (e) { 
-                showMsg("فشل التوثيق: " + e.message);
-            }
+            } catch (e) { showMsg("فشل التوثيق: " + e.message); }
         }
 
         async function processPayment(amt, name) {
-            selectedService = name;
+            selectedServiceName = name;
             try {
                 showMsg(`جاري تهيئة دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
-                    amount: amt,
-                    memo: "شراء خدمة: " + name,
-                    metadata: { service: name }
+                    amount: amt, memo: "شراء خدمة: " + name, metadata: { service: name }
                 }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId: id, action: 'approve' })
                     }).then(r => r.json()),
-                    
-                    onConnectedToBlockchain: (id, tx) => {
-                        currentTxId = tx;
-                        showMsg("تم تسجيل المعاملة على البلوكشين!");
-                    },
-                    
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; showMsg("تم تسجيل المعاملة على البلوكشين!"); },
                     onReadyForServerCompletion: async (id, tx) => {
-                        try {
-                            showMsg("جاري تأكيد المعاملة...");
-                            const response = await fetch('/api/payment-handler', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    paymentId: id, 
-                                    txid: tx, 
-                                    action: 'complete',
-                                    orderDetails: { service: selectedService, detail: "بانتظار الإدخال", contact: "بانتظار الإدخال" }
-                                })
-                            });
-                            if (response.ok) {
-                                document.getElementById('reqModal').style.display = 'flex';
-                                showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
-                            }
-                        } catch (e) { showMsg("خطأ في الاتصال بالسيرفر"); }
+                        const response = await fetch('/api/payment-handler', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
+                        });
+                        const result = await response.json();
+                        if (response.ok && result.completed) {
+                            document.getElementById('reqModal').style.display = 'flex';
+                            showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
+                        }
                     },
                     onCancel: () => showMsg("تم إلغاء العملية"),
                     onError: (e) => showMsg("خطأ في الدفع: " + e.message)
@@ -156,9 +137,9 @@
             const contact = document.getElementById('contactInfo').value;
             if(!detail || !contact) { showMsg("يرجى ملء جميع البيانات"); return; }
 
-            showMsg("جاري حفظ بيانات طلبك...");
+            showMsg("جاري حفظ طلبك وإرساله...");
             
-            // الخطوة الحاسمة: تحديث Supabase بالتفاصيل الحقيقية قبل إرسال الإيميل
+            // إضافة كود إرسال البيانات للسيرفر ليقوم بتحديث Supabase
             try {
                 await fetch('/api/payment-handler', {
                     method: 'POST',
@@ -166,26 +147,23 @@
                     body: JSON.stringify({ 
                         txid: currentTxId, 
                         action: 'update_details', 
-                        orderDetails: { service: selectedService, detail: detail, contact: contact } 
+                        orderDetails: { service: selectedServiceName, detail: detail, contact: contact } 
                     })
                 });
 
-                // إرسال الإيميل
+                // إرسال الإيميل بعد التأكد من الحفظ
                 emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: "abokareem", 
-                    service_detail: detail, 
-                    contact_info: contact,
-                    order_id: currentTxId 
+                    username: "abokareem", service_detail: detail, contact_info: contact, order_id: currentTxId 
                 }).then(function() {
                     document.getElementById('modalContent').innerHTML = `
                         <div style="text-align: center; padding: 10px;">
                             <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                            <h2 style="color: #333;">تم الإرسال والحفظ بنجاح!</h2>
+                            <h2 style="color: #333;">تم الحفظ والإرسال بنجاح!</h2>
                             <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريقنا قريباً.</p>
                             <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                         </div>`;
                 });
-            } catch (e) { showMsg("فشل الحفظ، حاول مرة أخرى"); }
+            } catch (e) { showMsg("فشل في حفظ البيانات، حاول ثانية"); }
         }
     </script>
 </body>
