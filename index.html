@@ -152,11 +152,13 @@
                     memo: "شراء خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ paymentId: id, action: 'approve' })
-                    }).then(r => r.json()),
+                    onReadyForServerApproval: (id) => {
+                        return fetch('/api/payment-handler', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, action: 'approve' })
+                        }).then(r => r.json());
+                    },
                     
                     onConnectedToBlockchain: (id, tx) => {
                         currentTxId = tx;
@@ -165,7 +167,7 @@
                     
                     onReadyForServerCompletion: async (id, tx) => {
                         try {
-                            showMsg("جاري تأكيد المعاملة وحفظها...");
+                            showMsg("جاري تأكيد المعاملة وحفظها في قاعدة البيانات...");
                             const response = await fetch('/api/payment-handler', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -175,7 +177,7 @@
                                     action: 'complete',
                                     orderDetails: {
                                         service: selectedServiceName,
-                                        detail: "انتظار التفاصيل",
+                                        detail: "انتظار التفاصيل النهائية",
                                         contact: "قيد الانتظار"
                                     }
                                 })
@@ -184,20 +186,20 @@
 
                             if (response.ok && result.completed) {
                                 document.getElementById('reqModal').style.display = 'flex';
-                                showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
+                                showMsg("تم التأكيد بنجاح! فضلاً أدخل بيانات التواصل.");
                             } else {
-                                showMsg("فشل التأكيد: " + (result.error || "حاول ثانية"));
+                                showMsg("فشل في تأكيد السيرفر: " + (result.error || "حاول ثانية"));
                             }
                         } catch (e) {
-                            showMsg("خطأ في الاتصال بالسيرفر");
+                            showMsg("خطأ في الاتصال بالسيرفر أثناء التأكيد");
                         }
                     },
 
-                    onCancel: () => showMsg("تم إلغاء العملية"),
+                    onCancel: () => showMsg("تم إلغاء العملية من قبلك"),
                     onError: (e) => showMsg("خطأ في الدفع: " + e.message)
                 });
             } catch (e) { 
-                showMsg("عذراً، حدث خطأ فني");
+                showMsg("عذراً، حدث خطأ فني غير متوقع");
             }
         }
 
@@ -210,7 +212,9 @@
                 return;
             }
 
-            showMsg("جاري إرسال طلبك...");
+            showMsg("جاري إرسال طلبك عبر البريد...");
+            
+            // إرسال الإيميل عبر EmailJS
             emailjs.send("service_vuti648", "template_m6rq1ab", {
                 username: "abokareem", 
                 service_detail: detail, 
@@ -221,11 +225,11 @@
                     <div style="text-align: center; padding: 10px;">
                         <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
                         <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
-                        <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريقنا قريباً.</p>
+                        <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريقنا قريباً عبر ${contact}.</p>
                         <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                     </div>`;
             }, function(error) {
-                showMsg("فشل الإرسال التلقائي، حاول مرة أخرى");
+                showMsg("فشل إرسال الإيميل، لكن طلبك محفوظ في قاعدة البيانات.");
             });
         }
     </script>
