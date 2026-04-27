@@ -155,9 +155,16 @@
                 const response = await fetch('/api/payment-handler', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
-                });
-
+                    
+body: JSON.stringify({ 
+    paymentId: id, 
+    txid: tx, 
+    action: 'complete',
+    orderDetails: {
+        service: name, // لملء عمود detail
+        contact: "بانتظار إدخال المستخدم" // لملء عمود contact
+    }
+})
                 const result = await response.json();
 
                 if (response.ok && result.completed) {
