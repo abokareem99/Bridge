@@ -143,28 +143,20 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId: id, action: 'approve' })
                     }).then(r => r.json()),
-                    
-                    onConnectedToBlockchain: (id, tx) => {
-                        currentTxId = tx;
-                        showMsg("تم تسجيل المعاملة على البلوكشين!");
-                    },
-                    
-                            onReadyForServerCompletion: async (id, tx) => {
-            try {
-                showMsg("جاري تأكيد المعاملة...");
-                const response = await fetch('/api/payment-handler', {
+                                    const response = await fetch('/api/payment-handler', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    
-body: JSON.stringify({ 
-    paymentId: id, 
-    txid: tx, 
-    action: 'complete',
-    orderDetails: {
-        service: name, // لملء عمود detail
-        contact: "بانتظار إدخال المستخدم" // لملء عمود contact
-    }
-})
+                    body: JSON.stringify({ 
+                        paymentId: id, 
+                        txid: tx, 
+                        action: 'complete',
+                        orderDetails: {
+                            service: name,
+                            contact: "بانتظار إدخال المستخدم"
+                        }
+                    })
+                });
+
                 const result = await response.json();
 
                 if (response.ok && result.completed) {
@@ -177,14 +169,6 @@ body: JSON.stringify({
                 showMsg("خطأ في الاتصال بالسيرفر");
             }
         },
-
-                    onCancel: () => showMsg("تم إلغاء العملية"),
-                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
-                });
-            } catch (e) { 
-                showMsg("عذراً، حدث خطأ فني"); 
-            }
-        }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
