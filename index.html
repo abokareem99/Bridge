@@ -183,39 +183,44 @@ const _supabase = supabase.createClient('https://xolwuawlnruvzqowxxbh.supabase.c
         }
 
         async function submitOrder() {
-            const detail = document.getElementById('orderDetail').value;
-            const contact = document.getElementById('contactInfo').value;
-            
-            if(!detail || !contact) {
-                showMsg("يرجى ملء جميع البيانات");
-                return;
-            }
+    const detail = document.getElementById('orderDetail').value;
+    const contact = document.getElementById('contactInfo').value;
 
-            showMsg("جاري إرسال طلبك...");
-            await _supabase.from('orders').insert([{ 
-                detail: detail, 
-                contact: contact, 
-                txid: currentTxId 
-            }]);
+    if (!detail || !contact) {
+        showMsg("يرجى ملء جميع البيانات");
+        return;
+    }
 
-            // إرسال حقيقي عبر EmailJS
-            emailjs.send("service_vuti648", "template_m6rq1ab", {
-                username: "abokareem", 
-                service_detail: detail, 
-                contact_info: contact,
-                order_id: currentTxId 
-            }).then(function() {
-                document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 10px;">
-                        <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                        <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
-                        <p style="margin-top:15px; font-weight:bold;">سيتواصل معك فريقنا قريباً.</p>
-                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
-                    </div>`;
-            }, function(error) {
-                showMsg("فشل الإرسال التلقائي، حاول مرة أخرى");
-            });
-        }
+    showMsg("...جاري إرسال طلبك");
+
+    // إرسال البيانات لـ Supabase بدون انتظار (لتجنب التعليق)
+    _supabase.from('orders').insert([{ 
+        detail: detail, 
+        contact: contact, 
+        txid: currentTxId 
+    }]).then(({ error }) => {
+        if (error) console.log("Database issue:", error);
+    });
+
+    // إرسال الإيميل وإظهار النجاح فوراً
+    emailjs.send("service_vuti648", "template_m6rq1ab", {
+        username: "abokareem", 
+        service_detail: detail, 
+        contact_info: contact,
+        order_id: currentTxId 
+    }).then(function() {
+        document.getElementById('modalContent').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
+                <p style="margin-top:15px; font-weight:bold; color: #555;">شكراً لك، سيتواصل معك فريقنا قريباً.</p>
+                <button class="btn-submit" style="margin-top:20px;" onclick="location.reload()">إغلاق</button>
+            </div>`;
+    }, function(error) {
+        showMsg("فشل الإرسال التلقائي، حاول مرة أخرى");
+    });
+}
+
     </script>
 </body>
                                                                    </html>
