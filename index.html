@@ -151,40 +151,34 @@
                     },
                     
                     onReadyForServerCompletion: async (id, tx) => {
-                        try {
-                            showMsg("جاري تأكيد المعاملة وحفظ البيانات...");
-                            const response = await fetch('/api/payment-handler', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    paymentId: id, 
-                                    txid: tx, 
-                                    action: 'complete',
-                                    orderDetails: {
-                                        service: selectedService,
-                                        contact: "في انتظار إكمال النموذج"
-                                    }
-                                })
-                            });
+    try {
+        showMsg("جاري تأكيد المعاملة وحفظ البيانات...");
+        const response = await fetch('/api/payment-handler', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                paymentId: id, 
+                txid: tx, 
+                action: 'complete',
+                orderDetails: {
+                    service: selectedService, // سيملأ عمود service
+                    detail: selectedService,  // سيملأ عمود detail
+                    contact: "قيد الانتظار"    // سيملأ عمود contact
+                }
+            })
+        });
 
-                            const result = await response.json();
-                            if (response.ok && result.completed) {
-                                document.getElementById('reqModal').style.display = 'flex';
-                                showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
-                            } else {
-                                showMsg("فشل التأكيد: " + (result.error || "حاول ثانية"));
-                            }
-                        } catch (e) {
-                            showMsg("خطأ في الاتصال بالسيرفر");
-                        }
-                    },
-                    onCancel: () => showMsg("تم إلغاء العملية"),
-                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
-                });
-            } catch (e) { 
-                showMsg("عذراً، حدث خطأ فني"); 
-            }
+        const result = await response.json();
+        if (response.ok && result.completed) {
+            currentTxId = tx;
+            document.getElementById('reqModal').style.display = 'flex';
+            showMsg("تم الحفظ في Supabase! أكمل بيانات التواصل.");
         }
+    } catch (e) {
+        showMsg("خطأ في الاتصال بالسيرفر");
+    }
+},
+
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
