@@ -12,7 +12,10 @@ export default async function handler(req, res) {
         if (action === 'approve') {
             await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
                 method: 'POST',
-                headers: { 'Authorization': `Key ${PI_API_KEY}`, 'Content-Type': 'application/json' }
+                headers: { 
+                    'Authorization': `Key ${PI_API_KEY}`, 
+                    'Content-Type': 'application/json' 
+                }
             });
             return res.status(200).json({ approved: true });
         } 
@@ -20,12 +23,15 @@ export default async function handler(req, res) {
         if (action === 'complete') {
             const piRes = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
                 method: 'POST',
-                headers: { 'Authorization': `Key ${PI_API_KEY}`, 'Content-Type': 'application/json' },
+                headers: { 
+                    'Authorization': `Key ${PI_API_KEY}`, 
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify({ txid })
             });
 
             if (piRes.ok) {
-                // الربط مع الجداول التي أنشأتها في الصور
+                // حفظ البيانات في جداول Supabase بناءً على صورك
                 await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
                     method: 'POST',
                     headers: {
@@ -34,12 +40,14 @@ export default async function handler(req, res) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        detail: orderDetails.service, // يطابق اسم العمود 'detail' في صورتك
-                        contact: orderDetails.contact, // يطابق اسم العمود 'contact' في صورتك
-                        txid: txid                   // يطابق اسم العمود 'txid' في صورتك
+                        detail: orderDetails.service, 
+                        contact: orderDetails.contact, 
+                        txid: txid                   
                     })
                 });
                 return res.status(200).json({ completed: true });
+            } else {
+                return res.status(400).json({ error: "فشل تأكيد المعاملة في Pi" });
             }
         }
     } catch (error) {
