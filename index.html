@@ -192,6 +192,11 @@ const _supabase = supabase.createClient('https://xolwuawlnruvzqowxxbh.supabase.c
             }
 
             showMsg("جاري إرسال طلبك...");
+            await _supabase.from('orders').insert([{ 
+                detail: detail, 
+                contact: contact, 
+                txid: currentTxId 
+            }]);
 
             // إرسال حقيقي عبر EmailJS
             emailjs.send("service_vuti648", "template_m6rq1ab", {
