@@ -3,7 +3,6 @@ export default async function handler(req, res) {
 
     const { paymentId, txid, action, orderDetails } = req.body;
     
-    // تأكد من أسماء هذه المتغيرات في إعدادات Vercel
     const PI_API_KEY = process.env.PI_API_KEY;
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -25,7 +24,7 @@ export default async function handler(req, res) {
             });
 
             if (piRes.ok) {
-                // محاولة الحفظ في Supabase
+                // حفظ البيانات في جميع الأعمدة التي أنشأتها
                 try {
                     await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
                         method: 'POST',
@@ -36,14 +35,14 @@ export default async function handler(req, res) {
                             'Prefer': 'return=minimal'
                         },
                         body: JSON.stringify({
-                            detail: orderDetails ? orderDetails.service : "خدمة غير محددة",
-                            contact: orderDetails ? orderDetails.contact : "لا توجد بيانات",
-                            txid: txid
+                            service: orderDetails ? orderDetails.service : "خدمة غير محددة", // لعمود service
+                            detail: orderDetails ? orderDetails.service : "لا توجد تفاصيل",   // لعمود detail
+                            contact: orderDetails ? orderDetails.contact : "قيد الانتظار",    // لعمود contact
+                            txid: txid // لعمود txid
                         })
                     });
                 } catch (dbError) {
                     console.error("Database error:", dbError);
-                    // نكمل العملية حتى لو فشل التخزين لكي لا يضيع حق المستخدم في الدفع
                 }
                 return res.status(200).json({ completed: true });
             } else {
