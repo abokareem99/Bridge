@@ -84,8 +84,8 @@
     <script>
         const toast = document.getElementById('toast');
         let currentTxId = ""; 
+        let currentPrice = 0; // القيمة الحقيقية للخدمة
 
-        // الربط المباشر بـ Supabase باستخدام بياناتك الجديدة
         const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
         const supabaseKey = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -104,6 +104,7 @@
         }
 
         async function processPayment(amt, name) {
+            currentPrice = amt; // حفظ السعر عند الضغط
             try {
                 showMsg(`جاري تهيئة دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
@@ -143,16 +144,23 @@
 
             showMsg("جاري حفظ طلبك...");
             try {
-                // حفظ في Supabase
+                // حفظ في Supabase مع القيمة الحقيقية
                 const { error: dbError } = await _supabase
                     .from('orders')
-                    .insert([{ service: detail }]);
+                    .insert([{ 
+                        service: detail,
+                        price: currentPrice
+                    }]);
 
                 if (dbError) throw dbError;
 
                 // إرسال عبر EmailJS
                 await emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: "abokareem", service_detail: detail, contact_info: contact, order_id: currentTxId 
+                    username: "abokareem", 
+                    service_detail: detail, 
+                    contact_info: contact, 
+                    order_id: currentTxId,
+                    price: currentPrice
                 });
 
                 document.getElementById('modalContent').innerHTML = `
@@ -163,7 +171,7 @@
                     </div>`;
             } catch (error) {
                 console.error(error);
-                showMsg("حدث خطأ، يرجى مراجعة إعدادات CORS في Supabase.");
+                showMsg("حدث خطأ أثناء الحفظ.");
             }
         }
     </script>
