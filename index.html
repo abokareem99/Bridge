@@ -26,12 +26,12 @@
         .section-title::before { content: ""; width: 4px; height: 20px; background: var(--pi-g); border-radius: 10px; }
 
         .services-grid { padding: 10px 15px; display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 600px; margin: 0 auto; width: 100%; }
-        .service-card { background: var(--w); padding: 20px; border-radius: 20px; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
+        .service-card { background: var(--w); padding: 20px; border-radius: 20px; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; }
         .service-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .service-title { font-weight: 700; color: var(--pi-d); font-size: 1rem; }
         .price-tag { color: #e65100; font-weight: 800; background: #fff3e0; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; }
         .service-desc { font-size: 0.85rem; color: #666; line-height: 1.4; margin-bottom: 12px; }
-        .service-footer { font-size: 0.75rem; color: var(--pi-p); display: flex; align-items: center; gap: 5px; opacity: 0.8; }
+        .service-footer { font-size: 0.75rem; color: var(--pi-p); display: flex; align-items: center; gap: 5px; }
 
         .add-btn { position: fixed; bottom: 30px; left: 30px; background: var(--pi-p); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-decoration: none; z-index: 1000; }
         
@@ -41,6 +41,9 @@
         .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
         
         #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; }
+        
+        .footer-links { text-align: center; padding: 20px; background: #eee; margin-top: auto; }
+        .footer-links a { color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -54,7 +57,7 @@
     <h2 class="section-title">الخدمات المتوفرة</h2>
     
     <section class="services-grid" id="servicesList">
-        <p style="text-align: center; color: #888; padding: 20px;">جاري تحميل الخدمات...</p>
+        <p style="text-align: center; color: #888; padding: 20px;">جاري تحميل الخدمات من Supabase...</p>
     </section>
 
     <a href="add-service.html" class="add-btn">
@@ -71,9 +74,10 @@
         </div>
     </div>
 
-    <footer style="text-align: center; padding: 40px 20px; color: #888; font-size: 0.8rem;">
-        <div>© 2026 Bridge Freelance | Powered by Pi Network</div>
-    </footer>
+    <div class="footer-links">
+        <a href="terms.html">شروط الاستخدام</a> | <a href="privacy.html">سياسة الخصوصية</a>
+        <div style="margin-top: 10px; color: #888; font-size: 0.75rem;">© 2026 Bridge Freelance</div>
+    </div>
 
     <div id="toast"></div>
 
@@ -100,10 +104,10 @@
                 showMsg("أهلاً بك " + auth.user.username);
                 document.getElementById('authBtn').innerText = "تم التوثيق ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
-                loadServices(); // تحميل الخدمات بعد التوثيق
+                loadServices(); 
             } catch (e) { 
                 showMsg("يرجى فتح التطبيق من متصفح Pi");
-                loadServices(); // تحميل الخدمات حتى بدون توثيق للمشاهدة
+                loadServices(); 
             }
         }
 
@@ -112,12 +116,10 @@
             try {
                 const { data, error } = await _supabase.from('services').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
-
                 if (data.length === 0) {
-                    list.innerHTML = '<p style="text-align: center; color: #888;">لا توجد خدمات مضافة حالياً.</p>';
+                    list.innerHTML = '<p style="text-align: center; color: #888;">لا توجد خدمات متاحة حالياً.</p>';
                     return;
                 }
-
                 list.innerHTML = data.map(s => `
                     <div class="service-card" onclick="buyService(${s.price}, '${s.title}')">
                         <div class="service-header">
@@ -125,14 +127,10 @@
                             <span class="price-tag">${s.price} Pi</span>
                         </div>
                         <p class="service-desc">${s.description}</p>
-                        <div class="service-footer">
-                            <i class="fas fa-user-circle"></i> بواسطة: ${s.user_pi}
-                        </div>
+                        <div class="service-footer"><i class="fas fa-user-circle"></i> بواسطة: ${s.user_pi}</div>
                     </div>
                 `).join('');
-            } catch (e) {
-                list.innerHTML = '<p style="text-align: center; color: red;">خطأ في تحميل البيانات.</p>';
-            }
+            } catch (e) { list.innerHTML = '<p style="text-align: center; color: red;">فشل الاتصال بـ Supabase.</p>'; }
         }
 
         async function buyService(amt, name) {
@@ -161,34 +159,20 @@
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
             if(!detail || !contact) { showMsg("يرجى إكمال البيانات"); return; }
-
             showMsg("جاري إرسال طلبك...");
             try {
-                // 1. الحفظ في Supabase
-                await _supabase.from('orders').insert([{ 
-                    service: currentServiceName + " - " + detail,
-                    price: currentPrice
-                }]);
-
-                // 2. الإرسال للإيميل
+                await _supabase.from('orders').insert([{ service: currentServiceName + " - " + detail, price: currentPrice }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: "abokareem", 
-                    service_detail: detail, 
-                    contact_info: contact, 
-                    order_id: currentTxId,
-                    price: currentPrice
+                    username: "abokareem", service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice
                 });
-
                 document.getElementById('modalContent').innerHTML = `
                     <div style="text-align: center; padding: 20px;">
                         <i class="fas fa-check-circle" style="font-size: 4rem; color: #2ecc71; margin-bottom: 15px;"></i>
                         <h2 style="color: #333;">تم طلب الخدمة!</h2>
-                        <p>سيتواصل معك المستقل قريباً.</p>
                         <button class="btn-submit" onclick="location.reload()">تم</button>
                     </div>`;
             } catch (error) { showMsg("حدث خطأ في الحفظ"); }
         }
-
         window.onload = startApp;
     </script>
 </body>
