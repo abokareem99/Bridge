@@ -21,12 +21,10 @@
     </style>
 </head>
 <body>
-
     <header class="header">
         <a href="index.html" style="color:white; text-decoration:none;">✕</a>
         <h1 style="font-size:1.1rem;">نشر خدمة جديدة</h1>
     </header>
-
     <div class="container">
         <div class="form-card">
             <form id="serviceForm">
@@ -37,7 +35,6 @@
             </form>
         </div>
     </div>
-
     <div id="statusToast" class="status-toast"></div>
 
     <script>
@@ -51,10 +48,7 @@
             setTimeout(() => { toast.style.display = 'none'; }, 5000);
         }
 
-        // محاولة التهيئة فوراً عند تحميل الصفحة
-        try {
-            window.Pi.init({ version: "2.0", sandbox: true });
-        } catch (e) { console.error("Init immediate error:", e); }
+        try { window.Pi.init({ version: "2.0", sandbox: true }); } catch (e) {}
 
         document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
@@ -63,31 +57,22 @@
             notify("جاري المصادقة...");
 
             try {
-                // إعادة التهيئة قبل المصادقة لضمان تجاوز خطأ الصورة الأولى
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments']);
-                
                 notify("جاري طلب الدفع...");
 
-                // الهيكل الكامل لـ Callbacks لمنع خطأ الصورة الثانية
                 window.Pi.createPayment({
                     amount: parseFloat(document.getElementById('servicePrice').value),
                     memo: "نشر خدمة: " + document.getElementById('serviceTitle').value,
                     metadata: { orderId: "srv_" + Date.now() }
                 }, {
-                    onReadyForServerApproval: function(id) { console.log("Approved:", id); },
-                    onConnectedToBlockchain: function(id, tx) {
-                        notify("نجح الدفع! جاري الحفظ...");
-                        saveData(auth.user.username);
-                    },
-                    onCancel: function(id) { notify("تم إلغاء الدفع"); btn.disabled = false; },
-                    onError: function(err, payment) { notify("خطأ: " + err.message); btn.disabled = false; },
-                    onIncomplete: function(id) { notify("يوجد دفعة غير مكتملة"); btn.disabled = false; }
+                    onReadyForServerApproval: function(id) { notify("بانتظار موافقة الخادم..."); },
+                    onConnectedToBlockchain: function(id, tx) { notify("نجح الدفع! جاري الحفظ..."); saveData(auth.user.username); },
+                    onCancel: function(id) { notify("تم الإلغاء"); btn.disabled = false; },
+                    onError: function(err) { notify("خطأ: " + err.message); btn.disabled = false; },
+                    onIncomplete: function(id) { notify("دفعة معلقة"); btn.disabled = false; }
                 });
-            } catch (err) {
-                notify("فشل الدخول: " + err.message);
-                btn.disabled = false;
-            }
+            } catch (err) { notify("خطأ: " + err.message); btn.disabled = false; }
         };
 
         async function saveData(user) {
@@ -97,8 +82,8 @@
                 price: document.getElementById('servicePrice').value,
                 user_pi: user
             }]);
-            if (!error) { notify("تم النشر!"); setTimeout(() => { window.location.href = 'index.html'; }, 2000); }
-            else { notify("خطأ في الحفظ"); document.getElementById('submitBtn').disabled = false; }
+            if (!error) { notify("تم النشر!"); setTimeout(() => location.href='index.html', 2000); }
+            else { notify("خطأ في الحفظ"); btn.disabled = false; }
         }
     </script>
 </body>
