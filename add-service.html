@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إضافة خدمة - جسر التواصل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         :root { --pi-purple: #6a1b9a; --pi-dark-purple: #4a148c; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -24,12 +22,10 @@
     </style>
 </head>
 <body>
-
     <header class="header">
         <a href="index.html" style="color:white; text-decoration:none;"><i class="fas fa-chevron-right"></i></a>
         <h1 style="font-size:1.1rem; margin-right:10px;">نشر خدمة جديدة</h1>
     </header>
-
     <div class="container">
         <div class="form-card">
             <form id="serviceForm">
@@ -49,7 +45,6 @@
             </form>
         </div>
     </div>
-
     <div id="statusToast" class="status-toast"></div>
 
     <script>
@@ -60,15 +55,13 @@
             const toast = document.getElementById('statusToast');
             toast.innerText = msg;
             toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 4000);
+            setTimeout(() => toast.style.display = 'none', 5000);
         }
 
-        // تهيئة الـ SDK بإصدار متوافق
+        // تهيئة الـ SDK
         try {
             window.Pi.init({ version: "2.0", sandbox: true });
-        } catch (e) {
-            console.error("Init error:", e);
-        }
+        } catch (e) { console.error(e); }
 
         document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
@@ -77,55 +70,54 @@
             notify("جاري المصادقة...");
 
             try {
-                // استخدام الإصدار 2.0 هنا أيضاً
                 const auth = await window.Pi.authenticate(['username', 'payments']);
                 
-                notify("افتح المحفظة لإتمام الدفع...");
+                notify("جاري طلب الدفع من المحفظة...");
 
+                // التعديل الجوهري هنا: إضافة كافة الـ Callbacks المطلوبة
                 window.Pi.createPayment({
-                    amount: parseFloat(document.getElementById('servicePrice').value) || 0.01,
-                    memo: "رسوم نشر خدمة جسر التواصل",
-                    metadata: { orderId: "service_" + Date.now() }
+                    amount: parseFloat(document.getElementById('servicePrice').value),
+                    memo: "رسوم نشر خدمة: " + document.getElementById('serviceTitle').value,
+                    metadata: { orderId: "srv_" + Date.now() }
                 }, {
                     onReadyForServerApproval: function(paymentId) {
-                        console.log("Payment waiting:", paymentId);
+                        // يتم استدعاء هذا عندما يوافق المستخدم في محفظته
+                        console.log("Payment approved by user:", paymentId);
+                        notify("تمت الموافقة.. جاري التأكيد من الشبكة");
                     },
                     onConnectedToBlockchain: function(paymentId, txid) {
-                        notify("تم الدفع! جاري الحفظ في القاعدة...");
+                        // يتم استدعاء هذا عند تسجيل المعاملة على البلوكشين
+                        notify("نجح الدفع! جاري الحفظ...");
                         saveData(auth.user.username);
                     },
-                    onCancel: function() { 
-                        notify("تم إلغاء الدفع"); 
-                        btn.disabled = false; 
+                    onCancel: function(paymentId) {
+                        notify("تم إلغاء العملية");
+                        btn.disabled = false;
                     },
-                    onError: function(err) { 
-                        notify("خطأ في الدفع: " + err.message); 
-                        btn.disabled = false; 
+                    onError: function(error, payment) {
+                        notify("حدث خطأ: " + error.message);
+                        btn.disabled = false;
                     }
                 });
             } catch (err) {
-                notify("خطأ في الدخول: " + err.message);
+                notify("خطأ في المصادقة: " + err.message);
                 btn.disabled = false;
             }
         };
 
         async function saveData(username) {
-            const title = document.getElementById('serviceTitle').value;
-            const desc = document.getElementById('serviceDesc').value;
-            const price = document.getElementById('servicePrice').value;
-
             const { error } = await _supabase.from('services').insert([{
-                title: title,
-                description: desc,
-                price: price,
+                title: document.getElementById('serviceTitle').value,
+                description: document.getElementById('serviceDesc').value,
+                price: document.getElementById('servicePrice').value,
                 user_pi: username
             }]);
 
             if (!error) {
-                notify("تم بنجاح! جاري العودة...");
+                notify("تم النشر بنجاح!");
                 setTimeout(() => window.location.href = 'index.html', 2000);
             } else {
-                notify("خطأ في الحفظ: " + error.message);
+                notify("فشل الحفظ: " + error.message);
                 document.getElementById('submitBtn').disabled = false;
             }
         }
