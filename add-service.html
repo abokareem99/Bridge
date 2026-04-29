@@ -10,12 +10,12 @@
         :root { --pi-purple: #6a1b9a; --pi-dark-purple: #4a148c; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--gray); padding-bottom: 40px; }
-        .header { background: var(--pi-purple); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 1000; }
+        .header { background: var(--pi-purple); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
         .form-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 20px; }
         .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--pi-dark-purple); font-size: 0.9rem; }
-        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95rem; }
+        .input-group input, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
         .submit-btn { width: 100%; background: var(--pi-purple); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 2000; }
     </style>
@@ -24,7 +24,7 @@
 
     <header class="header">
         <a href="index.html" style="color:white; text-decoration:none;"><i class="fas fa-chevron-right"></i></a>
-        <h1 style="font-size:1.1rem; margin-right:10px;">أنشئ خدمتك الجديدة</h1>
+        <h1 style="font-size:1.1rem; margin-right:10px;">نشر خدمة جديدة</h1>
     </header>
 
     <div class="container">
@@ -32,14 +32,7 @@
             <form id="serviceForm">
                 <div class="input-group">
                     <label>اسم الخدمة</label>
-                    <input type="text" id="serviceTitle" placeholder="مثلاً: تصميم شعار" required>
-                </div>
-                <div class="input-group">
-                    <label>الفئة</label>
-                    <select id="serviceCat">
-                        <option value="tech">برمجة وتكنولوجيا</option>
-                        <option value="design">تصميم جرافيك</option>
-                    </select>
+                    <input type="text" id="serviceTitle" required>
                 </div>
                 <div class="input-group">
                     <label>وصف الخدمة</label>
@@ -49,7 +42,7 @@
                     <label>السعر (Pi)</label>
                     <input type="number" id="servicePrice" step="0.01" required>
                 </div>
-                <button type="submit" class="submit-btn" id="btnText">دفع الرسوم ونشر الخدمة</button>
+                <button type="submit" class="submit-btn">ادفع وانشر الآن</button>
             </form>
         </div>
     </div>
@@ -58,7 +51,6 @@
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-        
         const supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
         function notify(msg) {
@@ -68,49 +60,51 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
-        // تهيئة بسيطة ومباشرة
-        Pi.init({ version: "2.0", sandbox: true });
+        // 1. تهيئة النظام فوراً
+        const Pi = window.Pi;
+        Pi.init({ version: "1.5", sandbox: true });
+
+        // 2. تعريف الدوال بشكل مسبق لضمان رؤيتها
+        const callbacks = {
+            onReadyForServerApproval: function(paymentId) {
+                console.log("Ready for server:", paymentId);
+                // ملاحظة: ستحتاج لاحقاً لربط هذه الخطوة بسيرفرك لإتمام الدفع نهائياً
+            },
+            onConnectedToBlockchain: function(paymentId, txid) {
+                notify("جاري الحفظ في القاعدة...");
+                const title = document.getElementById('serviceTitle').value;
+                const desc = document.getElementById('serviceDesc').value;
+                const price = document.getElementById('servicePrice').value;
+
+                supabase.from('services').insert([{
+                    title: title,
+                    description: desc,
+                    price: price
+                }]).then(() => {
+                    notify("تم النشر بنجاح!");
+                    document.getElementById('serviceForm').reset();
+                });
+            },
+            onCancel: function(paymentId) { notify("ألغيت العملية"); },
+            onError: function(error, payment) { notify("خطأ: " + error.message); },
+            onIncomplete: function(paymentId) { notify("دفع لم يكتمل"); }
+        };
 
         document.getElementById('serviceForm').onsubmit = function(e) {
             e.preventDefault();
-            
-            const title = document.getElementById('serviceTitle').value;
-            const cat = document.getElementById('serviceCat').value;
-            const desc = document.getElementById('serviceDesc').value;
-            const price = document.getElementById('servicePrice').value;
-
-            notify("جاري المصادقة...");
+            notify("جاري التحقق من الهوية...");
 
             Pi.authenticate(['username', 'payments']).then(function(auth) {
+                notify("افتح محفظتك للدفع...");
                 
                 Pi.createPayment({
                     amount: 0.01,
-                    memo: "نشر خدمة: " + title,
-                    metadata: { type: "listing" }
-                }, {
-                    onReadyForServerApproval: function(paymentId) {
-                        console.log("Ready:", paymentId);
-                        // في تطبيقات الويب البسيطة، ننتظر الربط مع الـ Backend لاحقاً
-                    },
-                    onConnectedToBlockchain: function(paymentId, txid) {
-                        notify("تم الدفع! جاري الحفظ...");
-                        supabase.from('services').insert([{
-                            title: title,
-                            category: cat,
-                            description: desc,
-                            price: price
-                        }]).then(res => {
-                            notify("تم النشر بنجاح!");
-                            document.getElementById('serviceForm').reset();
-                        });
-                    },
-                    onCancel: function(paymentId) { notify("تم الإلغاء"); },
-                    onError: function(error, payment) { notify("خطأ: " + error.message); },
-                    onIncomplete: function(paymentId) { notify("دفع غير مكتمل"); }
-                });
+                    memo: "رسوم نشر خدمة",
+                    metadata: { orderId: Date.now() }
+                }, callbacks); // تمرير الكائن الجاهز بالكامل هنا
 
             }).catch(function(err) {
-                notify("خطأ في الدخول: " + err.message);
+                notify("فشل الدخول: " + err.message);
             });
         };
     </script>
