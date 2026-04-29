@@ -8,125 +8,115 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --pi-p: #6a1b9a; --pi-g: #ffb74d; }
-        body { background: #f8f9fa; font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        h2 { text-align: center; color: var(--pi-p); margin-bottom: 10px; }
-        .fee { text-align: center; background: #fff3e0; color: #e65100; padding: 8px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #ececec; border-radius: 12px; background: #f9f9f9; box-sizing: border-box; outline: none; font-size: 0.95rem; }
-        input:focus, textarea:focus { border-color: var(--pi-p); }
+        body { background: #f8f9fa; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--pi-p); margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; }
         .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-pay:disabled { background: #ccc; }
-        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; min-height: 1.2em; }
-        .footer-links { margin-top: auto; padding: 20px; font-size: 0.8rem; }
-        .footer-links a { color: var(--pi-p); text-decoration: none; margin: 0 10px; font-weight: bold; }
+        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>نشر خدمة جديدة</h2>
-    <div class="fee">ضريبة النشر: 1.0 Pi</div>
+    <div style="text-align:center; background:#fff3e0; color:#e65100; padding:10px; border-radius:10px; font-size:0.8rem; margin-bottom:15px;">
+        رسوم النشر: 1.0 Pi
+    </div>
     
     <input type="text" id="title" placeholder="عنوان الخدمة">
-    <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
-    <input type="number" id="price" placeholder="السعر الذي ستتقاضاه (Pi)">
+    <textarea id="description" rows="4" placeholder="وصف الخدمة..."></textarea>
+    <input type="number" id="price" placeholder="سعر الخدمة (Pi)">
     
-    <button class="btn-pay" id="payBtn" onclick="processPayment()">دفع الرسوم والنشر الآن</button>
-    <div id="status">جاري التحقق من التوثيق...</div>
-</div>
-
-<div class="footer-links">
-    <a href="terms.html">شروط الاستخدام</a> | <a href="privacy.html">سياسة الخصوصية</a>
+    <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
+    <div id="status">جاري التوثيق...</div>
 </div>
 
 <script>
-    // إعدادات الربط مع Supabase
-    const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co";
-    const supabaseKey = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
+    const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
     let currentUser = "";
 
-    // تشغيل التوثيق فور فتح الصفحة لضمان التعرف على الحساب
     async function initPi() {
         try {
             await window.Pi.init({ version: "2.0", sandbox: true });
             const auth = await window.Pi.authenticate(['username', 'payments']);
             currentUser = auth.user.username;
-            document.getElementById('status').innerText = "تم التوثيق: " + currentUser;
+            document.getElementById('status').innerText = "مرحباً: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
-            document.getElementById('status').innerText = "فشل التوثيق - افتح الصفحة من متصفح Pi";
-            document.getElementById('status').style.color = "red";
+            document.getElementById('status').innerText = "فشل التوثيق - استخدم متصفح Pi";
         }
     }
 
-    async function processPayment() {
+    async function handlePayment() {
         const title = document.getElementById('title').value;
         const desc = document.getElementById('description').value;
         const price = document.getElementById('price').value;
         const btn = document.getElementById('payBtn');
-        
-        if(!title || !desc || !price || !currentUser) { 
-            alert("يرجى ملء البيانات والتأكد من التوثيق"); 
-            return; 
+
+        if(!title || !desc || !price || !currentUser) {
+            alert("يرجى ملء البيانات وتأكد من التوثيق");
+            return;
         }
-        
+
         btn.disabled = true;
-        document.getElementById('status').innerText = "جاري إنشاء المعاملة...";
+        document.getElementById('status').innerText = "جاري فتح المحفظة...";
 
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
                 memo: "رسوم نشر خدمة: " + title,
-                metadata: { type: "listing_fee", name: title }
+                metadata: { type: "listing_fee" }
             }, {
-                onReadyForServerApproval: (paymentId) => {
-                    // في وضع Sandbox، المحفظة تنتظر إشارة موافقة
-                    console.log("Payment Ready for Approval:", paymentId);
+                onReadyForServerApproval: async (paymentId) => {
+                    document.getElementById('status').innerText = "جاري تأكيد الدفع من السيرفر...";
+                    // مناداة كود الموافقة في Vercel الذي أنشأته في مجلد api
+                    await fetch('/api/approve-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentId })
+                    });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    // هذه المرحلة تعني أن الدفع تم بنجاح على البلوكشين
-                    document.getElementById('status').innerText = "تم الدفع! جاري حفظ البيانات...";
-                    saveService(title, desc, price);
+                    document.getElementById('status').innerText = "تم الدفع! جاري حفظ الخدمة...";
+                    saveToSupabase(title, desc, price);
                 },
-                onReadyForServerCompletion: (paymentId, txid) => {
-                    console.log("Payment Completed on Server");
+                onReadyForServerCompletion: async (paymentId, txid) => {
+                    // إبلاغ السيرفر بإكمال العملية
+                    await fetch('/api/complete-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentId, txid })
+                    });
                 },
-                onCancel: () => { 
-                    document.getElementById('status').innerText = "تم إلغاء عملية الدفع";
+                onCancel: () => {
+                    document.getElementById('status').innerText = "تم إلغاء الدفع";
                     btn.disabled = false;
                 },
-                onError: (e) => {
-                    // معالجة خطأ انتهاء الصلاحية
-                    document.getElementById('status').innerText = "خطأ: " + e.message;
+                onError: (error) => {
+                    document.getElementById('status').innerText = "خطأ: " + error.message;
                     btn.disabled = false;
                 }
             });
         } catch (e) {
-            alert("حدث خطأ تقني في الدفع");
+            alert("فشل بدء عملية الدفع");
             btn.disabled = false;
         }
     }
 
-    async function saveService(t, d, p) {
-        // إرسال البيانات للأعمدة التي أنشأتها في Supabase
-        try {
-            const { error } = await _supabase.from('services').insert([{ 
-                title: t,
-                description: d,
-                price: parseFloat(p),
-                user_pi: currentUser
-            }]);
+    async function saveToSupabase(t, d, p) {
+        const { error } = await _supabase.from('services').insert([{ 
+            title: t,
+            description: d,
+            price: parseFloat(p),
+            user_pi: currentUser
+        }]);
 
-            if (!error) {
-                alert("تم نشر خدمتك بنجاح وظهورها في الاندكس!");
-                window.location.href = "index.html";
-            } else {
-                throw error;
-            }
-        } catch (err) {
-            alert("تم الدفع ولكن فشل الحفظ في القاعدة: " + err.message);
+        if (!error) {
+            alert("تم النشر بنجاح!");
+            window.location.href = "index.html";
+        } else {
+            alert("تم الدفع وفشل الحفظ: " + error.message);
             document.getElementById('payBtn').disabled = false;
         }
     }
