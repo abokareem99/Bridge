@@ -60,52 +60,63 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
-        // 1. تهيئة النظام فوراً
+        // 1. تهيئة الـ SDK فور تحميل الصفحة
         const Pi = window.Pi;
-        Pi.init({ version: "1.5", sandbox: true });
+        try {
+            Pi.init({ version: "1.5", sandbox: true });
+            console.log("Pi SDK Initialized");
+        } catch (e) {
+            console.error("Initialization error:", e);
+        }
 
-        // 2. تعريف الدوال بشكل مسبق لضمان رؤيتها
-        const callbacks = {
-            onReadyForServerApproval: function(paymentId) {
-                console.log("Ready for server:", paymentId);
-                // ملاحظة: ستحتاج لاحقاً لربط هذه الخطوة بسيرفرك لإتمام الدفع نهائياً
-            },
-            onConnectedToBlockchain: function(paymentId, txid) {
-                notify("جاري الحفظ في القاعدة...");
-                const title = document.getElementById('serviceTitle').value;
-                const desc = document.getElementById('serviceDesc').value;
-                const price = document.getElementById('servicePrice').value;
-
-                supabase.from('services').insert([{
-                    title: title,
-                    description: desc,
-                    price: price
-                }]).then(() => {
-                    notify("تم النشر بنجاح!");
-                    document.getElementById('serviceForm').reset();
-                });
-            },
-            onCancel: function(paymentId) { notify("ألغيت العملية"); },
-            onError: function(error, payment) { notify("خطأ: " + error.message); },
-            onIncomplete: function(paymentId) { notify("دفع لم يكتمل"); }
-        };
-
-        document.getElementById('serviceForm').onsubmit = function(e) {
+        // 2. معالجة إرسال النموذج باستخدام async/await لضمان الترتيب
+        document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
             notify("جاري التحقق من الهوية...");
 
-            Pi.authenticate(['username', 'payments']).then(function(auth) {
-                notify("افتح محفظتك للدفع...");
+            try {
+                // الانتظار حتى تنجح المصادقة
+                const auth = await Pi.authenticate(['username', 'payments']);
+                notify("تم تسجيل الدخول: " + auth.user.username);
                 
+                // بدء عملية الدفع
                 Pi.createPayment({
                     amount: 0.01,
                     memo: "رسوم نشر خدمة",
-                    metadata: { orderId: Date.now() }
-                }, callbacks); // تمرير الكائن الجاهز بالكامل هنا
+                    metadata: { orderId: Date.now().toString() }
+                }, {
+                    onReadyForServerApproval: function(paymentId) {
+                        console.log("Payment ID for server:", paymentId);
+                    },
+                    onConnectedToBlockchain: async function(paymentId, txid) {
+                        notify("جاري حفظ البيانات...");
+                        
+                        const title = document.getElementById('serviceTitle').value;
+                        const desc = document.getElementById('serviceDesc').value;
+                        const price = document.getElementById('servicePrice').value;
 
-            }).catch(function(err) {
+                        const { error } = await supabase.from('services').insert([{
+                            title: title,
+                            description: desc,
+                            price: price
+                        }]);
+
+                        if (!error) {
+                            notify("تم النشر بنجاح!");
+                            document.getElementById('serviceForm').reset();
+                        } else {
+                            notify("خطأ في الحفظ: " + error.message);
+                        }
+                    },
+                    onCancel: function(paymentId) { notify("تم إلغاء العملية"); },
+                    onError: function(error, payment) { notify("خطأ في الدفع: " + error.message); },
+                    onIncomplete: function(paymentId) { notify("عملية دفع غير مكتملة"); }
+                });
+
+            } catch (err) {
                 notify("فشل الدخول: " + err.message);
-            });
+                console.error(err);
+            }
         };
     </script>
 </body>
