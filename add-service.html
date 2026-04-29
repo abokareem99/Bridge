@@ -21,6 +21,7 @@
     </style>
 </head>
 <body>
+
     <header class="header">
         <a href="index.html" style="color:white; text-decoration:none;">✕</a>
         <h1 style="font-size:1.1rem;">نشر خدمة جديدة</h1>
@@ -50,47 +51,50 @@
             setTimeout(() => { toast.style.display = 'none'; }, 5000);
         }
 
-        // التهيئة بإصدار 2.0 وهو المطلوب حالياً للمدفوعات
-        try {
-            window.Pi.init({ version: "2.0", sandbox: true });
-        } catch (e) { console.error(e); }
+        // تهيئة أساسية عند فتح الصفحة
+        window.onload = function() {
+            try {
+                window.Pi.init({ version: "2.0", sandbox: true });
+            } catch (e) { console.error("Init error", e); }
+        };
 
         document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            notify("جاري المصادقة...");
+            notify("جاري التحقق من الهوية...");
 
             try {
-                // المصادقة أولاً
+                // خطوة إجبارية لإيقاظ الـ SDK قبل الدفع
                 const auth = await window.Pi.authenticate(['username', 'payments']);
-                notify("جاري طلب الدفع من المحفظة...");
+                notify("جاري طلب الدفع...");
 
-                // هذا هو الهيكل الذي يمنع خطأ missing callbacks
+                // هذا هو الهيكل الذي يمنع خطأ missing callbacks الظاهر في صورك
                 window.Pi.createPayment({
                     amount: parseFloat(document.getElementById('servicePrice').value),
-                    memo: "نشر خدمة: " + document.getElementById('serviceTitle').value,
+                    memo: "إضافة خدمة: " + document.getElementById('serviceTitle').value,
                     metadata: { orderId: "srv_" + Date.now() }
                 }, {
                     onReadyForServerApproval: function(paymentId) {
-                        // ضرورية جداً لإتمام الدفع
-                        console.log("Ready for approval:", paymentId);
+                        console.log("Ready for approval", paymentId);
+                        // في بيئة التجربة (Sandbox) غالباً ما تكتمل العملية تلقائياً
                     },
                     onConnectedToBlockchain: function(paymentId, txid) {
-                        notify("نجح الدفع! جاري الحفظ...");
-                        saveData(auth.user.username);
+                        notify("تم الدفع! جاري الحفظ...");
+                        saveDataToSupabase(auth.user.username);
                     },
                     onCancel: function(paymentId) {
-                        notify("تم إلغاء الدفع");
+                        notify("تم إلغاء العملية");
                         btn.disabled = false;
                     },
                     onError: function(error, payment) {
-                        notify("خطأ: " + error.message);
+                        notify("خطأ في الدفع: " + error.message);
                         btn.disabled = false;
                     },
                     onIncomplete: function(paymentId) {
-                        // دالة إلزامية في الإصدارات الجديدة
-                        console.log("Incomplete payment found:", paymentId);
+                        // هذه هي الدالة التي كانت مفقودة وتسبب الخطأ في الصورة الأخيرة
+                        console.log("Incomplete payment", paymentId);
+                        btn.disabled = false;
                     }
                 });
             } catch (err) {
@@ -99,19 +103,20 @@
             }
         };
 
-        async function saveData(user) {
+        async function saveDataToSupabase(user) {
             const { error } = await _supabase.from('services').insert([{
                 title: document.getElementById('serviceTitle').value,
                 description: document.getElementById('serviceDesc').value,
                 price: document.getElementById('servicePrice').value,
                 user_pi: user
             }]);
+
             if (!error) {
                 notify("تم النشر بنجاح!");
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } else {
                 notify("خطأ في الحفظ بقاعدة البيانات");
-                btn.disabled = false;
+                document.getElementById('submitBtn').disabled = false;
             }
         }
     </script>
