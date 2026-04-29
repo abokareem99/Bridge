@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إضافة خدمة - جسر التواصل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
     <style>
         :root { --pi-purple: #6a1b9a; --pi-dark-purple: #4a148c; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -53,6 +55,9 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
         const supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
+        const Pi = window.Pi;
+        
+        // وظيفة التنبيه
         function notify(msg) {
             const toast = document.getElementById('statusToast');
             toast.innerText = msg;
@@ -60,62 +65,63 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
-        // 1. تهيئة الـ SDK فور تحميل الصفحة
-        const Pi = window.Pi;
+        // 1. التهيئة الفورية
         try {
             Pi.init({ version: "1.5", sandbox: true });
             console.log("Pi SDK Initialized");
         } catch (e) {
-            console.error("Initialization error:", e);
+            console.error("Pi Init Error:", e);
         }
 
-        // 2. معالجة إرسال النموذج باستخدام async/await لضمان الترتيب
         document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
-            notify("جاري التحقق من الهوية...");
+            
+            // التأكد من أن SDK جاهز قبل البدء
+            if (!Pi) {
+                notify("خطأ: مكتبة Pi لم يتم تحميلها");
+                return;
+            }
 
             try {
-                // الانتظار حتى تنجح المصادقة
+                notify("جاري المصادقة...");
                 const auth = await Pi.authenticate(['username', 'payments']);
-                notify("تم تسجيل الدخول: " + auth.user.username);
                 
-                // بدء عملية الدفع
-                Pi.createPayment({
+                notify("جاري إنشاء عملية الدفع...");
+                
+                await Pi.createPayment({
                     amount: 0.01,
-                    memo: "رسوم نشر خدمة",
-                    metadata: { orderId: Date.now().toString() }
+                    memo: "رسوم نشر خدمة " + document.getElementById('serviceTitle').value,
+                    metadata: { orderId: "ID_" + Date.now() }
                 }, {
-                    onReadyForServerApproval: function(paymentId) {
-                        console.log("Payment ID for server:", paymentId);
+                    onReadyForServerApproval: (paymentId) => {
+                        console.log("Payment waiting for approval:", paymentId);
                     },
-                    onConnectedToBlockchain: async function(paymentId, txid) {
-                        notify("جاري حفظ البيانات...");
+                    onConnectedToBlockchain: async (paymentId, txid) => {
+                        notify("نجح الدفع! جاري الحفظ في Supabase...");
                         
-                        const title = document.getElementById('serviceTitle').value;
-                        const desc = document.getElementById('serviceDesc').value;
-                        const price = document.getElementById('servicePrice').value;
-
                         const { error } = await supabase.from('services').insert([{
-                            title: title,
-                            description: desc,
-                            price: price
+                            title: document.getElementById('serviceTitle').value,
+                            description: document.getElementById('serviceDesc').value,
+                            price: document.getElementById('servicePrice').value,
+                            user_pi: auth.user.username // ربط الخدمة بالمستخدم
                         }]);
 
                         if (!error) {
                             notify("تم النشر بنجاح!");
                             document.getElementById('serviceForm').reset();
                         } else {
-                            notify("خطأ في الحفظ: " + error.message);
+                            notify("خطأ في Supabase: " + error.message);
                         }
                     },
-                    onCancel: function(paymentId) { notify("تم إلغاء العملية"); },
-                    onError: function(error, payment) { notify("خطأ في الدفع: " + error.message); },
-                    onIncomplete: function(paymentId) { notify("عملية دفع غير مكتملة"); }
+                    onCancel: (paymentId) => notify("تم إلغاء الدفع"),
+                    onError: (error, payment) => notify("خطأ: " + error.message),
+                    onIncomplete: (paymentId) => notify("هناك دفعة معلقة")
                 });
 
             } catch (err) {
-                notify("فشل الدخول: " + err.message);
-                console.error(err);
+                notify("عذراً: " + err.message);
+                // محاولة إعادة التهيئة إذا فشل الـ SDK
+                Pi.init({ version: "1.5", sandbox: true });
             }
         };
     </script>
