@@ -3,84 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إضافة خدمة - جسر التواصل</title>
+    <title>نشر خدمة جديدة - Bridge Freelance</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pi-p: #6a1b9a; --pi-g: #ffb74d; }
-        body { background: #f8f9fa; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; }
-        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; }
-        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; }
-    </style>
-</head>
-<body>
-
-<div class="card">
-    <h2 style="text-align:center; color:var(--pi-p);">نشر خدمة جديدة</h2>
-    <p style="text-align:center; font-size:0.8rem;">رسوم النشر: 1.0 Pi</p>
-    
-    <input type="text" id="title" placeholder="عنوان الخدمة">
-    <textarea id="description" rows="4" placeholder="تفاصيل الخدمة التي تقدمها..."></textarea>
-    <input type="number" id="price" placeholder="سعر خدمتك للعملاء (Pi)">
-    
-    <button class="btn-pay" id="payBtn" onclick="payAndPublish()">دفع الرسوم والنشر الآن</button>
-    <div id="status"></div>
-</div>
-
-<script>
-    const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
-
-    // تهيئة Pi بنفس طريقة الـ Index لضمان التوافق
-    window.onload = async () => {
-        try { await window.Pi.init({ version: "2.0", sandbox: true }); } catch(e) {}
-    };
-
-    function setStatus(m) { document.getElementById('status').innerText = m; }
-
-    async function payAndPublish() {
-        const title = document.getElementById('title').value;
-        const price = document.getElementById('price').value;
-        if(!title || !price) { setStatus("يرجى ملء البيانات أولاً"); return; }
-
-        setStatus("جاري طلب الدفع...");
-        try {
-            const auth = await window.Pi.authenticate(['username', 'payments']);
-            
-            await window.Pi.createPayment({
-                amount: 1.0, // رسوم النشر ثابتة
-                memo: "رسوم نشر خدمة: " + title,
-                metadata: { type: "publish_fee" }
-            }, {
-                onReadyForServerApproval: (id) => { console.log("Approved", id); },
-                onConnectedToBlockchain: (id, tx) => { 
-                    setStatus("تم الدفع! جاري الحفظ في المنصة...");
-                    saveService(auth.user.username);
-                },
-                onCancel: () => { setStatus("تم إلغاء الدفع"); },
-                onError: (e) => { setStatus("خطأ: " + e.message); },
-                // إضافة onIncomplete لضمان عدم ضياع الدوال
-                onIncomplete: (id) => { console.log("Incomplete", id); }
-            });
-        } catch (e) { setStatus("فشل التوثيق"); }
-    }
-
-    async function saveService(user) {
-        const { error } = await _supabase.from('services').insert([{ 
-            title: document.getElementById('title').value,
-            description: document.getElementById('description').value,
-            price: document.getElementById('price').value,
-            user_pi: user
-        }]);
-
-        if (!error) {
-            setStatus("تم النشر بنجاح! جاري العودة...");
-            setTimeout(() => location.href = 'index.html', 2000);
-        } else {
-            setStatus("خطأ في الحفظ");
-        }
-    }
-</script>
-</body>
-</html>
+        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: var(--w); width: 100%; max-width: 450px; padding: 30px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        h2 { color: var(--pi-p); text-align: center; margin-bottom: 20px; font-weight: 800; }
+        .fee-badge { background: #f3e5f5; color: var(--pi-p); padding: 8px 15px; border-radius: 12px; display: block; text-align: center; font-size: 0.9rem; margin-bottom: 25px; border: 1px dashed var(--pi-p); }
+        .input-group { margin-bottom: 15px; }
+        input, textarea { width: 100%; padding: 15px; border: 1px solid #ececec; border-radius: 15px; background: #fdfdfd; font-size: 0.95rem; outline: none; transition: 0.3s; }
+        input:
