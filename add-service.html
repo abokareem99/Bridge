@@ -114,7 +114,7 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
         
-        // تم تحديث الروابط بناءً على بياناتك
+        // الروابط والمفاتيح الخاصة بك
         const supabaseUrl = 'Https://xolwuawlnruvzqowxxbh.supabase.co' 
         const supabaseKey = 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll'
         const supabase = createClient(supabaseUrl, supabaseKey)
@@ -136,6 +136,7 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 await window.Pi.authenticate(['username', 'payments'], (p) => {});
 
+                // عملية دفع رسوم النشر
                 await window.Pi.createPayment({
                     amount: 0.01,
                     memo: "رسوم توثيق ونشر خدمة جديدة",
@@ -144,10 +145,11 @@
                         title: document.getElementById('serviceTitle').value 
                     }
                 }, {
-                    onReadyForServerApproval: (id) => { /* موافقة السيرفر */ },
+                    onReadyForServerApproval: (id) => { /* الموافقة من السيرفر */ },
                     onConnectedToBlockchain: async (id, txid) => {
                         notify("تم الدفع! جاري حفظ الخدمة...");
                         
+                        // حفظ البيانات في Supabase بعد نجاح الدفع
                         const { error } = await supabase.from('services').insert([{
                             title: document.getElementById('serviceTitle').value,
                             category: document.getElementById('serviceCat').value,
@@ -160,7 +162,10 @@
                         notify("تم النشر بنجاح! ستظهر خدمتك قريباً.");
                         form.reset();
                     },
-                    onError: (err) => notify("خطأ: " + err.message)
+                    onError: (err) => notify("خطأ: " + err.message),
+                    // الإضافات المطلوبة لحل خطأ Callback Missing:
+                    onCancel: (id) => notify("تم إلغاء عملية الدفع"),
+                    onIncomplete: (id) => notify("عملية الدفع غير مكتملة")
                 });
             } catch (err) {
                 notify("فشل: " + err.message);
