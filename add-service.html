@@ -7,36 +7,34 @@
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pi-p: #6a1b9a; --pi-g: #ffb74d; }
-        body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        :root { --pi-p: #6a1b9a; }
+        body { background: #f8f9fa; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: var(--pi-p); margin-bottom: 20px; }
-        .fee-info { text-align: center; background: #fff3e0; color: #e65100; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; font-size: 0.95rem; }
-        input:focus, textarea:focus { border-color: var(--pi-p); }
-        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; }
+        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; }
         .btn-pay:disabled { background: #ccc; }
-        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; font-weight: 600; }
+        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>نشر خدمة جديدة</h2>
-    <div class="fee-info">رسوم النشر: 1.0 Pi</div>
+    <div style="text-align:center; background:#fff3e0; color:#e65100; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:15px; font-weight:bold;">
+        رسوم النشر: 1.0 Pi
+    </div>
     
     <input type="text" id="title" placeholder="عنوان الخدمة">
-    <textarea id="description" rows="4" placeholder="وصف الخدمة..."></textarea>
-    <input type="number" id="price" placeholder="سعر خدمتك (Pi)">
+    <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
+    <input type="number" id="price" placeholder="السعر الذي ستتقاضاه (Pi)">
     
     <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
-    <div id="status">جاري تهيئة المحفظة...</div>
+    <div id="status">جاري التحقق من التوثيق...</div>
 </div>
 
 <script>
-    // إعدادات Supabase
     const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
-    
     let currentUser = "";
 
     async function initPi() {
@@ -44,7 +42,7 @@
             await window.Pi.init({ version: "2.0", sandbox: true });
             const auth = await window.Pi.authenticate(['username', 'payments']);
             currentUser = auth.user.username;
-            document.getElementById('status').innerText = "موثق كـ: " + currentUser;
+            document.getElementById('status').innerText = "مرحباً: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
             document.getElementById('status').innerText = "يرجى فتح التطبيق من متصفح Pi";
@@ -59,7 +57,7 @@
         const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("أكمل البيانات وتأكد من التوثيق");
+            alert("يرجى ملء كافة البيانات وتأكد من التوثيق");
             return;
         }
 
@@ -69,32 +67,32 @@
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
-                memo: "رسوم نشر: " + title,
+                memo: "رسوم نشر خدمة: " + title,
                 metadata: { type: "listing_fee" }
             }, {
                 onReadyForServerApproval: async (paymentId) => {
-                    document.getElementById('status').innerText = "جاري موافقة السيرفر...";
-                    // إرسال الـ action لملف الـ API الخاص بك
-                    await fetch('/api/approve-payment', {
+                    document.getElementById('status').innerText = "جاري تأكيد الدفع من السيرفر...";
+                    // تم تعديل المسار ليتطابق مع ملف payment-handler.js الخاص بك
+                    await fetch('/api/payment-handler', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId, action: 'approve' })
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع! جاري الحفظ في القاعدة...";
+                    document.getElementById('status').innerText = "تم الدفع بنجاح! جاري حفظ الخدمة...";
                     saveToSupabase(title, desc, price);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
-                    // التوثيق النهائي للمعاملة
-                    await fetch('/api/approve-payment', {
+                    // إتمام المعاملة نهائياً في السيرفر
+                    await fetch('/api/payment-handler', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
                 },
                 onCancel: () => {
-                    document.getElementById('status').innerText = "تم إلغاء الدفع";
+                    document.getElementById('status').innerText = "تم إلغاء العملية";
                     btn.disabled = false;
                 },
                 onError: (error) => {
@@ -103,12 +101,13 @@
                 }
             });
         } catch (e) {
-            alert("فشل بدء الدفع");
+            alert("فشل بدء عملية الدفع");
             btn.disabled = false;
         }
     }
 
     async function saveToSupabase(t, d, p) {
+        // الحفظ في الجدول والأعمدة التي أنشأتها
         const { error } = await _supabase.from('services').insert([{ 
             title: t,
             description: d,
@@ -117,10 +116,10 @@
         }]);
 
         if (!error) {
-            alert("تم النشر بنجاح! ستظهر خدمتك في الاندكس الآن.");
+            alert("تم نشر خدمتك بنجاح!");
             window.location.href = "index.html";
         } else {
-            alert("تم الدفع وفشل الحفظ في القاعدة: " + error.message);
+            alert("تم الدفع ولكن فشل الحفظ في Supabase: " + error.message);
             document.getElementById('payBtn').disabled = false;
         }
     }
