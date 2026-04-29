@@ -35,7 +35,7 @@
 </div>
 
 <script>
-    // 1. إعداد Supabase بالمعطيات الصحيحة التي زودتني بها
+    // 1. إعداد Supabase بالقيم التي أكدتها أنت
     const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
     const SB_KEY = "Sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
@@ -56,6 +56,7 @@
             document.getElementById('status').style.color = "green";
         } catch (e) {
             document.getElementById('status').innerText = "يرجى فتح التطبيق من متصفح Pi";
+            document.getElementById('status').style.color = "red";
         }
     }
 
@@ -66,7 +67,7 @@
         const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("يرجى ملء كافة البيانات يا هندسة");
+            alert("يرجى ملء كافة البيانات");
             return;
         }
 
@@ -87,8 +88,8 @@
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع! جاري الحفظ في جدول الخدمات...";
-                    saveDataToServices(title, desc, price, txid);
+                    document.getElementById('status').innerText = "تم الدفع! جاري محاولة الحفظ...";
+                    saveDataFinal(title, desc, price, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
                     await fetch('/api/payment-handler', {
@@ -97,43 +98,56 @@
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
                 },
-                onCancel: () => { document.getElementById('status').innerText = "تم الإلغاء"; btn.disabled = false; },
-                onError: (error) => { document.getElementById('status').innerText = "خطأ: " + error.message; btn.disabled = false; }
+                onCancel: () => { 
+                    document.getElementById('status').innerText = "تم الإلغاء"; 
+                    btn.disabled = false; 
+                },
+                onError: (error) => { 
+                    document.getElementById('status').innerText = "خطأ دفع: " + error.message; 
+                    btn.disabled = false; 
+                }
             });
         } catch (e) {
-            alert("فشل الدفع");
+            alert("فشل نظام الدفع");
             btn.disabled = false;
         }
     }
 
-    async function saveDataToServices(t, d, p, txid) {
-        // الحفظ في جدول 'services'
-        // لاحظ أننا لا نرسل الـ id لأن سوبابيز يولده تلقائياً كما ضبطناه
-        const { error } = await _supabase.from('services').insert([{ 
-            title: t, 
-            description: d, 
-            price: parseFloat(p), 
-            user_pi: currentUser,
-            txid: txid 
-        }]);
+    async function saveDataFinal(t, d, p, tx) {
+        try {
+            // محاولة الحفظ مع توضيح الأعمدة بدقة
+            const { data, error } = await _supabase
+                .from('services')
+                .insert([
+                    { 
+                        title: t, 
+                        description: d, 
+                        price: parseFloat(p), 
+                        user_pi: currentUser, 
+                        txid: tx 
+                    }
+                ]);
 
-        if (!error) {
-            // إرسال الإيميل بعد نجاح الحفظ
-            try {
+            if (error) {
+                // في حال وجود خطأ من Supabase، سيظهر هنا بالتفصيل
+                console.error("Supabase Error:", error);
+                alert("خطأ قاعدة البيانات: " + error.message + "\nكود الخطأ: " + error.code);
+                document.getElementById('payBtn').disabled = false;
+            } else {
+                // إرسال الإيميل
                 await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
                     from_name: currentUser,
                     service_title: t,
                     service_price: p,
                     message: d,
-                    txid: txid
+                    txid: tx
                 });
-            } catch (err) { console.error("Email error:", err); }
 
-            alert("تم نشر الخدمة بنجاح في جدول الخدمات! مبروك يا أبو كريم.");
-            window.location.href = "services.html"; 
-        } else {
-            alert("الدفع تم ولكن فشل الحفظ في قاعدة البيانات: " + error.message);
-            console.error("Supabase Insert Error:", error);
+                alert("مبروك يا أبو كريم! تم النشر بنجاح ووصلت لجدول الخدمات.");
+                window.location.href = "services.html";
+            }
+        } catch (err) {
+            alert("حدث خطأ غير متوقع: " + err.message);
             document.getElementById('payBtn').disabled = false;
         }
     }
