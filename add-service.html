@@ -21,7 +21,6 @@
         .input-group input, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
         .submit-btn { width: 100%; background: var(--pi-purple); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 2000; }
-        .disabled { background: #ccc !important; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -61,72 +60,56 @@
             const toast = document.getElementById('statusToast');
             toast.innerText = msg;
             toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
+            setTimeout(() => toast.style.display = 'none', 4000);
         }
 
-        // دالة التهيئة المضمونة
-        async function initializePi() {
-            try {
-                if (window.Pi) {
-                    await window.Pi.init({ version: "1.5", sandbox: true });
-                    console.log("Pi SDK Initialized Successfully");
-                } else {
-                    notify("خطأ: لم يتم تحميل مكتبة Pi");
-                }
-            } catch (err) {
-                console.error("Initialization error:", err);
-            }
+        // تهيئة الـ SDK بإصدار متوافق
+        try {
+            window.Pi.init({ version: "2.0", sandbox: true });
+        } catch (e) {
+            console.error("Init error:", e);
         }
-
-        // تشغيل التهيئة فور تحميل الصفحة
-        initializePi();
 
         document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.classList.add('disabled');
             btn.disabled = true;
-
-            notify("جاري التأكد من التهيئة...");
+            notify("جاري المصادقة...");
 
             try {
-                // إعادة التهيئة كخطوة احتياطية لمنع خطأ الصور التي أرسلتها
-                await window.Pi.init({ version: "1.5", sandbox: true });
-
+                // استخدام الإصدار 2.0 هنا أيضاً
                 const auth = await window.Pi.authenticate(['username', 'payments']);
-                notify("جاري إنشاء عملية الدفع...");
+                
+                notify("افتح المحفظة لإتمام الدفع...");
 
                 window.Pi.createPayment({
-                    amount: 0.01,
-                    memo: "نشر خدمة: " + document.getElementById('serviceTitle').value,
-                    metadata: { orderId: "ID_" + Date.now() }
+                    amount: parseFloat(document.getElementById('servicePrice').value) || 0.01,
+                    memo: "رسوم نشر خدمة جسر التواصل",
+                    metadata: { orderId: "service_" + Date.now() }
                 }, {
                     onReadyForServerApproval: function(paymentId) {
-                        console.log("Payment Ready:", paymentId);
+                        console.log("Payment waiting:", paymentId);
                     },
                     onConnectedToBlockchain: function(paymentId, txid) {
-                        notify("نجح الدفع! جاري الحفظ...");
-                        saveToDatabase(auth.user.username);
+                        notify("تم الدفع! جاري الحفظ في القاعدة...");
+                        saveData(auth.user.username);
                     },
                     onCancel: function() { 
-                        notify("تم إلغاء العملية");
-                        btn.classList.remove('disabled');
-                        btn.disabled = false;
+                        notify("تم إلغاء الدفع"); 
+                        btn.disabled = false; 
                     },
-                    onError: function(err) {
-                        notify("خطأ: " + err.message);
-                        btn.classList.remove('disabled');
-                        btn.disabled = false;
+                    onError: function(err) { 
+                        notify("خطأ في الدفع: " + err.message); 
+                        btn.disabled = false; 
                     }
                 });
             } catch (err) {
                 notify("خطأ في الدخول: " + err.message);
-                btn.classList.remove('disabled');
                 btn.disabled = false;
             }
         };
 
-        async function saveToDatabase(username) {
+        async function saveData(username) {
             const title = document.getElementById('serviceTitle').value;
             const desc = document.getElementById('serviceDesc').value;
             const price = document.getElementById('servicePrice').value;
@@ -139,10 +122,10 @@
             }]);
 
             if (!error) {
-                notify("تم النشر بنجاح!");
+                notify("تم بنجاح! جاري العودة...");
                 setTimeout(() => window.location.href = 'index.html', 2000);
             } else {
-                notify("خطأ في القاعدة: " + error.message);
+                notify("خطأ في الحفظ: " + error.message);
                 document.getElementById('submitBtn').disabled = false;
             }
         }
