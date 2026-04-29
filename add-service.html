@@ -10,27 +10,24 @@
         :root { --pi-p: #6a1b9a; }
         body { background: #f8f9fa; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--pi-p); margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; }
         .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; }
         .btn-pay:disabled { background: #ccc; }
-        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; }
+        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>نشر خدمة جديدة</h2>
-    <div style="text-align:center; background:#fff3e0; color:#e65100; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:15px; font-weight:bold;">
-        رسوم النشر: 1.0 Pi
-    </div>
+    <h2 style="text-align:center; color:var(--pi-p);">نشر خدمة جديدة</h2>
+    <div style="text-align:center; background:#fff3e0; color:#e65100; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:15px;">رسوم النشر: 1.0 Pi</div>
     
     <input type="text" id="title" placeholder="عنوان الخدمة">
-    <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
-    <input type="number" id="price" placeholder="السعر الذي ستتقاضاه (Pi)">
+    <textarea id="description" rows="4" placeholder="وصف الخدمة..."></textarea>
+    <input type="number" id="price" placeholder="سعر خدمتك (Pi)">
     
     <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
-    <div id="status">جاري التحقق من التوثيق...</div>
+    <div id="status">جاري التوثيق...</div>
 </div>
 
 <script>
@@ -42,11 +39,10 @@
             await window.Pi.init({ version: "2.0", sandbox: true });
             const auth = await window.Pi.authenticate(['username', 'payments']);
             currentUser = auth.user.username;
-            document.getElementById('status').innerText = "مرحباً: " + currentUser;
+            document.getElementById('status').innerText = "موثق كـ: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
-            document.getElementById('status').innerText = "يرجى فتح التطبيق من متصفح Pi";
-            document.getElementById('status').style.color = "red";
+            document.getElementById('status').innerText = "يرجى استخدام متصفح Pi";
         }
     }
 
@@ -56,10 +52,7 @@
         const price = document.getElementById('price').value;
         const btn = document.getElementById('payBtn');
 
-        if(!title || !desc || !price || !currentUser) {
-            alert("يرجى ملء كافة البيانات وتأكد من التوثيق");
-            return;
-        }
+        if(!title || !desc || !price || !currentUser) { alert("أكمل البيانات أولاً"); return; }
 
         btn.disabled = true;
         document.getElementById('status').innerText = "جاري إنشاء المعاملة...";
@@ -67,60 +60,49 @@
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
-                memo: "رسوم نشر خدمة: " + title,
+                memo: "رسوم نشر: " + title,
                 metadata: { type: "listing_fee" }
             }, {
                 onReadyForServerApproval: async (paymentId) => {
-                    document.getElementById('status').innerText = "جاري تأكيد الدفع من السيرفر...";
-                    // تم تعديل المسار ليتطابق مع ملف payment-handler.js الخاص بك
-                    await fetch('/api/payment-handler', {
+                    document.getElementById('status').innerText = "جاري موافقة السيرفر (Approve)...";
+                    const response = await fetch('/api/payment-handler', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId, action: 'approve' })
                     });
+                    if (!response.ok) throw new Error("السيرفر لم يستجب للموافقة");
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع بنجاح! جاري حفظ الخدمة...";
+                    document.getElementById('status').innerText = "تم الدفع! جاري الحفظ...";
                     saveToSupabase(title, desc, price);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
-                    // إتمام المعاملة نهائياً في السيرفر
-                    await fetch('/api/payment-handler', {
+                    document.getElementById('status').innerText = "إتمام المعاملة نهائياً (Complete)...";
+                    const response = await fetch('/api/payment-handler', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
+                    if (!response.ok) console.error("فشل إتمام المعاملة في السيرفر");
                 },
-                onCancel: () => {
-                    document.getElementById('status').innerText = "تم إلغاء العملية";
-                    btn.disabled = false;
-                },
-                onError: (error) => {
-                    document.getElementById('status').innerText = "خطأ: " + error.message;
-                    btn.disabled = false;
-                }
+                onCancel: () => { document.getElementById('status').innerText = "تم الإلغاء"; btn.disabled = false; },
+                onError: (error) => { document.getElementById('status').innerText = "خطأ: " + error.message; btn.disabled = false; }
             });
         } catch (e) {
-            alert("فشل بدء عملية الدفع");
+            alert("خطأ غير متوقع: " + e.message);
             btn.disabled = false;
         }
     }
 
     async function saveToSupabase(t, d, p) {
-        // الحفظ في الجدول والأعمدة التي أنشأتها
         const { error } = await _supabase.from('services').insert([{ 
-            title: t,
-            description: d,
-            price: parseFloat(p),
-            user_pi: currentUser
+            title: t, description: d, price: parseFloat(p), user_pi: currentUser
         }]);
-
         if (!error) {
-            alert("تم نشر خدمتك بنجاح!");
+            alert("مبروك! تم النشر بنجاح.");
             window.location.href = "index.html";
         } else {
-            alert("تم الدفع ولكن فشل الحفظ في Supabase: " + error.message);
-            document.getElementById('payBtn').disabled = false;
+            alert("الدفع تم ولكن فشل الحفظ: " + error.message);
         }
     }
 
