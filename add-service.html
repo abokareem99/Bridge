@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -22,6 +21,7 @@
         .input-group input, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
         .submit-btn { width: 100%; background: var(--pi-purple); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 2000; }
+        .disabled { background: #ccc !important; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -54,7 +54,6 @@
     <div id="statusToast" class="status-toast"></div>
 
     <script>
-        // تعريف Supabase من السكريبت العادي
         const { createClient } = supabase;
         const _supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
@@ -65,42 +64,69 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
-        // تهيئة Pi بشكل فوري ومباشر
-        try {
-            window.Pi.init({ version: "1.5", sandbox: true });
-        } catch (e) {
-            console.error("Init Error", e);
+        // دالة التهيئة المضمونة
+        async function initializePi() {
+            try {
+                if (window.Pi) {
+                    await window.Pi.init({ version: "1.5", sandbox: true });
+                    console.log("Pi SDK Initialized Successfully");
+                } else {
+                    notify("خطأ: لم يتم تحميل مكتبة Pi");
+                }
+            } catch (err) {
+                console.error("Initialization error:", err);
+            }
         }
 
-        document.getElementById('serviceForm').onsubmit = function(e) {
+        // تشغيل التهيئة فور تحميل الصفحة
+        initializePi();
+
+        document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
+            btn.classList.add('disabled');
             btn.disabled = true;
-            notify("جاري المصادقة...");
 
-            window.Pi.authenticate(['username', 'payments']).then(function(auth) {
-                notify("جاري فتح المحفظة...");
-                
+            notify("جاري التأكد من التهيئة...");
+
+            try {
+                // إعادة التهيئة كخطوة احتياطية لمنع خطأ الصور التي أرسلتها
+                await window.Pi.init({ version: "1.5", sandbox: true });
+
+                const auth = await window.Pi.authenticate(['username', 'payments']);
+                notify("جاري إنشاء عملية الدفع...");
+
                 window.Pi.createPayment({
                     amount: 0.01,
                     memo: "نشر خدمة: " + document.getElementById('serviceTitle').value,
                     metadata: { orderId: "ID_" + Date.now() }
                 }, {
-                    onReadyForServerApproval: function(paymentId) { console.log("Ready:", paymentId); },
-                    onConnectedToBlockchain: function(paymentId, txid) {
-                        notify("تم الدفع! جاري الحفظ...");
-                        saveData();
+                    onReadyForServerApproval: function(paymentId) {
+                        console.log("Payment Ready:", paymentId);
                     },
-                    onCancel: function(id) { notify("تم الإلغاء"); btn.disabled = false; },
-                    onError: function(err) { notify("خطأ: " + err.message); btn.disabled = false; }
+                    onConnectedToBlockchain: function(paymentId, txid) {
+                        notify("نجح الدفع! جاري الحفظ...");
+                        saveToDatabase(auth.user.username);
+                    },
+                    onCancel: function() { 
+                        notify("تم إلغاء العملية");
+                        btn.classList.remove('disabled');
+                        btn.disabled = false;
+                    },
+                    onError: function(err) {
+                        notify("خطأ: " + err.message);
+                        btn.classList.remove('disabled');
+                        btn.disabled = false;
+                    }
                 });
-            }).catch(function(err) {
-                notify("فشل الدخول: " + err.message);
+            } catch (err) {
+                notify("خطأ في الدخول: " + err.message);
+                btn.classList.remove('disabled');
                 btn.disabled = false;
-            });
+            }
         };
 
-        async function saveData() {
+        async function saveToDatabase(username) {
             const title = document.getElementById('serviceTitle').value;
             const desc = document.getElementById('serviceDesc').value;
             const price = document.getElementById('servicePrice').value;
@@ -108,7 +134,8 @@
             const { error } = await _supabase.from('services').insert([{
                 title: title,
                 description: desc,
-                price: price
+                price: price,
+                user_pi: username
             }]);
 
             if (!error) {
