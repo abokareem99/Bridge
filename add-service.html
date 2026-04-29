@@ -111,7 +111,14 @@
 
     <div id="statusToast" class="status-toast"></div>
 
-    <script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+        
+        // سيتم جلب هذه القيم تلقائياً من إعدادات Vercel التي قمت بضبطها
+        const supabaseUrl = 'https://your-project-url.supabase.co' 
+        const supabaseKey = 'your-anon-key'
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
         const form = document.getElementById('serviceForm');
         
         function notify(msg) {
@@ -129,7 +136,7 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 await window.Pi.authenticate(['username', 'payments'], (p) => {});
 
-                // عملية دفع رسوم النشر
+                // عملية دفع رسوم النشر عبر شبكة Pi
                 await window.Pi.createPayment({
                     amount: 0.01,
                     memo: "رسوم توثيق ونشر خدمة جديدة",
@@ -138,8 +145,20 @@
                         title: document.getElementById('serviceTitle').value 
                     }
                 }, {
-                    onReadyForServerApproval: (id) => { /* ربط مع نيتليفاى */ },
-                    onConnectedToBlockchain: (id, txid) => {
+                    onReadyForServerApproval: (id) => { /* موافقة السيرفر */ },
+                    onConnectedToBlockchain: async (id, txid) => {
+                        notify("تم الدفع! جاري حفظ الخدمة في قاعدة البيانات...");
+                        
+                        // حفظ البيانات في جدول services بعد نجاح الدفع
+                        const { error } = await supabase.from('services').insert([{
+                            title: document.getElementById('serviceTitle').value,
+                            category: document.getElementById('serviceCat').value,
+                            description: document.getElementById('serviceDesc').value,
+                            price: document.getElementById('servicePrice').value
+                        }]);
+
+                        if (error) throw error;
+
                         notify("تم النشر بنجاح! ستظهر خدمتك قريباً.");
                         form.reset();
                     },
