@@ -2,76 +2,85 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نشر خدمة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة خدمة - جسر التواصل</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; }
-        .btn { width: 100%; background: #6a1b9a; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        #st { color: red; text-align: center; margin-top: 10px; font-weight: bold; }
+        :root { --pi-p: #6a1b9a; --pi-g: #ffb74d; }
+        body { background: #f8f9fa; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; }
+        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; }
+        #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 style="text-align:center; color:#6a1b9a;">نشر خدمة</h2>
-        <input type="text" id="t" placeholder="العنوان">
-        <textarea id="d" placeholder="الوصف"></textarea>
-        <input type="number" id="p" placeholder="السعر">
-        <button class="btn" id="b" onclick="go()">دفع ونشر</button>
-        <div id="st"></div>
-    </div>
 
-    <script>
-        const sb = supabase.createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
-        
-        // 1. تعريف الدوال في مستوى الصفحة العام (Global) فوراً
-        const callbacks = {
-            onReadyForServerApproval: (id) => console.log("Ready", id),
-            onConnectedToBlockchain: (id, tx) => save(),
-            onCancel: (id) => { err("تم الإلغاء"); res(); },
-            onError: (e) => { err("خطأ: " + e.message); res(); },
-            onIncomplete: (id) => { err("فشل الدفع"); res(); }
-        };
+<div class="card">
+    <h2 style="text-align:center; color:var(--pi-p);">نشر خدمة جديدة</h2>
+    <p style="text-align:center; font-size:0.8rem;">رسوم النشر: 1.0 Pi</p>
+    
+    <input type="text" id="title" placeholder="عنوان الخدمة">
+    <textarea id="description" rows="4" placeholder="تفاصيل الخدمة التي تقدمها..."></textarea>
+    <input type="number" id="price" placeholder="سعر خدمتك للعملاء (Pi)">
+    
+    <button class="btn-pay" id="payBtn" onclick="payAndPublish()">دفع الرسوم والنشر الآن</button>
+    <div id="status"></div>
+</div>
 
-        function err(m) { document.getElementById('st').innerText = m; }
-        function res() { const b = document.getElementById('b'); b.disabled = false; b.innerText = "دفع ونشر"; }
+<script>
+    const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
 
-        window.onload = () => { window.Pi.init({ version: "2.0", sandbox: true }); };
+    // تهيئة Pi بنفس طريقة الـ Index لضمان التوافق
+    window.onload = async () => {
+        try { await window.Pi.init({ version: "2.0", sandbox: true }); } catch(e) {}
+    };
 
-        async function go() {
-            const btn = document.getElementById('b');
-            btn.disabled = true;
-            btn.innerText = "جاري التحقق...";
-            err("");
+    function setStatus(m) { document.getElementById('status').innerText = m; }
 
-            try {
-                const auth = await window.Pi.authenticate(['username', 'payments']);
-                window.uid = auth.user.username;
-                
-                // 2. استدعاء الدفع باستخدام الكائن المعرف مسبقاً
-                window.Pi.createPayment({
-                    amount: parseFloat(document.getElementById('p').value),
-                    memo: "نشر: " + document.getElementById('t').value,
-                    metadata: { orderId: "srv_" + Date.now() }
-                }, callbacks);
-            } catch (e) {
-                err("فشل: " + e.message);
-                res();
-            }
+    async function payAndPublish() {
+        const title = document.getElementById('title').value;
+        const price = document.getElementById('price').value;
+        if(!title || !price) { setStatus("يرجى ملء البيانات أولاً"); return; }
+
+        setStatus("جاري طلب الدفع...");
+        try {
+            const auth = await window.Pi.authenticate(['username', 'payments']);
+            
+            await window.Pi.createPayment({
+                amount: 1.0, // رسوم النشر ثابتة
+                memo: "رسوم نشر خدمة: " + title,
+                metadata: { type: "publish_fee" }
+            }, {
+                onReadyForServerApproval: (id) => { console.log("Approved", id); },
+                onConnectedToBlockchain: (id, tx) => { 
+                    setStatus("تم الدفع! جاري الحفظ في المنصة...");
+                    saveService(auth.user.username);
+                },
+                onCancel: () => { setStatus("تم إلغاء الدفع"); },
+                onError: (e) => { setStatus("خطأ: " + e.message); },
+                // إضافة onIncomplete لضمان عدم ضياع الدوال
+                onIncomplete: (id) => { console.log("Incomplete", id); }
+            });
+        } catch (e) { setStatus("فشل التوثيق"); }
+    }
+
+    async function saveService(user) {
+        const { error } = await _supabase.from('services').insert([{ 
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            price: document.getElementById('price').value,
+            user_pi: user
+        }]);
+
+        if (!error) {
+            setStatus("تم النشر بنجاح! جاري العودة...");
+            setTimeout(() => location.href = 'index.html', 2000);
+        } else {
+            setStatus("خطأ في الحفظ");
         }
-
-        async function save() {
-            const { error } = await sb.from('services').insert([{
-                title: document.getElementById('t').value,
-                description: document.getElementById('d').value,
-                price: document.getElementById('p').value,
-                user_pi: window.uid
-            }]);
-            if (!error) { window.location.href = 'index.html'; }
-            else { err("خطأ في قاعدة البيانات"); res(); }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
