@@ -5,57 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جسر التواصل - سوق الخدمات المصغرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --pi-purple: #6a1b9a;
-            --pi-gold: #ffb74d;
-            --white: #ffffff;
-            --gray: #f4f4f9;
-        }
-
+        :root { --pi-purple: #6a1b9a; --pi-gold: #ffb74d; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--gray); padding-bottom: 80px; }
-
-        .header {
-            background: var(--pi-purple); color: white; padding: 20px;
-            text-align: center; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
+        .header { background: var(--pi-purple); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
-
-        .service-card {
-            background: white; border-radius: 12px; padding: 15px;
-            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-right: 5px solid var(--pi-gold);
-        }
+        .service-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-right: 5px solid var(--pi-gold); }
         .service-card h3 { color: var(--pi-purple); margin-bottom: 8px; font-size: 1.1rem; }
-        .service-card p { color: #555; font-size: 0.9rem; line-height: 1.4; }
-        
-        .card-footer {
-            margin-top: 10px; display: flex; justify-content: space-between;
-            align-items: center; border-top: 1px solid #eee; padding-top: 10px;
-        }
+        .card-footer { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px; }
         .price-tag { color: #27ae60; font-weight: bold; }
         .category-tag { background: #eee; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; }
-
-        .add-service-fab {
-            position: fixed; bottom: 20px; left: 20px;
-            background: var(--pi-purple); color: white;
-            width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-decoration: none; z-index: 1000;
-        }
-        
+        .add-service-fab { position: fixed; bottom: 20px; left: 20px; background: var(--pi-purple); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-decoration: none; z-index: 1000; }
         .loading { text-align: center; padding: 20px; color: var(--pi-purple); }
     </style>
 </head>
 <body>
-
     <header class="header">
         <h1>جسر التواصل</h1>
         <p id="userStatus" style="font-size: 0.8rem; opacity: 0.9;">جاري التحقق من الهوية...</p>
@@ -67,71 +34,46 @@
         </div>
     </div>
 
-    <a href="add-service.html" class="add-service-fab">
-        <i class="fas fa-plus"></i>
-    </a>
+    <a href="add-service.html" class="add-service-fab"><i class="fas fa-plus"></i></a>
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+    <script>
+        const { createClient } = supabase;
+        const _supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
-        const supabaseUrl = 'Https://xolwuawlnruvzqowxxbh.supabase.co' 
-        const supabaseKey = 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll'
-        const supabase = createClient(supabaseUrl, supabaseKey)
-
-        // 1. تهيئة نظام Pi فوراً عند تحميل الموديول
-        const Pi = window.Pi;
-        try {
-            Pi.init({ version: "1.5", sandbox: true });
-            
-            // طلب المصادقة بمجرد فتح التطبيق لضمان صلاحية الجلسة
-            Pi.authenticate(['username', 'payments']).then((auth) => {
+        // تهيئة Pi
+        async function initApp() {
+            try {
+                await window.Pi.init({ version: "2.0", sandbox: true });
+                const auth = await window.Pi.authenticate(['username', 'payments']);
                 document.getElementById('userStatus').innerText = "مرحباً: " + auth.user.username;
-                console.log("Authenticated as:", auth.user.username);
-            }).catch(err => {
-                document.getElementById('userStatus').innerText = "يرجى فتح التطبيق من متصفح Pi";
-            });
-        } catch (e) {
-            console.error("Pi Init Error:", e);
+                fetchServices();
+            } catch (e) {
+                document.getElementById('userStatus').innerText = "يرجى الفتح من متصفح Pi";
+                fetchServices(); // جلب البيانات حتى لو فشل الدخول
+            }
         }
 
         async function fetchServices() {
             const container = document.getElementById('servicesContainer');
+            const { data, error } = await _supabase.from('services').select('*').order('created_at', { ascending: false });
             
-            try {
-                const { data, error } = await supabase
-                    .from('services')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                if (data.length === 0) {
-                    container.innerHTML = '<p style="text-align:center;">لا توجد خدمات متاحة حالياً.</p>';
-                    return;
-                }
-
-                container.innerHTML = ''; 
-                data.forEach(service => {
-                    container.innerHTML += `
-                        <div class="service-card">
-                            <h3>${service.title}</h3>
-                            <p>${service.description}</p>
-                            <div class="card-footer">
-                                <span class="category-tag">${service.category || 'عام'}</span>
-                                <span class="price-tag">${service.price} Pi</span>
-                            </div>
+            if (error) { container.innerHTML = "خطأ في التحميل"; return; }
+            
+            container.innerHTML = data.length ? '' : 'لا توجد خدمات';
+            data.forEach(service => {
+                container.innerHTML += `
+                    <div class="service-card">
+                        <h3>${service.title}</h3>
+                        <p>${service.description}</p>
+                        <div class="card-footer">
+                            <span class="category-tag">عام</span>
+                            <span class="price-tag">${service.price} Pi</span>
                         </div>
-                    `;
-                });
-
-            } catch (err) {
-                container.innerHTML = '<p style="color:red; text-align:center;">خطأ في تحميل البيانات.</p>';
-                console.error(err);
-            }
+                    </div>`;
+            });
         }
 
-        // تشغيل جلب البيانات
-        window.onload = fetchServices;
+        window.onload = initApp;
     </script>
 </body>
 </html>
