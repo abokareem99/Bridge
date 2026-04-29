@@ -26,17 +26,19 @@
     <h2>نشر خدمة جديدة</h2>
     <div class="fee-badge">رسوم النشر: 1.0 Pi</div>
     
-    <input type="text" id="title" placeholder="عنوان الخدمة (مثلاً: برمجة تطبيق)">
+    <input type="text" id="title" placeholder="عنوان الخدمة">
     <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
-    <input type="number" id="price" placeholder="السعر الذي ستتقاضاه (Pi)">
+    <input type="number" id="price" placeholder="السعر المطلوب (Pi)">
     
-    <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر في الخدمات</button>
+    <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
     <div id="status">جاري تهيئة النظام...</div>
 </div>
 
 <script>
-    // 1. إعداد Supabase
-    const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
+    // 1. إعداد Supabase بالمعطيات الصحيحة التي زودتني بها
+    const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
+    const SB_KEY = "Sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
+    const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
     // 2. إعداد EmailJS
     (function(){
@@ -64,18 +66,18 @@
         const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("يرجى إكمال جميع البيانات");
+            alert("يرجى ملء كافة البيانات يا هندسة");
             return;
         }
 
         btn.disabled = true;
-        document.getElementById('status').innerText = "جاري إنشاء معاملة الدفع...";
+        document.getElementById('status').innerText = "جاري إنشاء المعاملة...";
 
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
-                memo: "رسوم نشر خدمة جديدة: " + title,
-                metadata: { type: "service_listing" }
+                memo: "رسوم نشر خدمة: " + title,
+                metadata: { type: "listing_fee" }
             }, {
                 onReadyForServerApproval: async (paymentId) => {
                     await fetch('/api/payment-handler', {
@@ -86,7 +88,7 @@
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
                     document.getElementById('status').innerText = "تم الدفع! جاري الحفظ في جدول الخدمات...";
-                    saveToServicesTable(title, desc, price, txid);
+                    saveDataToServices(title, desc, price, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
                     await fetch('/api/payment-handler', {
@@ -95,7 +97,7 @@
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
                 },
-                onCancel: () => { document.getElementById('status').innerText = "تم إلغاء الدفع"; btn.disabled = false; },
+                onCancel: () => { document.getElementById('status').innerText = "تم الإلغاء"; btn.disabled = false; },
                 onError: (error) => { document.getElementById('status').innerText = "خطأ: " + error.message; btn.disabled = false; }
             });
         } catch (e) {
@@ -104,8 +106,9 @@
         }
     }
 
-    async function saveToServicesTable(t, d, p, txid) {
-        // الحفظ في جدول 'services' تحديداً
+    async function saveDataToServices(t, d, p, txid) {
+        // الحفظ في جدول 'services'
+        // لاحظ أننا لا نرسل الـ id لأن سوبابيز يولده تلقائياً كما ضبطناه
         const { error } = await _supabase.from('services').insert([{ 
             title: t, 
             description: d, 
@@ -115,19 +118,22 @@
         }]);
 
         if (!error) {
-            // إرسال الإيميل للتوثيق
-            await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
-                from_name: currentUser,
-                service_title: t,
-                service_price: p,
-                message: d,
-                txid: txid
-            });
+            // إرسال الإيميل بعد نجاح الحفظ
+            try {
+                await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
+                    from_name: currentUser,
+                    service_title: t,
+                    service_price: p,
+                    message: d,
+                    txid: txid
+                });
+            } catch (err) { console.error("Email error:", err); }
 
-            alert("تم إضافة خدمتك لجدول الخدمات بنجاح!");
-            window.location.href = "services.html"; // التوجه لصفحة العرض
+            alert("تم نشر الخدمة بنجاح في جدول الخدمات! مبروك يا أبو كريم.");
+            window.location.href = "services.html"; 
         } else {
-            alert("حدث خطأ في قاعدة البيانات: " + error.message);
+            alert("الدفع تم ولكن فشل الحفظ في قاعدة البيانات: " + error.message);
+            console.error("Supabase Insert Error:", error);
             document.getElementById('payBtn').disabled = false;
         }
     }
