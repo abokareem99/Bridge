@@ -1,0 +1,7 @@
+# الحماية من رفع المفاتيح السرية
+.env*.local
+.env
+node_modules/
+.next/
+out/
+build/
