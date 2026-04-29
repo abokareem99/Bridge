@@ -14,9 +14,10 @@
         .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee; }
         h2 { text-align: center; color: var(--pi-p); }
         .fee-badge { text-align: center; background: #fff3e0; color: #e65100; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; }
-        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 18px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-pay:disabled { background: #ccc; }
+        input, textarea, select { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; }
+        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 18px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .btn-pay:hover { background: #4a148c; }
+        .btn-pay:disabled { background: #ccc; cursor: not-allowed; }
         #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; font-weight: bold; }
     </style>
 </head>
@@ -26,16 +27,25 @@
     <h2>نشر خدمة جديدة</h2>
     <div class="fee-badge">رسوم النشر: 1.0 Pi</div>
     
-    <input type="text" id="title" placeholder="عنوان الخدمة">
+    <input type="text" id="title" placeholder="عنوان الخدمة (مثلاً: تصميم شعار)">
     <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
-    <input type="number" id="price" placeholder="السعر المطلوب (Pi)">
     
-    <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
-    <div id="status">جاري التعرف على حساب Pi...</div>
+    <select id="category">
+        <option value="برمجة">برمجة وتطوير</option>
+        <option value="تصميم">تصميم جرافيك</option>
+        <option value="تسويق">تسويق إلكتروني</option>
+        <option value="أخرى" selected>تصنيفات أخرى</option>
+    </select>
+
+    <input type="number" id="price" placeholder="السعر المطلوب منك (Pi)">
+    <input type="text" id="contact" placeholder="وسيلة التواصل (واتساب أو إيميل)">
+    
+    <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع 1.0 Pi والنشر</button>
+    <div id="status">جاري الاتصال بـ Pi Network...</div>
 </div>
 
 <script>
-    // استخدمنا الـ Project ID الخاص بك هنا مباشرة
+    // الإعدادات الخاصة بمشروعك (xolwuawlnruvzqowxxbh)
     const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
     const SB_KEY = "Sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
@@ -46,6 +56,7 @@
 
     let currentUser = "";
 
+    // تشغيل نظام Pi عند التحميل
     async function initPi() {
         try {
             await window.Pi.init({ version: "2.0", sandbox: true });
@@ -54,7 +65,7 @@
             document.getElementById('status').innerText = "متصل كـ: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
-            document.getElementById('status').innerText = "يرجى استخدام متصفح Pi";
+            document.getElementById('status').innerText = "يرجى فتح التطبيق من متصفح Pi";
             document.getElementById('status').style.color = "red";
         }
     }
@@ -63,20 +74,22 @@
         const title = document.getElementById('title').value;
         const desc = document.getElementById('description').value;
         const price = document.getElementById('price').value;
+        const cat = document.getElementById('category').value;
+        const contact = document.getElementById('contact').value;
         const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("أكمل البيانات أولاً يا هندسة");
+            alert("يا هندسة، يرجى تعبئة الحقول الأساسية أولاً");
             return;
         }
 
         btn.disabled = true;
-        document.getElementById('status').innerText = "بدء عملية الدفع...";
+        document.getElementById('status').innerText = "جاري تحضير عملية الدفع...";
 
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
-                memo: "نشر خدمة: " + title,
+                memo: "رسوم نشر: " + title,
                 metadata: { type: "listing_fee" }
             }, {
                 onReadyForServerApproval: async (paymentId) => {
@@ -87,8 +100,8 @@
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "اكتمل الدفع! جاري الحفظ في سوبابيز...";
-                    saveToSupabase(title, desc, price, txid);
+                    document.getElementById('status').innerText = "تم الدفع! جاري التثبيت في سوبابيز...";
+                    saveFinalData(title, desc, price, cat, contact, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
                     await fetch('/api/payment-handler', {
@@ -97,43 +110,55 @@
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
                 },
-                onCancel: () => { document.getElementById('status').innerText = "تم الإلغاء"; btn.disabled = false; },
-                onError: (error) => { document.getElementById('status').innerText = "خطأ: " + error.message; btn.disabled = false; }
+                onCancel: () => { 
+                    document.getElementById('status').innerText = "تم إلغاء الدفع"; 
+                    btn.disabled = false; 
+                },
+                onError: (error) => { 
+                    document.getElementById('status').innerText = "خطأ: " + error.message; 
+                    btn.disabled = false; 
+                }
             });
         } catch (e) {
-            alert("حدث خطأ في الاتصال بمحفظة Pi");
+            alert("فشل الوصول لمحفظة Pi");
             btn.disabled = false;
         }
     }
 
-    async function saveToSupabase(t, d, p, tx) {
-        // محاولة الحفظ مع استبعاد الـ ID ليقوم Supabase بتوليده
-        const { error } = await _supabase
-            .from('services')
-            .insert([{ 
-                title: t, 
-                description: d, 
-                price: parseFloat(p), 
-                user_pi: currentUser, 
-                txid: tx 
-            }]);
+    async function saveFinalData(t, d, p, cat, con, tx) {
+        try {
+            // إرسال كافة الأعمدة التي رأيناها في صور قاعدة بياناتك
+            const { error } = await _supabase
+                .from('services')
+                .insert([{ 
+                    title: t, 
+                    description: d, 
+                    price: parseFloat(p), 
+                    user_pi: currentUser, 
+                    txid: tx,
+                    category: cat,
+                    contact_info: con || "لم يتم إدخال وسيلة تواصل"
+                }]);
 
-        if (!error) {
-            // إرسال إشعار إيميل
-            emailjs.send("Service_vuti648", "Template_m6rq1ab", {
-                from_name: currentUser,
-                service_title: t,
-                service_price: p,
-                message: d,
-                txid: tx
-            });
+            if (!error) {
+                // إرسال الإيميل (اختياري)
+                emailjs.send("Service_vuti648", "Template_m6rq1ab", {
+                    from_name: currentUser,
+                    service_title: t,
+                    service_price: p,
+                    message: d,
+                    txid: tx
+                });
 
-            alert("تم النشر بنجاح! مبروك يا أبا كريم.");
-            window.location.href = "services.html"; 
-        } else {
-            // تنبيه في حال وجود خطأ في الأعمدة أو الصلاحيات
-            alert("تم الدفع ولكن فشل الحفظ: " + error.message);
-            console.error("Supabase Error:", error);
+                alert("ألف مبروك! الخدمة الآن على الشبكة وفي جدول سوبابيز.");
+                window.location.href = "services.html"; 
+            } else {
+                alert("حدث خطأ أثناء الحفظ في سوبابيز: " + error.message);
+                console.error("Supabase Error Detail:", error);
+                document.getElementById('payBtn').disabled = false;
+            }
+        } catch (err) {
+            alert("خطأ غير متوقع: " + err.message);
             document.getElementById('payBtn').disabled = false;
         }
     }
