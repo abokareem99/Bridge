@@ -28,17 +28,17 @@
     
     <input type="text" id="title" placeholder="عنوان الخدمة">
     <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
-    <input type="number" id="price" placeholder="السعر المطلوب (Pi)">
+    <input type="number" id="price" placeholder="السعر المطلوب بـ (Pi)">
     
     <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
     <div id="status">جاري تهيئة النظام...</div>
 </div>
 
 <script>
-    // 1. إعداد Supabase
+    // 1. إعداد Supabase (استخدام المفاتيح الخاصة بك)
     const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
     
-    // 2. إعداد EmailJS بالمفاتيح التي زودتني بها
+    // 2. إعداد EmailJS
     (function(){
         emailjs.init("aRCAx1NwvATaC4F-m"); 
     })();
@@ -53,7 +53,8 @@
             document.getElementById('status').innerText = "موثق كـ: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
-            document.getElementById('status').innerText = "يرجى استخدام متصفح Pi";
+            document.getElementById('status').innerText = "يرجى فتح التطبيق من متصفح Pi";
+            document.getElementById('status').style.color = "red";
         }
     }
 
@@ -64,20 +65,21 @@
         const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("يرجى ملء كافة البيانات");
+            alert("أكمل البيانات أولاً يا هندسة");
             return;
         }
 
         btn.disabled = true;
-        document.getElementById('status').innerText = "جاري إنشاء المعاملة...";
+        document.getElementById('status').innerText = "جاري تحضير عملية الدفع...";
 
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
-                memo: "رسوم نشر: " + title,
+                memo: "رسوم نشر خدمة: " + title,
                 metadata: { type: "listing_fee" }
             }, {
                 onReadyForServerApproval: async (paymentId) => {
+                    // إرسال المعرف للسيرفر للموافقة
                     await fetch('/api/payment-handler', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -85,8 +87,9 @@
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع! جاري الحفظ والإرسال...";
-                    saveDataAndSendEmail(title, desc, price);
+                    document.getElementById('status').innerText = "تم الدفع بنجاح! جاري الحفظ...";
+                    // الحفظ في Supabase وإرسال الإيميل بعد نجاح الدفع
+                    saveDataAndSendEmail(title, desc, price, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
                     await fetch('/api/payment-handler', {
@@ -95,42 +98,51 @@
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
                 },
-                onCancel: () => { document.getElementById('status').innerText = "تم الإلغاء"; btn.disabled = false; },
-                onError: (error) => { document.getElementById('status').innerText = "خطأ: " + error.message; btn.disabled = false; }
+                onCancel: () => { 
+                    document.getElementById('status').innerText = "تم إلغاء العملية"; 
+                    btn.disabled = false; 
+                },
+                onError: (error) => { 
+                    document.getElementById('status').innerText = "خطأ في الدفع: " + error.message; 
+                    btn.disabled = false; 
+                }
             });
         } catch (e) {
-            alert("فشل الدفع");
+            console.error(e);
+            alert("فشل نظام الدفع، حاول مرة أخرى");
             btn.disabled = false;
         }
     }
 
-    async function saveDataAndSendEmail(t, d, p) {
-        // أولاً: إرسال الإيميل
-        try {
-            await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
-                from_name: currentUser,
-                service_title: t,
-                service_price: p,
-                message: d
-            });
-            console.log("Email sent");
-        } catch (err) {
-            console.error("EmailJS Error:", err);
-        }
-
-        // ثانياً: الحفظ في Supabase
-        const { error } = await _supabase.from('services').insert([{ 
+    async function saveDataAndSendEmail(t, d, p, txid) {
+        // الحفظ في جدول 'services'
+        const { data, error } = await _supabase.from('services').insert([{ 
             title: t, 
             description: d, 
             price: parseFloat(p), 
-            user_pi: currentUser 
+            user_pi: currentUser,
+            transaction_id: txid // حفظ رقم المعاملة للتوثيق
         }]);
 
         if (!error) {
-            alert("تم النشر بنجاح! مبروك يا أبو كريم.");
-            window.location.href = "index.html";
+            // إرسال إشعار بالبريد الإلكتروني بعد الحفظ الناجح
+            try {
+                await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
+                    from_name: currentUser,
+                    service_title: t,
+                    service_price: p,
+                    message: d,
+                    transaction_id: txid
+                });
+            } catch (mailErr) {
+                console.warn("Email notification failed but data is saved.");
+            }
+
+            alert("تم نشر خدمتك بنجاح في جسر التواصل!");
+            window.location.href = "services.html"; // التوجه لصفحة عرض الخدمات
         } else {
-            alert("الدفع تم ولكن فشل الحفظ في القاعدة: " + error.message);
+            alert("حدث خطأ أثناء الحفظ في قاعدة البيانات: " + error.message);
+            console.error("Supabase Error:", error);
             document.getElementById('payBtn').disabled = false;
         }
     }
