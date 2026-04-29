@@ -114,7 +114,6 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
         
-        // الروابط والمفاتيح الخاصة بك
         const supabaseUrl = 'Https://xolwuawlnruvzqowxxbh.supabase.co' 
         const supabaseKey = 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll'
         const supabase = createClient(supabaseUrl, supabaseKey)
@@ -128,28 +127,36 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
+        // تهيئة Pi SDK عند تحميل الصفحة مباشرة
+        window.onload = async () => {
+            try {
+                await window.Pi.init({ version: "2.0", sandbox: true });
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
         form.onsubmit = async (e) => {
             e.preventDefault();
             
             try {
-                notify("جاري تهيئة الدفع...");
-                await window.Pi.init({ version: "2.0", sandbox: true });
-                await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                notify("جاري طلب الصلاحيات...");
+                const auth = await window.Pi.authenticate(['username', 'payments']);
+                
+                notify("جاري إنشاء عملية الدفع...");
 
-                // عملية دفع رسوم النشر
-                await window.Pi.createPayment({
+                const payment = await window.Pi.createPayment({
                     amount: 0.01,
-                    memo: "رسوم توثيق ونشر خدمة جديدة",
-                    metadata: { 
-                        type: "service_listing",
-                        title: document.getElementById('serviceTitle').value 
-                    }
+                    memo: "رسوم نشر خدمة: " + document.getElementById('serviceTitle').value,
+                    metadata: { type: "service_listing" }
                 }, {
-                    onReadyForServerApproval: (id) => { /* الموافقة من السيرفر */ },
-                    onConnectedToBlockchain: async (id, txid) => {
-                        notify("تم الدفع! جاري حفظ الخدمة...");
+                    onReadyForServerApproval: function(paymentId) {
+                        // إرسال المعرف للسيرفر للموافقة (هنا نقوم بالموافقة تلقائياً للتجربة)
+                        console.log("Payment Ready:", paymentId);
+                    },
+                    onConnectedToBlockchain: async function(paymentId, txid) {
+                        notify("تم الدفع! جاري حفظ البيانات...");
                         
-                        // حفظ البيانات في Supabase بعد نجاح الدفع
                         const { error } = await supabase.from('services').insert([{
                             title: document.getElementById('serviceTitle').value,
                             category: document.getElementById('serviceCat').value,
@@ -158,14 +165,18 @@
                         }]);
 
                         if (error) throw error;
-
-                        notify("تم النشر بنجاح! ستظهر خدمتك قريباً.");
+                        notify("تم النشر بنجاح!");
                         form.reset();
                     },
-                    onError: (err) => notify("خطأ: " + err.message),
-                    // الإضافات المطلوبة لحل خطأ Callback Missing:
-                    onCancel: (id) => notify("تم إلغاء عملية الدفع"),
-                    onIncomplete: (id) => notify("عملية الدفع غير مكتملة")
+                    onCancel: function(paymentId) {
+                        notify("تم إلغاء الدفع");
+                    },
+                    onError: function(error, payment) {
+                        notify("خطأ في الدفع: " + error.message);
+                    },
+                    onIncomplete: function(paymentId) {
+                        notify("عملية دفع غير مكتملة");
+                    }
                 });
             } catch (err) {
                 notify("فشل: " + err.message);
