@@ -21,140 +21,156 @@
         .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 8px; font-weight: 800; }
         .welcome-msg { font-size: 0.9rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.3); }
         .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.3s; }
-        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .cat-card { background: var(--w); padding: 20px 10px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 18px; font-size: 1.6rem; margin-bottom: 12px; }
-        .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.95rem; margin-bottom: 6px; }
-        .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 3px 10px; border-radius: 6px; }
+        
+        .section-title { padding: 20px 20px 10px; color: var(--pi-d); font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ""; width: 4px; height: 20px; background: var(--pi-g); border-radius: 10px; }
+
+        .services-grid { padding: 10px 15px; display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 600px; margin: 0 auto; width: 100%; }
+        .service-card { background: var(--w); padding: 20px; border-radius: 20px; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
+        .service-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .service-title { font-weight: 700; color: var(--pi-d); font-size: 1rem; }
+        .price-tag { color: #e65100; font-weight: 800; background: #fff3e0; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; }
+        .service-desc { font-size: 0.85rem; color: #666; line-height: 1.4; margin-bottom: 12px; }
+        .service-footer { font-size: 0.75rem; color: var(--pi-p); display: flex; align-items: center; gap: 5px; opacity: 0.8; }
+
+        .add-btn { position: fixed; bottom: 30px; left: 30px; background: var(--pi-p); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-decoration: none; z-index: 1000; }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .modal-content h2 { color: var(--pi-d); font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
+        .modal-content { background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right; }
         .modal-content textarea, .modal-content input { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 0.9rem; background: #f9f9f9; outline: none; }
         .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
-        .footer-container { margin-top: auto; padding: 20px 10px 40px; text-align: center; }
-        .copyright { font-size: 0.8rem; color: #888; margin-top: 5px; }
-        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; min-width: 200px; }
+        
+        #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; }
     </style>
 </head>
 <body>
     <section class="hero">
-        <div>
-            <h1 class="hero-title">جسر التواصل</h1>
-            <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-            <p style="font-size: 0.85rem; margin-bottom: 18px; opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
-            <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
-        </div>
+        <h1 class="hero-title">جسر التواصل</h1>
+        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
+        <p style="font-size: 0.85rem; margin-bottom: 18px; opacity: 0.9;">سوق الخدمات المصغرة لمجتمع Pi Network</p>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
     </section>
 
-    <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة والتطوير')">
-            <i class="fas fa-code"></i><span>البرمجة</span><span class="price-badge">Pi 1.0</span>
-        </div>
-        <div class="cat-card" onclick="processPayment(0.8, 'التصميم الجرافيكي')">
-            <i class="fas fa-palette"></i><span>التصميم</span><span class="price-badge">Pi 0.8</span>
-        </div>
-        <div class="cat-card" onclick="processPayment(0.7, 'التسويق والمبيعات')">
-            <i class="fas fa-bullhorn"></i><span>التسويق</span><span class="price-badge">Pi 0.7</span>
-        </div>
-        <div class="cat-card" onclick="processPayment(0.5, 'الكتابة والترجمة')">
-            <i class="fas fa-pen-nib"></i><span>الترجمة</span><span class="price-badge">Pi 0.5</span>
-        </div>
+    <h2 class="section-title">الخدمات المتوفرة</h2>
+    
+    <section class="services-grid" id="servicesList">
+        <p style="text-align: center; color: #888; padding: 20px;">جاري تحميل الخدمات...</p>
     </section>
 
-    <div id="reqModal" class="modal" style="display: none;">
+    <a href="add-service.html" class="add-btn">
+        <i class="fas fa-plus"></i>
+    </a>
+
+    <div id="reqModal" class="modal">
         <div class="modal-content" id="modalContent">
-            <h2>📦 مطلوبات التنفيذ</h2>
-            <p style="font-size: 0.85rem; color: #666; text-align: center;">لقد تم الدفع بنجاح! فضلاً زودنا بالتفاصيل:</p>
-            <textarea id="orderDetail" rows="4" placeholder="اشرح لنا الخدمة المطلوبة بالتفصيل..."></textarea>
-            <input type="text" id="contactInfo" placeholder="رقم واتساب أو معرف تلجرام">
-            <button class="btn-submit" onclick="submitOrder()">إرسال بيانات الطلب</button>
+            <h2>📦 تفاصيل طلبك</h2>
+            <p style="font-size: 0.85rem; color: #666; text-align: center;">تم الدفع بنجاح! زودنا بتفاصيل تنفيذ الخدمة:</p>
+            <textarea id="orderDetail" rows="4" placeholder="اشرح ما تحتاجه من هذه الخدمة..."></textarea>
+            <input type="text" id="contactInfo" placeholder="رقم واتساب أو حساب تلجرام">
+            <button class="btn-submit" onclick="submitOrder()">تأكيد وإرسال الطلب</button>
         </div>
     </div>
 
-<footer class="footer-container">
-    <div class="legal-links" style="margin-bottom: 15px;">
-        <a href="terms.html" style="color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px;">شروط الاستخدام</a> 
-        <span style="color: #ccc;">|</span>
-        <a href="privacy.html" style="color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px;">سياسة الخصوصية</a>
-    </div>
-    <div class="copyright">© Bridge Freelance - Powered by Pi Network 2026</div>
-</footer>
+    <footer style="text-align: center; padding: 40px 20px; color: #888; font-size: 0.8rem;">
+        <div>© 2026 Bridge Freelance | Powered by Pi Network</div>
+    </footer>
+
     <div id="toast"></div>
 
     <script>
-        const toast = document.getElementById('toast');
-        let currentTxId = ""; 
-        let currentPrice = 0; // القيمة الحقيقية للخدمة
-
         const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
         const supabaseKey = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 4000); }
+        let currentTxId = ""; 
+        let currentPrice = 0;
+        let currentServiceName = "";
+
+        function showMsg(m) { 
+            const t = document.getElementById('toast');
+            t.innerText = m; t.style.display = 'block'; 
+            setTimeout(() => t.style.display='none', 4000); 
+        }
 
         async function startApp() {
             try {
                 showMsg("جاري الاتصال بالشبكة...");
                 await window.Pi.init({ version: "2.0", sandbox: true });
-                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                const auth = await window.Pi.authenticate(['username', 'payments']);
                 showMsg("أهلاً بك " + auth.user.username);
-                document.getElementById('authBtn').innerText = "الحساب موثق ✅";
+                document.getElementById('authBtn').innerText = "تم التوثيق ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
-            } catch (e) { showMsg("فشل التوثيق: " + e.message); }
+                loadServices(); // تحميل الخدمات بعد التوثيق
+            } catch (e) { 
+                showMsg("يرجى فتح التطبيق من متصفح Pi");
+                loadServices(); // تحميل الخدمات حتى بدون توثيق للمشاهدة
+            }
         }
 
-        async function processPayment(amt, name) {
-            currentPrice = amt; // حفظ السعر عند الضغط
+        async function loadServices() {
+            const list = document.getElementById('servicesList');
             try {
-                showMsg(`جاري تهيئة دفع ${amt} Pi لخدمة ${name}...`);
+                const { data, error } = await _supabase.from('services').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: #888;">لا توجد خدمات مضافة حالياً.</p>';
+                    return;
+                }
+
+                list.innerHTML = data.map(s => `
+                    <div class="service-card" onclick="buyService(${s.price}, '${s.title}')">
+                        <div class="service-header">
+                            <span class="service-title">${s.title}</span>
+                            <span class="price-tag">${s.price} Pi</span>
+                        </div>
+                        <p class="service-desc">${s.description}</p>
+                        <div class="service-footer">
+                            <i class="fas fa-user-circle"></i> بواسطة: ${s.user_pi}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<p style="text-align: center; color: red;">خطأ في تحميل البيانات.</p>';
+            }
+        }
+
+        async function buyService(amt, name) {
+            currentPrice = amt;
+            currentServiceName = name;
+            try {
+                showMsg(`جاري معالجة دفع ${amt} Pi...`);
                 await window.Pi.createPayment({
                     amount: amt,
                     memo: "شراء خدمة: " + name,
                     metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ paymentId: id, action: 'approve' })
-                    }).then(r => r.json()),
-                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; showMsg("تم تسجيل المعاملة على البلوكشين!"); },
-                    onReadyForServerCompletion: async (id, tx) => {
-                        try {
-                            showMsg("جاري تأكيد المعاملة...");
-                            const response = await fetch('/api/payment-handler', {
-                                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
-                            });
-                            const result = await response.json();
-                            if (response.ok && result.completed) {
-                                document.getElementById('reqModal').style.display = 'flex';
-                                showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
-                            } else { showMsg("فشل التأكيد: " + (result.error || "حاول ثانية")); }
-                        } catch (e) { showMsg("خطأ في الاتصال بالسيرفر"); }
+                    onReadyForServerApproval: (id) => console.log("Approved", id),
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
+                    onReadyForServerCompletion: (id, tx) => {
+                        document.getElementById('reqModal').style.display = 'flex';
+                        showMsg("تم الدفع بنجاح!");
                     },
                     onCancel: () => showMsg("تم إلغاء العملية"),
-                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
+                    onError: (e) => showMsg("خطأ: " + e.message)
                 });
-            } catch (e) { showMsg("عذراً، حدث خطأ فني"); }
+            } catch (e) { showMsg("حدث خطأ في الدفع"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) { showMsg("يرجى ملء جميع البيانات"); return; }
+            if(!detail || !contact) { showMsg("يرجى إكمال البيانات"); return; }
 
-            showMsg("جاري حفظ طلبك...");
+            showMsg("جاري إرسال طلبك...");
             try {
-                // حفظ في Supabase مع القيمة الحقيقية
-                const { error: dbError } = await _supabase
-                    .from('orders')
-                    .insert([{ 
-                        service: detail,
-                        price: currentPrice
-                    }]);
+                // 1. الحفظ في Supabase
+                await _supabase.from('orders').insert([{ 
+                    service: currentServiceName + " - " + detail,
+                    price: currentPrice
+                }]);
 
-                if (dbError) throw dbError;
-
-                // إرسال عبر EmailJS
+                // 2. الإرسال للإيميل
                 await emailjs.send("service_vuti648", "template_m6rq1ab", {
                     username: "abokareem", 
                     service_detail: detail, 
@@ -164,16 +180,16 @@
                 });
 
                 document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 10px;">
-                        <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                        <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
-                        <button class="btn-submit" onclick="location.reload()">إغلاق</button>
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #2ecc71; margin-bottom: 15px;"></i>
+                        <h2 style="color: #333;">تم طلب الخدمة!</h2>
+                        <p>سيتواصل معك المستقل قريباً.</p>
+                        <button class="btn-submit" onclick="location.reload()">تم</button>
                     </div>`;
-            } catch (error) {
-                console.error(error);
-                showMsg("حدث خطأ أثناء الحفظ.");
-            }
+            } catch (error) { showMsg("حدث خطأ في الحفظ"); }
         }
+
+        window.onload = startApp;
     </script>
 </body>
 </html>
