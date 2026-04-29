@@ -8,6 +8,8 @@
     
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root { --pi-purple: #6a1b9a; --pi-dark-purple: #4a148c; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -44,20 +46,18 @@
                     <label>السعر (Pi)</label>
                     <input type="number" id="servicePrice" step="0.01" required>
                 </div>
-                <button type="submit" class="submit-btn">ادفع وانشر الآن</button>
+                <button type="submit" class="submit-btn" id="submitBtn">ادفع وانشر الآن</button>
             </form>
         </div>
     </div>
 
     <div id="statusToast" class="status-toast"></div>
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-        const supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
+    <script>
+        // تعريف Supabase من السكريبت العادي
+        const { createClient } = supabase;
+        const _supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
-        const Pi = window.Pi;
-        
-        // وظيفة التنبيه
         function notify(msg) {
             const toast = document.getElementById('statusToast');
             toast.innerText = msg;
@@ -65,65 +65,60 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
-        // 1. التهيئة الفورية
+        // تهيئة Pi بشكل فوري ومباشر
         try {
-            Pi.init({ version: "1.5", sandbox: true });
-            console.log("Pi SDK Initialized");
+            window.Pi.init({ version: "1.5", sandbox: true });
         } catch (e) {
-            console.error("Pi Init Error:", e);
+            console.error("Init Error", e);
         }
 
-        document.getElementById('serviceForm').onsubmit = async function(e) {
+        document.getElementById('serviceForm').onsubmit = function(e) {
             e.preventDefault();
-            
-            // التأكد من أن SDK جاهز قبل البدء
-            if (!Pi) {
-                notify("خطأ: مكتبة Pi لم يتم تحميلها");
-                return;
-            }
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            notify("جاري المصادقة...");
 
-            try {
-                notify("جاري المصادقة...");
-                const auth = await Pi.authenticate(['username', 'payments']);
+            window.Pi.authenticate(['username', 'payments']).then(function(auth) {
+                notify("جاري فتح المحفظة...");
                 
-                notify("جاري إنشاء عملية الدفع...");
-                
-                await Pi.createPayment({
+                window.Pi.createPayment({
                     amount: 0.01,
-                    memo: "رسوم نشر خدمة " + document.getElementById('serviceTitle').value,
+                    memo: "نشر خدمة: " + document.getElementById('serviceTitle').value,
                     metadata: { orderId: "ID_" + Date.now() }
                 }, {
-                    onReadyForServerApproval: (paymentId) => {
-                        console.log("Payment waiting for approval:", paymentId);
+                    onReadyForServerApproval: function(paymentId) { console.log("Ready:", paymentId); },
+                    onConnectedToBlockchain: function(paymentId, txid) {
+                        notify("تم الدفع! جاري الحفظ...");
+                        saveData();
                     },
-                    onConnectedToBlockchain: async (paymentId, txid) => {
-                        notify("نجح الدفع! جاري الحفظ في Supabase...");
-                        
-                        const { error } = await supabase.from('services').insert([{
-                            title: document.getElementById('serviceTitle').value,
-                            description: document.getElementById('serviceDesc').value,
-                            price: document.getElementById('servicePrice').value,
-                            user_pi: auth.user.username // ربط الخدمة بالمستخدم
-                        }]);
-
-                        if (!error) {
-                            notify("تم النشر بنجاح!");
-                            document.getElementById('serviceForm').reset();
-                        } else {
-                            notify("خطأ في Supabase: " + error.message);
-                        }
-                    },
-                    onCancel: (paymentId) => notify("تم إلغاء الدفع"),
-                    onError: (error, payment) => notify("خطأ: " + error.message),
-                    onIncomplete: (paymentId) => notify("هناك دفعة معلقة")
+                    onCancel: function(id) { notify("تم الإلغاء"); btn.disabled = false; },
+                    onError: function(err) { notify("خطأ: " + err.message); btn.disabled = false; }
                 });
-
-            } catch (err) {
-                notify("عذراً: " + err.message);
-                // محاولة إعادة التهيئة إذا فشل الـ SDK
-                Pi.init({ version: "1.5", sandbox: true });
-            }
+            }).catch(function(err) {
+                notify("فشل الدخول: " + err.message);
+                btn.disabled = false;
+            });
         };
+
+        async function saveData() {
+            const title = document.getElementById('serviceTitle').value;
+            const desc = document.getElementById('serviceDesc').value;
+            const price = document.getElementById('servicePrice').value;
+
+            const { error } = await _supabase.from('services').insert([{
+                title: title,
+                description: desc,
+                price: price
+            }]);
+
+            if (!error) {
+                notify("تم النشر بنجاح!");
+                setTimeout(() => window.location.href = 'index.html', 2000);
+            } else {
+                notify("خطأ في القاعدة: " + error.message);
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
     </script>
 </body>
 </html>
