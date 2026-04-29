@@ -26,9 +26,9 @@
     <h2>نشر خدمة جديدة</h2>
     <div class="fee-badge">رسوم النشر: 1.0 Pi</div>
     
-    <input type="text" id="title" placeholder="عنوان الخدمة (مثلاً: تصميم شعار)">
+    <input type="text" id="title" placeholder="عنوان الخدمة">
     <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
-    <input type="number" id="price" placeholder="السعر الذي ستتقاضاه (Pi)">
+    <input type="number" id="price" placeholder="السعر المطلوب (Pi)">
     
     <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع الرسوم والنشر الآن</button>
     <div id="status">جاري تهيئة النظام...</div>
@@ -38,9 +38,9 @@
     // 1. إعداد Supabase
     const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll");
     
-    // 2. إعداد EmailJS - ضع الـ Public Key الخاص بك هنا
+    // 2. إعداد EmailJS بالمفاتيح التي زودتني بها
     (function(){
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); 
+        emailjs.init("aRCAx1NwvATaC4F-m"); 
     })();
 
     let currentUser = "";
@@ -50,10 +50,10 @@
             await window.Pi.init({ version: "2.0", sandbox: true });
             const auth = await window.Pi.authenticate(['username', 'payments']);
             currentUser = auth.user.username;
-            document.getElementById('status').innerText = "مرحباً: " + currentUser;
+            document.getElementById('status').innerText = "موثق كـ: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
-            document.getElementById('status').innerText = "افتح التطبيق من متصفح Pi";
+            document.getElementById('status').innerText = "يرجى استخدام متصفح Pi";
         }
     }
 
@@ -64,7 +64,7 @@
         const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("يرجى إكمال البيانات");
+            alert("يرجى ملء كافة البيانات");
             return;
         }
 
@@ -105,17 +105,17 @@
     }
 
     async function saveDataAndSendEmail(t, d, p) {
-        // أولاً: محاولة إرسال الإيميل (EmailJS)
+        // أولاً: إرسال الإيميل
         try {
-            await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+            await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
                 from_name: currentUser,
                 service_title: t,
                 service_price: p,
                 message: d
             });
-            console.log("Email sent successfully");
+            console.log("Email sent");
         } catch (err) {
-            console.error("EmailJS failed but continuing to Supabase:", err);
+            console.error("EmailJS Error:", err);
         }
 
         // ثانياً: الحفظ في Supabase
@@ -127,10 +127,10 @@
         }]);
 
         if (!error) {
-            alert("تم الدفع والنشر بنجاح!");
+            alert("تم النشر بنجاح! مبروك يا أبو كريم.");
             window.location.href = "index.html";
         } else {
-            alert("تم الدفع وفشل الحفظ في القاعدة: " + error.message);
+            alert("الدفع تم ولكن فشل الحفظ في القاعدة: " + error.message);
             document.getElementById('payBtn').disabled = false;
         }
     }
