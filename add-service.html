@@ -4,20 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إضافة خدمة - جسر التواصل</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-        :root { --pi-purple: #6a1b9a; --pi-dark-purple: #4a148c; --white: #ffffff; --gray: #f4f4f9; }
+        :root { --pi-purple: #6a1b9a; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--gray); padding-bottom: 40px; }
+        body { background-color: var(--gray); }
         .header { background: var(--pi-purple); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
         .form-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--pi-dark-purple); font-size: 0.9rem; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #4a148c; font-size: 0.9rem; }
         .input-group input, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
         .submit-btn { width: 100%; background: var(--pi-purple); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 2000; }
@@ -26,25 +23,16 @@
 <body>
 
     <header class="header">
-        <a href="index.html" style="color:white; text-decoration:none;"><i class="fas fa-chevron-right"></i></a>
-        <h1 style="font-size:1.1rem; margin-right:10px;">نشر خدمة جديدة</h1>
+        <a href="index.html" style="color:white; text-decoration:none;">✕</a>
+        <h1 style="font-size:1.1rem;">نشر خدمة جديدة</h1>
     </header>
 
     <div class="container">
         <div class="form-card">
             <form id="serviceForm">
-                <div class="input-group">
-                    <label>اسم الخدمة</label>
-                    <input type="text" id="serviceTitle" required>
-                </div>
-                <div class="input-group">
-                    <label>وصف الخدمة</label>
-                    <textarea id="serviceDesc" rows="4" required></textarea>
-                </div>
-                <div class="input-group">
-                    <label>السعر (Pi)</label>
-                    <input type="number" id="servicePrice" step="0.01" required>
-                </div>
+                <div class="input-group"><label>اسم الخدمة</label><input type="text" id="serviceTitle" required></div>
+                <div class="input-group"><label>وصف الخدمة</label><textarea id="serviceDesc" rows="4" required></textarea></div>
+                <div class="input-group"><label>السعر (Pi)</label><input type="number" id="servicePrice" step="0.01" required></div>
                 <button type="submit" class="submit-btn" id="submitBtn">ادفع وانشر الآن</button>
             </form>
         </div>
@@ -60,13 +48,13 @@
             const toast = document.getElementById('statusToast');
             toast.innerText = msg;
             toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 5000);
+            setTimeout(() => { toast.style.display = 'none'; }, 5000);
         }
 
-        // التهيئة بإصدار مستقر
+        // محاولة التهيئة فوراً عند تحميل الصفحة
         try {
             window.Pi.init({ version: "2.0", sandbox: true });
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Init immediate error:", e); }
 
         document.getElementById('serviceForm').onsubmit = async function(e) {
             e.preventDefault();
@@ -75,56 +63,42 @@
             notify("جاري المصادقة...");
 
             try {
-                // التأكد من استدعاء المصادقة قبل الدفع
+                // إعادة التهيئة قبل المصادقة لضمان تجاوز خطأ الصورة الأولى
+                await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments']);
                 
-                notify("جاري فتح المحفظة...");
+                notify("جاري طلب الدفع...");
 
-                // هيكل الدفع الكامل لمنع خطأ missing callbacks
+                // الهيكل الكامل لـ Callbacks لمنع خطأ الصورة الثانية
                 window.Pi.createPayment({
                     amount: parseFloat(document.getElementById('servicePrice').value),
                     memo: "نشر خدمة: " + document.getElementById('serviceTitle').value,
                     metadata: { orderId: "srv_" + Date.now() }
                 }, {
-                    onReadyForServerApproval: function(paymentId) {
-                        // يتم استدعاؤه عند موافقة المستخدم في المحفظة
-                        notify("تمت الموافقة.. جاري التأكيد");
-                    },
-                    onConnectedToBlockchain: function(paymentId, txid) {
-                        // يتم استدعاؤه عند تسجيل المعاملة بنجاح
+                    onReadyForServerApproval: function(id) { console.log("Approved:", id); },
+                    onConnectedToBlockchain: function(id, tx) {
                         notify("نجح الدفع! جاري الحفظ...");
-                        saveToSupabase(auth.user.username);
+                        saveData(auth.user.username);
                     },
-                    onCancel: function(paymentId) {
-                        notify("تم إلغاء العملية");
-                        btn.disabled = false;
-                    },
-                    onError: function(error, payment) {
-                        notify("خطأ: " + error.message);
-                        btn.disabled = false;
-                    }
+                    onCancel: function(id) { notify("تم إلغاء الدفع"); btn.disabled = false; },
+                    onError: function(err, payment) { notify("خطأ: " + err.message); btn.disabled = false; },
+                    onIncomplete: function(id) { notify("يوجد دفعة غير مكتملة"); btn.disabled = false; }
                 });
             } catch (err) {
-                notify("خطأ في الدخول: " + err.message);
+                notify("فشل الدخول: " + err.message);
                 btn.disabled = false;
             }
         };
 
-        async function saveToSupabase(username) {
+        async function saveData(user) {
             const { error } = await _supabase.from('services').insert([{
                 title: document.getElementById('serviceTitle').value,
                 description: document.getElementById('serviceDesc').value,
                 price: document.getElementById('servicePrice').value,
-                user_pi: username
+                user_pi: user
             }]);
-
-            if (!error) {
-                notify("تم النشر بنجاح!");
-                setTimeout(() => window.location.href = 'index.html', 2000);
-            } else {
-                notify("خطأ في الحفظ: " + error.message);
-                document.getElementById('submitBtn').disabled = false;
-            }
+            if (!error) { notify("تم النشر!"); setTimeout(() => { window.location.href = 'index.html'; }, 2000); }
+            else { notify("خطأ في الحفظ"); document.getElementById('submitBtn').disabled = false; }
         }
     </script>
 </body>
