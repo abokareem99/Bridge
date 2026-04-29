@@ -114,9 +114,9 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
         
-        // سيتم جلب هذه القيم تلقائياً من إعدادات Vercel التي قمت بضبطها
-        const supabaseUrl = 'https://your-project-url.supabase.co' 
-        const supabaseKey = 'your-anon-key'
+        // تم تحديث الروابط بناءً على بياناتك
+        const supabaseUrl = 'Https://xolwuawlnruvzqowxxbh.supabase.co' 
+        const supabaseKey = 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll'
         const supabase = createClient(supabaseUrl, supabaseKey)
 
         const form = document.getElementById('serviceForm');
@@ -136,7 +136,6 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 await window.Pi.authenticate(['username', 'payments'], (p) => {});
 
-                // عملية دفع رسوم النشر عبر شبكة Pi
                 await window.Pi.createPayment({
                     amount: 0.01,
                     memo: "رسوم توثيق ونشر خدمة جديدة",
@@ -147,9 +146,8 @@
                 }, {
                     onReadyForServerApproval: (id) => { /* موافقة السيرفر */ },
                     onConnectedToBlockchain: async (id, txid) => {
-                        notify("تم الدفع! جاري حفظ الخدمة في قاعدة البيانات...");
+                        notify("تم الدفع! جاري حفظ الخدمة...");
                         
-                        // حفظ البيانات في جدول services بعد نجاح الدفع
                         const { error } = await supabase.from('services').insert([{
                             title: document.getElementById('serviceTitle').value,
                             category: document.getElementById('serviceCat').value,
