@@ -18,6 +18,7 @@
         .card-footer { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px; }
         .price-tag { color: #27ae60; font-weight: bold; }
         .category-tag { background: #eee; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; }
+        /* زر الإضافة العائم - تم تحديثه بالاسم الجديد */
         .add-service-fab { position: fixed; bottom: 20px; left: 20px; background: var(--pi-purple); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-decoration: none; z-index: 1000; }
         .loading { text-align: center; padding: 20px; color: var(--pi-purple); }
     </style>
@@ -34,39 +35,45 @@
         </div>
     </div>
 
-    <a href="add-service.html" class="add-service-fab"><i class="fas fa-plus"></i></a>
+    <a href="publish-service.html" class="add-service-fab"><i class="fas fa-plus"></i></a>
 
     <script>
         const { createClient } = supabase;
         const _supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
-        // تهيئة Pi
+        // تهيئة Pi بإصدار ثابت لتجنب مشاكل التوافق
         async function initApp() {
             try {
+                // استخدام إصدار 2.0 كما هو مطلوب في التحديثات الأخيرة
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments']);
                 document.getElementById('userStatus').innerText = "مرحباً: " + auth.user.username;
                 fetchServices();
             } catch (e) {
+                console.error("SDK Init failed:", e);
                 document.getElementById('userStatus').innerText = "يرجى الفتح من متصفح Pi";
-                fetchServices(); // جلب البيانات حتى لو فشل الدخول
+                fetchServices(); 
             }
         }
 
         async function fetchServices() {
             const container = document.getElementById('servicesContainer');
+            // جلب البيانات من جدول services
             const { data, error } = await _supabase.from('services').select('*').order('created_at', { ascending: false });
             
-            if (error) { container.innerHTML = "خطأ في التحميل"; return; }
+            if (error) { 
+                container.innerHTML = "<div class='loading'>خطأ في الاتصال بقاعدة البيانات</div>"; 
+                return; 
+            }
             
-            container.innerHTML = data.length ? '' : 'لا توجد خدمات';
+            container.innerHTML = data.length ? '' : '<div class="loading">لا توجد خدمات متاحة حالياً</div>';
             data.forEach(service => {
                 container.innerHTML += `
                     <div class="service-card">
                         <h3>${service.title}</h3>
                         <p>${service.description}</p>
                         <div class="card-footer">
-                            <span class="category-tag">عام</span>
+                            <span class="category-tag">خدمة مصغرة</span>
                             <span class="price-tag">${service.price} Pi</span>
                         </div>
                     </div>`;
