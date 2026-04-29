@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جسر التواصل - سوق الخدمات المصغرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
     <style>
         :root {
             --pi-purple: #6a1b9a;
@@ -56,7 +58,7 @@
 
     <header class="header">
         <h1>جسر التواصل</h1>
-        <p style="font-size: 0.8rem; opacity: 0.9;">سوق خدمات Pi Network</p>
+        <p id="userStatus" style="font-size: 0.8rem; opacity: 0.9;">جاري التحقق من الهوية...</p>
     </header>
 
     <div class="container">
@@ -72,10 +74,25 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-        // تم وضع روابطك هنا ليعمل الأندكس على جلب البيانات
         const supabaseUrl = 'Https://xolwuawlnruvzqowxxbh.supabase.co' 
         const supabaseKey = 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll'
         const supabase = createClient(supabaseUrl, supabaseKey)
+
+        // 1. تهيئة نظام Pi فوراً عند تحميل الموديول
+        const Pi = window.Pi;
+        try {
+            Pi.init({ version: "1.5", sandbox: true });
+            
+            // طلب المصادقة بمجرد فتح التطبيق لضمان صلاحية الجلسة
+            Pi.authenticate(['username', 'payments']).then((auth) => {
+                document.getElementById('userStatus').innerText = "مرحباً: " + auth.user.username;
+                console.log("Authenticated as:", auth.user.username);
+            }).catch(err => {
+                document.getElementById('userStatus').innerText = "يرجى فتح التطبيق من متصفح Pi";
+            });
+        } catch (e) {
+            console.error("Pi Init Error:", e);
+        }
 
         async function fetchServices() {
             const container = document.getElementById('servicesContainer');
@@ -113,6 +130,7 @@
             }
         }
 
+        // تشغيل جلب البيانات
         window.onload = fetchServices;
     </script>
 </body>
