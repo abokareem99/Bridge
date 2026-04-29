@@ -7,104 +7,49 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
-        :root {
-            --pi-purple: #6a1b9a;
-            --pi-dark-purple: #4a148c;
-            --pi-gold: #ffb74d;
-            --white: #ffffff;
-            --gray: #f4f4f9;
-        }
-
+        :root { --pi-purple: #6a1b9a; --pi-dark-purple: #4a148c; --white: #ffffff; --gray: #f4f4f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--gray); padding-bottom: 40px; }
-
-        .header {
-            background: var(--pi-purple); color: white; padding: 18px;
-            display: flex; align-items: center; gap: 15px;
-            position: sticky; top: 0; z-index: 1000;
-        }
-        .header h1 { font-size: 1.1rem; }
-        .back-btn { color: white; text-decoration: none; font-size: 1.2rem; }
-
+        .header { background: var(--pi-purple); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 1000; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-
-        .form-card {
-            background: white; border-radius: 15px; padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
+        .form-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 20px; }
         .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--pi-dark-purple); font-size: 0.9rem; }
-        
-        .input-group input, .input-group textarea, .input-group select {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;
-            font-size: 0.95rem; outline: none; transition: 0.3s;
-        }
-        .input-group input:focus { border-color: var(--pi-purple); box-shadow: 0 0 5px rgba(106, 27, 154, 0.2); }
-
-        .fee-notice {
-            background: #fff9e6; padding: 12px; border-radius: 10px;
-            font-size: 0.85rem; color: #856404; margin-bottom: 25px;
-            display: flex; align-items: center; gap: 10px;
-        }
-
-        .submit-btn {
-            width: 100%; background: var(--pi-purple); color: white; border: none;
-            padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1rem;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .submit-btn:hover { background: var(--pi-dark-purple); }
-
-        .status-toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #333; color: white; padding: 12px 25px; border-radius: 50px;
-            font-size: 0.85rem; display: none; z-index: 2000;
-        }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95rem; }
+        .submit-btn { width: 100%; background: var(--pi-purple); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 2000; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <a href="index.html" class="back-btn"><i class="fas fa-chevron-right"></i></a>
-        <h1>أنشئ خدمتك الجديدة</h1>
+        <a href="index.html" style="color:white; text-decoration:none;"><i class="fas fa-chevron-right"></i></a>
+        <h1 style="font-size:1.1rem; margin-right:10px;">أنشئ خدمتك الجديدة</h1>
     </header>
 
     <div class="container">
         <div class="form-card">
-            <div class="fee-notice">
-                <i class="fas fa-info-circle"></i>
-                <span>رسوم نشر الخدمة هي 0.01 Pi لضمان جدية المبدعين.</span>
-            </div>
-
             <form id="serviceForm">
                 <div class="input-group">
                     <label>اسم الخدمة</label>
-                    <input type="text" id="serviceTitle" placeholder="مثلاً: تصميم شعار احترافي" required>
+                    <input type="text" id="serviceTitle" placeholder="مثلاً: تصميم شعار" required>
                 </div>
-
                 <div class="input-group">
                     <label>الفئة</label>
                     <select id="serviceCat">
                         <option value="tech">برمجة وتكنولوجيا</option>
                         <option value="design">تصميم جرافيك</option>
-                        <option value="writing">كتابة وترجمة</option>
-                        <option value="marketing">تسويق ومبيعات</option>
                     </select>
                 </div>
-
                 <div class="input-group">
                     <label>وصف الخدمة</label>
-                    <textarea id="serviceDesc" rows="4" placeholder="اشرح بالتفصيل ما الذي ستقدمه للعميل..." required></textarea>
+                    <textarea id="serviceDesc" rows="4" required></textarea>
                 </div>
-
                 <div class="input-group">
-                    <label>السعر المطلوب (Pi)</label>
-                    <input type="number" id="servicePrice" step="0.01" placeholder="مثلاً: 0.5" required>
+                    <label>السعر (Pi)</label>
+                    <input type="number" id="servicePrice" step="0.01" required>
                 </div>
-
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-plus-circle"></i> دفع الرسوم ونشر الخدمة
-                </button>
+                <button type="submit" class="submit-btn" id="btnText">دفع الرسوم ونشر الخدمة</button>
             </form>
         </div>
     </div>
@@ -114,12 +59,8 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
         
-        const supabaseUrl = 'Https://xolwuawlnruvzqowxxbh.supabase.co' 
-        const supabaseKey = 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll'
-        const supabase = createClient(supabaseUrl, supabaseKey)
+        const supabase = createClient('Https://xolwuawlnruvzqowxxbh.supabase.co', 'sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll');
 
-        const form = document.getElementById('serviceForm');
-        
         function notify(msg) {
             const toast = document.getElementById('statusToast');
             toast.innerText = msg;
@@ -127,60 +68,50 @@
             setTimeout(() => toast.style.display = 'none', 3000);
         }
 
-        // تهيئة Pi SDK عند تحميل الصفحة مباشرة
-        window.onload = async () => {
-            try {
-                await window.Pi.init({ version: "2.0", sandbox: true });
-            } catch (err) {
-                console.error(err);
-            }
-        };
+        // تهيئة بسيطة ومباشرة
+        Pi.init({ version: "2.0", sandbox: true });
 
-        form.onsubmit = async (e) => {
+        document.getElementById('serviceForm').onsubmit = function(e) {
             e.preventDefault();
             
-            try {
-                notify("جاري طلب الصلاحيات...");
-                const auth = await window.Pi.authenticate(['username', 'payments']);
-                
-                notify("جاري إنشاء عملية الدفع...");
+            const title = document.getElementById('serviceTitle').value;
+            const cat = document.getElementById('serviceCat').value;
+            const desc = document.getElementById('serviceDesc').value;
+            const price = document.getElementById('servicePrice').value;
 
-                const payment = await window.Pi.createPayment({
+            notify("جاري المصادقة...");
+
+            Pi.authenticate(['username', 'payments']).then(function(auth) {
+                
+                Pi.createPayment({
                     amount: 0.01,
-                    memo: "رسوم نشر خدمة: " + document.getElementById('serviceTitle').value,
-                    metadata: { type: "service_listing" }
+                    memo: "نشر خدمة: " + title,
+                    metadata: { type: "listing" }
                 }, {
                     onReadyForServerApproval: function(paymentId) {
-                        // إرسال المعرف للسيرفر للموافقة (هنا نقوم بالموافقة تلقائياً للتجربة)
-                        console.log("Payment Ready:", paymentId);
+                        console.log("Ready:", paymentId);
+                        // في تطبيقات الويب البسيطة، ننتظر الربط مع الـ Backend لاحقاً
                     },
-                    onConnectedToBlockchain: async function(paymentId, txid) {
-                        notify("تم الدفع! جاري حفظ البيانات...");
-                        
-                        const { error } = await supabase.from('services').insert([{
-                            title: document.getElementById('serviceTitle').value,
-                            category: document.getElementById('serviceCat').value,
-                            description: document.getElementById('serviceDesc').value,
-                            price: document.getElementById('servicePrice').value
-                        }]);
-
-                        if (error) throw error;
-                        notify("تم النشر بنجاح!");
-                        form.reset();
+                    onConnectedToBlockchain: function(paymentId, txid) {
+                        notify("تم الدفع! جاري الحفظ...");
+                        supabase.from('services').insert([{
+                            title: title,
+                            category: cat,
+                            description: desc,
+                            price: price
+                        }]).then(res => {
+                            notify("تم النشر بنجاح!");
+                            document.getElementById('serviceForm').reset();
+                        });
                     },
-                    onCancel: function(paymentId) {
-                        notify("تم إلغاء الدفع");
-                    },
-                    onError: function(error, payment) {
-                        notify("خطأ في الدفع: " + error.message);
-                    },
-                    onIncomplete: function(paymentId) {
-                        notify("عملية دفع غير مكتملة");
-                    }
+                    onCancel: function(paymentId) { notify("تم الإلغاء"); },
+                    onError: function(error, payment) { notify("خطأ: " + error.message); },
+                    onIncomplete: function(paymentId) { notify("دفع غير مكتمل"); }
                 });
-            } catch (err) {
-                notify("فشل: " + err.message);
-            }
+
+            }).catch(function(err) {
+                notify("خطأ في الدخول: " + err.message);
+            });
         };
     </script>
 </body>
