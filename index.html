@@ -3,37 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>جسر التواصل - النسخة المستقرة</title>
+    <title>جسر التواصل - النسخة الكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --p: #4a148c; --y: #ffb74d; }
         body { background: var(--p); color: white; font-family: sans-serif; margin: 0; padding-bottom: 30px; text-align: center; }
-        .header { padding: 20px; background: #5e1bbf; border-bottom: 3px solid var(--y); }
-        .auth-btn { background: #2ecc71; color: white; padding: 10px 20px; border-radius: 20px; display: inline-block; margin: 10px; font-weight: bold; cursor: pointer; }
+        .header { padding: 20px; background: #5e1bbf; border-bottom: 3px solid var(--y); position: relative; }
+        .auth-btn { background: #2ecc71; color: white; padding: 10px 20px; border-radius: 20px; display: inline-block; margin-top: 10px; font-weight: bold; cursor: pointer; }
         .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .buy-card { background: var(--y); color: var(--p); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: none; }
+        .buy-card { background: var(--y); color: var(--p); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; position: relative; }
         .price-badge { background: var(--p); color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--y); color: var(--p); padding: 10px 20px; border-radius: 30px; display: none; z-index: 2000; border: 2px solid white; }
+        .add-btn { position: fixed; bottom: 20px; right: 20px; background: #2ecc71; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; cursor: pointer; }
+        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--y); color: var(--p); padding: 12px 25px; border-radius: 30px; display: none; font-weight: bold; z-index: 2000; border: 2px solid white; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content { background: white; color: var(--p); padding: 25px; border-radius: 25px; width: 85%; }
+        input { width: 90%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1 style="color:var(--y);">جسر التواصل</h1>
-        <div id="btnAuth" class="auth-btn" onclick="initPi()">اضغط للتحقق</div>
+        <div id="btnAuth" class="auth-btn" onclick="initPi()">إضغط للتحقق</div>
     </div>
 
     <div id="pageMarket" class="market-grid">
         </div>
+
+    <div class="add-btn" onclick="document.getElementById('addModal').style.display='flex'">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3>نشر خدمة جديدة</h3>
+            <input type="text" id="newTitle" placeholder="اسم الخدمة">
+            <input type="number" id="newPrice" placeholder="السعر بـ Pi">
+            <button onclick="publish()" style="width:100%; background:var(--p); color:white; padding:15px; border-radius:12px; margin-top:15px; border:none; font-weight:bold;">نشر الآن</button>
+            <button onclick="document.getElementById('addModal').style.display='none'" style="margin-top:10px; background:none; border:none; color:grey;">إلغاء</button>
+        </div>
+    </div>
 
     <div id="toast"></div>
 
     <script>
         const _sb = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
         
-        function msg(t) { const e=document.getElementById('toast'); e.innerText=t; e.style.display='block'; setTimeout(()=>e.style.display='none',3000); }
+        function msg(t) { const e=document.getElementById('toast'); e.innerText=t; e.style.display='block'; setTimeout(()=>e.style.display='none',4000); }
 
         async function initPi() {
             try {
@@ -42,14 +60,14 @@
                 window.piUser = auth.user.username;
                 document.getElementById('btnAuth').innerText = "مرحباً: " + window.piUser;
                 load();
-            } catch (e) { msg("افتح من Pi Browser"); }
+            } catch (e) { msg("يرجى الفتح من Pi Browser"); }
         }
 
         async function load() {
             const { data } = await _sb.from('services').select('*').order('id', {ascending:false});
             if(data) {
                 document.getElementById('pageMarket').innerHTML = data.map(i => `
-                    <div class="buy-card" onclick="onOrder('${i.price}', '${i.title}')">
+                    <div class="buy-card" onclick="startPay('${i.price}', '${i.title}')">
                         <i class="fas fa-briefcase" style="font-size:1.5rem;"></i><br>
                         <b>${i.title}</b><br>
                         <span class="price-badge">${i.price} Pi</span>
@@ -58,46 +76,48 @@
             }
         }
 
-        // --- استبدال كود الدفع بالكود المستقر الذي طلبته ---
-        async function onOrder(amount, title) {
-            if (!window.piUser) return msg("يرجى التحقق أولاً");
-            
+        async function startPay(amt, tit) {
+            if(!window.piUser) return msg("يرجى التحقق أولاً");
             msg("جاري فتح المحفظة...");
-            
             try {
-                const payment = await window.Pi.createPayment({
-                    amount: parseFloat(amount),
-                    memo: "طلب خدمة: " + title,
-                    metadata: { service_name: title }
+                await window.Pi.createPayment({
+                    amount: parseFloat(amt),
+                    memo: "طلب: " + tit,
+                    metadata: { service: tit }
                 }, {
-                    onReadyForServerApproval: (paymentId) => {
+                    onReadyForServerApproval: (id) => {
                         return fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, action: 'approve' })
-                        }).then(res => res.json());
+                            body: JSON.stringify({ paymentId: id, action: 'approve' })
+                        }).then(r => r.json());
                     },
-                    onConnectedToBlockchain: (paymentId, txid) => {
-                        // حفظ البيانات في Supabase فور الربط بالبلوكشين
-                        _sb.from('services').update({ txid: txid, status: 'paid' })
-                           .match({ title: title, user_pi: window.piUser });
+                    onConnectedToBlockchain: (id, tx) => {
+                        msg("تم الربط بالبلوكشين.. جاري الحفظ");
+                        _sb.from('services').update({ txid: tx }).match({ title: tit });
                     },
-                    onReadyForServerCompletion: (paymentId, txid) => {
+                    onReadyForServerCompletion: (id, tx) => {
                         fetch('/api/payment-handler', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId, txid, action: 'complete' })
+                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
                         });
-                        msg("تم الدفع بنجاح! راجع بريدك");
+                        msg("تم الدفع بنجاح! راجع بريدك الآن ✅");
                     },
-                    onCancel: (id) => msg("تم إلغاء الطلب"),
-                    onError: (err, id) => msg("حدث خطأ في الاتصال")
+                    onError: (e) => msg("خطأ في الاتصال بالشبكة")
                 });
-            } catch (e) {
-                msg("خطأ غير متوقع بالشبكة");
-            }
+            } catch (e) { msg("خطأ غير متوقع"); }
         }
-        // ------------------------------------------------
+
+        async function publish() {
+            const t = document.getElementById('newTitle').value;
+            const p = document.getElementById('newPrice').value;
+            if(!t || !p || !window.piUser) return msg("أكمل البيانات وسجل دخولك");
+            await _sb.from('services').insert([{ title: t, price: p, user_pi: window.piUser }]);
+            msg("تم نشر خدمتك بنجاح! 🎉");
+            document.getElementById('addModal').style.display='none';
+            load();
+        }
 
         window.onload = load;
     </script>
