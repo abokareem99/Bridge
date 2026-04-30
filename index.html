@@ -3,185 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>جسر التواصل - النظام الكامل</title>
+    <title>جسر التواصل - الإصلاح النهائي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script> (function() { emailjs.init("aRCAx1NwvATaC4F-m"); })(); </script>
+
     <style>
         :root { --pi-d: #4a148c; --pi-g: #ffb74d; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--pi-d); color: white; min-height: 100vh; }
         
-        .header { padding: 20px; text-align: center; background: linear-gradient(to bottom, #5e1bbf, var(--pi-d)); }
-        .welcome-badge { background: #2ecc71; color: white; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-top: 10px; cursor: pointer; }
+        .header { padding: 20px; text-align: center; background: #5e1bbf; border-bottom: 2px solid var(--pi-g); }
+        .welcome-badge { background: #2ecc71; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-top: 10px; cursor: pointer; }
 
         .view-switcher { display: flex; justify-content: center; gap: 10px; padding: 15px; }
-        .switch-btn { flex: 1; max-width: 150px; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        .switch-btn { flex: 1; max-width: 150px; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
         .active { background: var(--pi-g); color: var(--pi-d); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .inactive { background: rgba(255,255,255,0.1); color: white; }
 
         .market-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card { background: var(--pi-g); padding: 20px 10px; border-radius: 20px; color: var(--pi-d); text-align: center; cursor: pointer; transition: 0.2s; }
-        .card:active { transform: scale(0.95); }
-        .price-badge { background: var(--pi-d); color: white; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; margin-top: 8px; display: inline-block; }
+        .card { background: var(--pi-g); padding: 20px 10px; border-radius: 20px; color: var(--pi-d); text-align: center; cursor: pointer; }
+        .price-badge { background: var(--pi-d); color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 8px; margin-top: 8px; display: inline-block; font-weight: bold; }
 
-        /* نافذة الطلب (التي تطلب الإيميل والتفاصيل) */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; }
-        .modal-content { background: var(--pi-g); width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; color: var(--pi-d); }
-        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid var(--pi-d); font-weight: bold; }
+        /* نافذة المودال */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; color: var(--pi-d); }
+        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid #ccc; font-weight: bold; }
 
         .history-section { padding: 20px; background: rgba(0,0,0,0.2); border-radius: 25px 25px 0 0; margin-top: 20px; }
         .order-item { background: white; color: var(--pi-d); padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 30px; display: none; z-index: 11000; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10000; font-weight: bold; border: 2px solid white; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1 style="color: var(--pi-g);">جسر التواصل</h1>
-        <div id="authBtn" class="welcome-badge" onclick="startApp()">تحقق عبر Pi Network</div>
+        <div id="authBtn" class="welcome-badge" onclick="startApp()">اضغط للتحقق (مهم جداً)</div>
     </div>
 
     <div class="view-switcher">
-        <button id="bTab" class="switch-btn active" onclick="show('buyer')">سوق الخدمات</button>
-        <button id="sTab" class="switch-btn inactive" onclick="show('seller')">أضف خدمة</button>
+        <button id="bTab" class="switch-btn active" onclick="changeView('buyer')">سوق الخدمات</button>
+        <button id="sTab" class="switch-btn inactive" onclick="changeView('seller')">أضف خدمة</button>
     </div>
 
-    <div id="buyerView" class="market-grid"></div>
+    <div id="buyerView" class="market-grid">
+        </div>
 
     <div id="sellerView" style="display:none; padding:20px;">
-        <div style="background:var(--pi-g); padding:20px; border-radius:20px; color:var(--pi-d);">
-            <h3 style="text-align:center;">عرض خدمة جديدة</h3>
-            <input type="text" id="gTitle" placeholder="اسم الخدمة">
-            <input type="number" id="gPrice" placeholder="السعر بـ Pi">
-            <button onclick="publishGig()" style="width:100%; background:var(--pi-d); color:white; padding:15px; border:none; border-radius:12px; margin-top:15px; font-weight:bold;">نشر الآن</button>
+        <div style="background:var(--pi-g); padding:25px; border-radius:25px; color:var(--pi-d);">
+            <h2 style="text-align:center; margin-bottom:15px;">نشر خدمة</h2>
+            <input type="text" id="gigTit" placeholder="عنوان الخدمة">
+            <input type="number" id="gigPrc" placeholder="السعر بـ Pi">
+            <button onclick="saveNewGig()" style="width:100%; background:var(--pi-d); color:white; padding:15px; border:none; border-radius:15px; margin-top:20px; font-weight:bold;">نشر الآن</button>
         </div>
     </div>
 
     <div class="history-section">
-        <h4 style="color: var(--pi-g); margin-bottom:10px;"><i class="fas fa-history"></i> سجل مشترياتي</h4>
-        <div id="orderList"></div>
+        <h4 style="color: var(--pi-g); margin-bottom:15px;"><i class="fas fa-history"></i> سجل مشترياتي الأخيرة</h4>
+        <div id="ordersDisplay"></div>
     </div>
 
-    <div id="reqModal" class="modal">
+    <div id="orderModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center;">تم الدفع بنجاح! 🎉</h2>
-            <p style="margin-top:10px; font-size:0.9rem;">يرجى تزويدنا بتفاصيل طلبك للتواصل:</p>
-            <textarea id="orderDetail" rows="3" placeholder="اشرح ماذا تريد من العارض..."></textarea>
-            <input type="text" id="contactInfo" placeholder="إيميلك أو واتساب للتواصل">
-            <button onclick="confirmOrder()" style="width:100%; background:var(--pi-d); color:white; padding:15px; border:none; border-radius:12px; margin-top:15px; font-weight:bold;">إرسال الطلب للعارض</button>
+            <h2 style="text-align:center;">تم الدفع! ✅</h2>
+            <p style="margin-top:10px;">اكتب تفاصيل طلبك وإيميلك للعارض:</p>
+            <textarea id="uMsg" rows="3" placeholder="مثلاً: أريد تصميم شعار باسم..."></textarea>
+            <input type="text" id="uContact" placeholder="إيميلك أو واتساب">
+            <button onclick="finalSubmit()" style="width:100%; background:var(--pi-d); color:white; padding:15px; border:none; border-radius:12px; margin-top:15px; font-weight:bold;">إرسال الطلب</button>
         </div>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        // إعدادات سوبابيز
+        const sUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
+        const sKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
+        const _db = supabase.createClient(sUrl, sKey);
+        
+        emailjs.init("aRCAx1NwvATaC4F-m");
 
-        let tempOrder = { title: "", price: 0, txid: "" };
+        let activeOrder = { title: "", price: 0, txid: "" };
 
-        function msg(t) { const e=document.getElementById('toast'); e.innerText=t; e.style.display='block'; setTimeout(()=>e.style.display='none',3000); }
+        function showMsg(t) { 
+            const e = document.getElementById('toast'); 
+            e.innerText = t; 
+            e.style.display = 'block'; 
+            setTimeout(() => e.style.display = 'none', 3000); 
+        }
 
-        function show(v) {
-            document.getElementById('buyerView').style.display = v==='buyer'?'grid':'none';
-            document.getElementById('sellerView').style.display = v==='seller'?'block':'none';
-            document.getElementById('bTab').className = v==='buyer'?'switch-btn active':'switch-btn inactive';
-            document.getElementById('sTab').className = v==='seller'?'switch-btn active':'switch-btn inactive';
+        function changeView(v) {
+            document.getElementById('buyerView').style.display = (v === 'buyer') ? 'grid' : 'none';
+            document.getElementById('sellerView').style.display = (v === 'seller') ? 'block' : 'none';
+            document.getElementById('bTab').className = (v === 'buyer') ? 'switch-btn active' : 'switch-btn inactive';
+            document.getElementById('sTab').className = (v === 'seller') ? 'switch-btn active' : 'switch-btn inactive';
         }
 
         async function startApp() {
             try {
-                await window.Pi.init({ version: "2.0", sandbox: true }); // اجعلها false عند النشر الحقيقي
-                const auth = await window.Pi.authenticate(['username', 'payments'], (p)=>{});
-                window.currentUser = auth.user.username;
+                showMsg("جاري التحقق...");
+                await window.Pi.init({ version: "2.0", sandbox: true }); // غير لـ false عند الماين نت
+                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                window.userAccount = auth.user.username;
                 document.getElementById('authBtn').innerText = "مرحباً " + auth.user.username;
-                loadMarket();
-                loadMyOrders();
-            } catch (e) { msg("افتح عبر متصفح Pi"); }
+                document.getElementById('authBtn').style.background = "#2ecc71";
+                await loadMarketData();
+                await loadUserOrders();
+            } catch (e) { 
+                showMsg("يرجى فتح التطبيق داخل متصفح Pi");
+            }
         }
 
-        async function loadMarket() {
-            const { data } = await _supabase.from('market_gigs').select('*').order('id', {ascending: false});
-            if(data) {
-                document.getElementById('buyerView').innerHTML = data.map(g => `
-                    <div class="card" onclick="startPayment(${g.price}, '${g.title}')">
-                        <i class="fas fa-tools" style="font-size:1.5rem; margin-bottom:8px;"></i>
+        async function loadMarketData() {
+            const { data, error } = await _db.from('market_gigs').select('*').order('id', {ascending: false});
+            const container = document.getElementById('buyerView');
+            if(data && data.length > 0) {
+                container.innerHTML = data.map(g => `
+                    <div class="card" onclick="handlePayment(${g.price}, '${g.title}')">
+                        <i class="fas fa-briefcase" style="font-size:1.5rem; margin-bottom:8px;"></i>
                         <div style="font-weight:bold;">${g.title}</div>
                         <div class="price-badge">${g.price} Pi</div>
                     </div>
                 `).join('');
+            } else {
+                container.innerHTML = "<p style='grid-column:span 2; text-align:center;'>لا توجد خدمات حالياً</p>";
             }
         }
 
-        async function startPayment(amt, name) {
-            if(!window.currentUser) return msg("تحقق من هويتك أولاً");
-            msg("فتح المحفظة...");
+        async function handlePayment(amt, name) {
+            if(!window.userAccount) return showMsg("سجل دخولك عبر الزر الأخضر أولاً");
+            showMsg("جاري فتح المحفظة...");
             try {
                 await window.Pi.createPayment({
-                    amount: amt, memo: "طلب خدمة: " + name, metadata: { service: name }
+                    amount: amt, memo: "شراء خدمة: " + name, metadata: { item: name }
                 }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({paymentId:id, action:'approve'}) }).then(r=>r.json()),
-                    onConnectedToBlockchain: (id, tx) => { tempOrder.txid = tx; },
+                    onConnectedToBlockchain: (id, tx) => { activeOrder.txid = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
                         await fetch('/api/payment-handler', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({paymentId:id, txid:tx, action:'complete'}) });
-                        tempOrder.title = name;
-                        tempOrder.price = amt;
-                        document.getElementById('reqModal').style.display = 'flex'; // هنا تظهر نافذة الإيميل
+                        activeOrder.title = name;
+                        activeOrder.price = amt;
+                        document.getElementById('orderModal').style.display = 'flex'; // فتح نافذة التفاصيل
                     },
-                    onError: () => msg("فشل الدفع")
+                    onError: (e) => showMsg("خطأ في الدفع")
                 });
-            } catch (e) { msg("خطأ في الاتصال"); }
+            } catch (e) { showMsg("خطأ في الاتصال بالمحفظة"); }
         }
 
-        async function confirmOrder() {
-            const detail = document.getElementById('orderDetail').value;
-            const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return msg("أكمل البيانات");
+        async function finalSubmit() {
+            const msgBody = document.getElementById('uMsg').value;
+            const contact = document.getElementById('uContact').value;
+            if(!msgBody || !contact) return showMsg("أكمل البيانات");
 
-            await _supabase.from('services').insert([{ 
-                title: tempOrder.title, description: detail, price: String(tempOrder.price),
-                contact_info: contact, user_pi: window.currentUser, txid: tempOrder.txid
+            await _db.from('services').insert([{ 
+                title: activeOrder.title, description: msgBody, price: String(activeOrder.price),
+                contact_info: contact, user_pi: window.userAccount, txid: activeOrder.txid
             }]);
 
-            // إرسال تنبيه بالإيميل لك
             emailjs.send("service_vuti648", "template_m6rq1ab", {
-                username: window.currentUser, service_detail: detail, contact_info: contact, price: tempOrder.price
+                username: window.userAccount, service_detail: msgBody, contact_info: contact, price: activeOrder.price
             });
 
-            msg("تم إرسال طلبك بنجاح!");
-            document.getElementById('reqModal').style.display = 'none';
-            loadMyOrders();
+            showMsg("تم إرسال الطلب بنجاح!");
+            document.getElementById('orderModal').style.display = 'none';
+            loadUserOrders();
         }
 
-        async function publishGig() {
-            const t = document.getElementById('gTitle').value;
-            const p = document.getElementById('gPrice').value;
-            if(!t || !p || !window.currentUser) return msg("أكمل البيانات");
-            await _supabase.from('market_gigs').insert([{ title:t, price:p, seller_name:window.currentUser }]);
-            msg("تم النشر!");
-            show('buyer');
-            loadMarket();
+        async function saveNewGig() {
+            const t = document.getElementById('gigTit').value;
+            const p = document.getElementById('gigPrc').value;
+            if(!t || !p || !window.userAccount) return showMsg("أكمل البيانات وسجل دخولك");
+            
+            await _db.from('market_gigs').insert([{ title:t, price:p, seller_name:window.userAccount }]);
+            showMsg("تم النشر بنجاح!");
+            document.getElementById('gigTit').value = "";
+            document.getElementById('gigPrc').value = "";
+            changeView('buyer');
+            loadMarketData();
         }
 
-        async function loadMyOrders() {
-            if(!window.currentUser) return;
-            const { data } = await _supabase.from('services').select('*').eq('user_pi', window.currentUser).order('id', {ascending:false});
+        async function loadUserOrders() {
+            if(!window.userAccount) return;
+            const { data } = await _db.from('services').select('*').eq('user_pi', window.userAccount).order('id', {ascending:false});
             if(data) {
-                document.getElementById('orderList').innerHTML = data.map(o => `
+                document.getElementById('ordersDisplay').innerHTML = data.map(o => `
                     <div class="order-item">
                         <div style="font-size:0.8rem;"><strong>${o.title}</strong><br><small>${o.price} Pi</small></div>
-                        <div style="background:#2ecc71; color:white; padding:4px 10px; border-radius:8px; font-size:0.7rem;">مكتمل ✅</div>
+                        <div style="background:#2ecc71; color:white; padding:4px 10px; border-radius:8px; font-size:0.7rem; font-weight:bold;">مكتمل ✅</div>
                     </div>
                 `).join('');
             }
         }
 
-        window.onload = loadMarket;
+        // تحميل أولي للسوق
+        window.onload = loadMarketData;
     </script>
 </body>
 </html>
