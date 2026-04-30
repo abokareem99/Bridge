@@ -1,113 +1,157 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - Ultra Fast</title>
+    <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; }
-        body { background: #f4f4f9; font-family: sans-serif; margin: 0; padding: 0; }
-        .hero { background: var(--pi-d); color: white; text-align: center; padding: 25px; border-radius: 0 0 20px 20px; }
-        .btn-auth { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
-        .categories { display: flex; gap: 10px; padding: 20px; justify-content: center; }
-        .cat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; width: 45%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
-        .price { color: #e65100; font-weight: bold; font-size: 0.9rem; }
-        .feed { padding: 20px; }
-        .item { background: white; padding: 12px; margin-bottom: 8px; border-radius: 10px; border-left: 4px solid var(--pi-g); }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; }
-        .modal-box { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 350px; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 15px; border-radius: 20px; display: none; }
+        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .hero { padding: 40px 20px; background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); text-align: center; color: var(--w); border-radius: 0 0 35px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 10px; font-weight: 800; }
+        .btn-auth { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+
+        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .cat-card { background: var(--w); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.05); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .cat-card:active { transform: scale(0.95); }
+        .cat-card i { color: var(--pi-p); font-size: 1.8rem; margin-bottom: 12px; display: block; }
+        .price-badge { font-size: 0.85rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 4px 12px; border-radius: 8px; margin-top: 10px; display: inline-block; }
+
+        .feed-section { padding: 20px; max-width: 500px; margin: 0 auto; width: 100%; }
+        .feed-title { font-size: 1.1rem; color: var(--pi-d); font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .feed-item { background: var(--w); padding: 15px; border-radius: 18px; border-right: 5px solid var(--pi-g); margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 25px; text-align: right; }
+        input, textarea { width: 100%; padding: 15px; margin-top: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 1rem; outline: none; }
+        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 15px; border-radius: 15px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 10000; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div class="hero">
-    <h2 style="color:var(--pi-g)">Bridge Freelance</h2>
-    <p style="font-size: 0.8rem;">Verified Platform: abokareem999</p>
-    <button id="authBtn" class="btn-auth" onclick="login()">Verify Pi Account</button>
-</div>
+    <section class="hero">
+        <h1 class="hero-title">جسر التواصل</h1>
+        <p style="font-size: 0.9rem; opacity: 0.9;">مرحباً بك في منصة abokareem 🌐</p>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">تحقق من الحساب عبر Pi</button>
+    </section>
 
-<div class="categories">
-    <div class="cat-card" onclick="pay(1.0, 'Programming')">
-        <i class="fas fa-code"></i><br>Programming<br><span class="price">1.0 Pi</span>
+    <section class="categories">
+        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة')">
+            <i class="fas fa-code"></i><span>البرمجة</span><br><span class="price-badge">1.0 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.8, 'التصميم')">
+            <i class="fas fa-palette"></i><span>التصميم</span><br><span class="price-badge">0.8 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.5, 'الترجمة')">
+            <i class="fas fa-pen-nib"></i><span>الترجمة</span><br><span class="price-badge">0.5 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.7, 'التسويق')">
+            <i class="fas fa-bullhorn"></i><span>التسويق</span><br><span class="price-badge">0.7 Pi</span>
+        </div>
+    </section>
+
+    <section class="feed-section">
+        <div class="feed-title">
+            <span>آخر الخدمات المطلوبة</span>
+            <i class="fas fa-sync-alt" onclick="loadFeed()" style="cursor:pointer; color:var(--pi-p)"></i>
+        </div>
+        <div id="servicesFeed"></div>
+    </section>
+
+    <div id="reqModal" class="modal">
+        <div class="modal-content" id="modalUI">
+            <h2 style="color:var(--pi-d); text-align:center;">تفاصيل الطلب 📦</h2>
+            <textarea id="orderDetail" rows="3" placeholder="اشرح الخدمة المطلوبة بدقة..."></textarea>
+            <input type="email" id="contactEmail" placeholder="بريدك الإلكتروني للتواصل">
+            <button class="btn-submit" onclick="submitToSupabase()">إرسال لجدول الخدمات</button>
+        </div>
     </div>
-    <div class="cat-card" onclick="pay(0.8, 'Design')">
-        <i class="fas fa-palette"></i><br>Design<br><span class="price">0.8 Pi</span>
-    </div>
-</div>
 
-<div class="feed">
-    <h4 style="color:var(--pi-d)">Latest Orders</h4>
-    <div id="list"></div>
-</div>
+    <div id="toast"></div>
 
-<div id="modal" class="modal">
-    <div class="modal-box">
-        <h3>Order Sent!</h3>
-        <p>Success. Please add your email:</p>
-        <input type="email" id="email" placeholder="Email Address" style="width:100%; padding:10px; margin:10px 0;">
-        <textarea id="desc" placeholder="Details..." style="width:100%; padding:10px;"></textarea>
-        <button onclick="save()" style="width:100%; background:var(--pi-p); color:white; padding:10px; border:none; margin-top:10px; border-radius:10px;">Save Order</button>
-    </div>
-</div>
+    <script>
+        const sbUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
+        const sbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
+        const _sb = supabase.createClient(sbUrl, sbKey);
 
-<div id="toast"></div>
+        let curTx = "", curAmt = 0, curCat = "";
 
-<script>
-    const sbUrl = "https://xolwuawlnruvzqowxxbh.supabase.co";
-    const sbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-    const _sb = supabase.createClient(sbUrl, sbKey);
+        function showMsg(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(()=>t.style.display='none', 4000); }
 
-    let _tx = "", _amt = 0, _cat = "";
+        async function loadFeed() {
+            const { data, error } = await _sb.from('services').select('*').order('created_at', { ascending: false }).limit(5);
+            if (!error && data) {
+                document.getElementById('servicesFeed').innerHTML = data.map(i => `
+                    <div class="feed-item">
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--pi-p);">
+                            <span>${i.title}</span> <span style="color:#e65100;">${i.price} Pi</span>
+                        </div>
+                        <p style="font-size:0.85rem; color:#555; margin-top:8px;">${i.description}</p>
+                        <div style="font-size:0.75rem; color:#999; margin-top:10px; border-top:1px solid #eee; padding-top:5px;">
+                            <i class="fas fa-user-circle"></i> بواسطة: ${i.user_pi}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
 
-    function msg(t) { const s = document.getElementById('toast'); s.innerText = t; s.style.display='block'; setTimeout(()=>s.style.display='none', 3000); }
+        window.onload = loadFeed;
 
-    async function load() {
-        const { data } = await _sb.from('services').select('*').order('created_at', {ascending: false}).limit(3);
-        if(data) document.getElementById('list').innerHTML = data.map(i => `<div class="item"><b>${i.title}</b> - ${i.price} Pi</div>`).join('');
-    }
-    window.onload = load;
+        async function startApp() {
+            try {
+                await window.Pi.init({ version: "2.0", sandbox: true });
+                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                window.user = auth.user.username;
+                document.getElementById('authBtn').innerText = "تم التوثيق: " + window.user;
+                document.getElementById('authBtn').style.background = "#2ecc71";
+            } catch (e) { showMsg("فشل التوثيق مع الشبكة"); }
+        }
 
-    async function login() {
-        try {
-            await window.Pi.init({ version: "2.0", sandbox: true });
-            const auth = await window.Pi.authenticate(['username', 'payments'], (p)=>{});
-            window.user = auth.user.username;
-            document.getElementById('authBtn').innerText = "Hi, " + window.user;
-        } catch(e) { msg("Login Error"); }
-    }
+        async function processPayment(amt, name) {
+            if (!window.user) { showMsg("يرجى توثيق الحساب أولاً"); return; }
+            curAmt = amt; curCat = name;
+            try {
+                showMsg("جاري فتح محفظة Pi...");
+                await window.Pi.createPayment({
+                    amount: amt, memo: "طلب خدمة: " + name, metadata: { category: name }
+                }, {
+                    onReadyForServerApproval: (id) => {
+                        return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, action: 'approve' }) });
+                    },
+                    onConnectedToBlockchain: (id, tx) => { curTx = tx; },
+                    onReadyForServerCompletion: (id, tx) => { 
+                        document.getElementById('reqModal').style.display = 'flex';
+                        return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, tx, action: 'complete' }) });
+                    },
+                    onCancel: () => showMsg("تم إلغاء عملية الدفع"),
+                    onError: (error) => showMsg("خطأ في الدفع - يرجى المحاولة مرة أخرى")
+                });
+            } catch (e) { showMsg("النظام مشغول حالياً"); }
+        }
 
-    async function pay(amt, cat) {
-        if(!window.user) return msg("Login First!");
-        _amt = amt; _cat = cat;
-        try {
-            await window.Pi.createPayment({
-                amount: amt, memo: "Order " + cat, metadata: {cat}
-            }, {
-                onReadyForServerApproval: (id) => fetch('/api/pay', {method:'POST', body: JSON.stringify({id, action:'approve'})}),
-                onConnectedToBlockchain: (id, tx) => { _tx = tx; },
-                onReadyForServerCompletion: (id, tx) => {
-                    document.getElementById('modal').style.display = 'flex';
-                    return fetch('/api/pay', {method:'POST', body: JSON.stringify({id, tx, action:'complete'})});
-                },
-                onCancel: () => msg("Cancelled"),
-                onError: (e) => msg("Error - Try Again")
-            });
-        } catch(e) { msg("Network Busy"); }
-    }
+        async function submitToSupabase() {
+            const desc = document.getElementById('orderDetail').value;
+            const mail = document.getElementById('contactEmail').value;
+            if (!desc || !mail) return showMsg("يرجى إكمال جميع الحقول");
 
-    async function save() {
-        const e = document.getElementById('email').value;
-        const d = document.getElementById('desc').value;
-        if(!e || !d) return msg("Fill fields");
-        const { error } = await _sb.from('services').insert([{
-            title: _cat, description: d, price: String(_amt), category: _cat, contact_info: e, user_pi: window.user, txid: _tx
-        }]);
-        if(!error) location.reload();
-    }
-</script>
+            const { error } = await _sb.from('services').insert([{ 
+                title: curCat, description: desc, price: String(curAmt),
+                category: curCat, contact_info: mail, user_pi: window.user, txid: curTx
+            }]);
+
+            if (!error) {
+                showMsg("تم نشر الطلب بنجاح!");
+                loadFeed();
+                document.getElementById('modalUI').innerHTML = "<div style='text-align:center;'><i class='fas fa-check-circle' style='font-size:3rem; color:green;'></i><h2>تم بنجاح!</h2><p>تم إرسال طلبك للجدول.</p><button class='btn-submit' onclick='location.reload()'>إغلاق</button></div>";
+            } else { showMsg("خطأ في الحفظ بقاعدة البيانات"); }
+        }
+    </script>
 </body>
 </html>
