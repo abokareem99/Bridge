@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -16,65 +16,62 @@
             --pi-p: #6a1b9a; 
             --pi-d: #4a148c; 
             --pi-g: #ffb74d; 
-            --blue-msg: #007bff; /* لون أزرق واضح للرسائل */
+            --blue-msg: #007bff; 
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--pi-d); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-        .hero { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 5px; font-weight: 800; }
-        .welcome-msg { font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; font-weight: bold; }
-        .btn-auth { background: #2ecc71; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .categories { padding: 15px; max-width: 450px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-        .cat-card { background: var(--pi-g); padding: 12px 5px; border-radius: 18px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.1rem; margin: 0 auto 8px; }
-        .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px; }
-        .price-badge { font-size: 0.75rem; color: #fff; font-weight: bold; background: var(--pi-d); padding: 2px 8px; border-radius: 5px; }
-        .orders-section { padding: 10px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
-        .section-title { color: var(--pi-g); margin-bottom: 10px; text-align: center; font-size: 0.95rem; font-weight: bold; }
-        .order-item { background: var(--pi-g); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-right: 4px solid var(--pi-d); color: var(--pi-d); }
+        body { background-color: var(--pi-d); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        [span_1](start_span)/* تعديل لون رسالة "جاري الاتصال" و "مرحبا" لتصبح زرقاء[span_1](end_span) */
-        #toast { 
-            position: fixed; 
-            bottom: 80px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: var(--blue-msg); [span_2](start_span)/* لون أزرق[span_2](end_span) */
-            color: white; 
-            padding: 10px 25px; 
-            border-radius: 30px; 
-            display: none; 
-            z-index: 5000; 
-            font-size: 0.85rem; 
-            font-weight: bold; 
-            border: 1px solid white; 
-        }
+        /* ضغط الهيرو لأقصى حد */
+        .hero { padding: 10px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .hero-title { font-size: 1.4rem; color: var(--pi-g); margin-bottom: 2px; font-weight: 800; }
+        .welcome-msg { font-size: 0.7rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 2px 10px; border-radius: 15px; margin-bottom: 5px; font-weight: bold; }
+        .hero-p { font-size: 0.65rem; margin-bottom: 8px; color: var(--pi-g); opacity: 0.8; }
+        
+        .btn-auth { background: #2ecc71; color: white; border: none; padding: 6px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
 
+        /* تنظيم الشبكة لتكون أصغر */
+        .categories { padding: 10px; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+        .cat-card { background: var(--pi-g); padding: 8px 4px; border-radius: 12px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; margin: 0 auto 5px; }
+        .cat-card span { font-weight: 700; font-size: 0.75rem; display: block; }
+        .price-badge { font-size: 0.65rem; color: #fff; font-weight: bold; background: var(--pi-d); padding: 1px 6px; border-radius: 4px; }
+        
+        /* قسم الطلبات مضغوط */
+        .orders-section { padding: 5px 15px; max-width: 400px; margin: 0 auto; width: 100%; flex-grow: 1; overflow-y: auto; }
+        .section-title { color: var(--pi-g); margin-bottom: 5px; text-align: center; font-size: 0.8rem; font-weight: bold; }
+        .order-item { background: var(--pi-g); padding: 6px 10px; border-radius: 10px; margin-bottom: 5px; border-right: 3px solid var(--pi-d); color: var(--pi-d); }
+
+        /* الفوتر ظاهر دائماً وبشكل رشيق */
+        .footer-container { padding: 10px; text-align: center; background: rgba(0,0,0,0.1); }
+        .footer-links { display: flex; justify-content: center; gap: 15px; font-size: 0.7rem; }
+        .footer-links a { color: var(--pi-g); text-decoration: none; font-weight: bold; }
+        
+        #toast { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--blue-msg); color: white; padding: 8px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.75rem; font-weight: bold; border: 1px solid white; }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: var(--pi-g); width: 90%; max-width: 380px; padding: 25px 20px; border-radius: 20px; text-align: right; color: var(--pi-d); }
-        textarea, input { background: rgba(255,255,255,0.3); border: 1px solid var(--pi-d); color: var(--pi-d); font-weight: bold; width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; }
+        .modal-content { background: var(--pi-g); width: 85%; max-width: 320px; padding: 20px; border-radius: 15px; text-align: right; color: var(--pi-d); }
     </style>
 </head>
 <body>
     <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
         <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-        <p style="font-size: 0.75rem; margin-bottom: 12px; color: var(--pi-g); opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
+        <p class="hero-p">بوابتك لخدمات العمل الحر عبر Pi Network</p>
         <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
     </section>
 
     <section class="categories">
         <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
-            <i class="fas fa-code"></i><span>Programming</span><span class="price-badge">Pi 1.0</span>
+            <i class="fas fa-code"></i><span>Programming</span><span class="price-badge">1.0 Pi</span>
         </div>
         <div class="cat-card" onclick="processPayment(0.8, 'Design')">
-            <i class="fas fa-palette"></i><span>Design</span><span class="price-badge">Pi 0.8</span>
+            <i class="fas fa-palette"></i><span>Design</span><span class="price-badge">0.8 Pi</span>
         </div>
         <div class="cat-card" onclick="processPayment(0.7, 'Marketing')">
-            <i class="fas fa-bullhorn"></i><span>Marketing</span><span class="price-badge">Pi 0.7</span>
+            <i class="fas fa-bullhorn"></i><span>Marketing</span><span class="price-badge">0.7 Pi</span>
         </div>
         <div class="cat-card" onclick="processPayment(0.5, 'Translation')">
-            <i class="fas fa-pen-nib"></i><span>Translation</span><span class="price-badge">Pi 0.5</span>
+            <i class="fas fa-pen-nib"></i><span>Translation</span><span class="price-badge">0.5 Pi</span>
         </div>
     </section>
 
@@ -83,12 +80,19 @@
         <div id="ordersList"></div>
     </section>
 
+    <footer class="footer-container">
+        <div class="footer-links">
+            <a href="#"><i class="fas fa-shield-alt"></i> السياسات</a>
+            <a href="#"><i class="fas fa-file-contract"></i> الشروط</a>
+        </div>
+    </footer>
+
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center; margin-bottom:10px;">اكتمل الدفع! 🎉</h2>
-            <textarea id="orderDetail" rows="3" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
-            <input type="email" id="contactInfo" placeholder="بريدك الإلكتروني">
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:8px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب</button>
+            <h3 style="text-align:center;">اكتمل الدفع! 🎉</h3>
+            <textarea id="orderDetail" rows="2" style="width:100%; margin-top:10px; border-radius:5px; padding:5px;" placeholder="تفاصيل طلبك..."></textarea>
+            <input type="email" id="contactInfo" style="width:100%; margin-top:5px; border-radius:5px; padding:5px;" placeholder="ايميلك">
+            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:10px; border-radius:5px; margin-top:10px; font-weight:bold;" onclick="submitOrder()">إرسال</button>
         </div>
     </div>
 
@@ -101,11 +105,7 @@
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function showMsg(m) { 
-            toast.innerText = m; 
-            toast.style.display = 'block'; 
-            setTimeout(() => toast.style.display='none', 3000); 
-        }
+        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
 
         async function startApp() {
             try {
@@ -114,20 +114,17 @@
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
-                document.getElementById('authBtn').style.background = "#2ecc71";
                 showMsg("مرحباً " + auth.user.username);
-            } catch (e) { 
-                showMsg("فشل الدخول");
-            }
+            } catch (e) { showMsg("فشل الدخول"); }
         }
 
         async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول أولاً"); return; }
+            if(!window.currentUser) { showMsg("سجل دخولك أولاً"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                showMsg("بدء عملية الدفع...");
+                showMsg("بدء الدفع...");
                 await window.Pi.createPayment({
-                    amount: amt, memo: "طلب خدمة: " + name, metadata: { service: name }
+                    amount: amt, memo: "طلب: " + name, metadata: { service: name }
                 }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
@@ -135,18 +132,16 @@
                         await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("فشل الدفع"),
-                    onCancel: () => showMsg("تم إلغاء الدفع")
+                    onError: () => showMsg("فشل الدفع")
                 });
-            } catch (e) { showMsg("حدث خطأ"); }
+            } catch (e) { showMsg("خطأ"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("يرجى إكمال البيانات");
+            if(!detail || !contact) return;
             try {
-                showMsg("جاري حفظ الطلب...");
                 await _supabase.from('services').insert([{ 
                     title: currentCategory, description: detail, price: String(currentPrice),
                     category: currentCategory, contact_info: contact,
@@ -155,21 +150,19 @@
                 await emailjs.send("service_vuti648", "template_m6rq1ab", {
                     username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice
                 });
-                showMsg("تم الإرسال بنجاح!");
-                setTimeout(() => location.reload(), 2000);
-            } catch (error) { showMsg("خطأ في الإرسال"); }
+                location.reload();
+            } catch (error) { showMsg("خطأ حفظ"); }
         }
 
         async function loadOrders() {
             try {
-                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
+                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(3);
                 if (data) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
                         <div class="order-item">
-                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.8rem;">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.75rem;">
                                 <span>${o.title}</span><span>${o.price} Pi</span>
                             </div>
-                            <div style="font-size:0.7rem; opacity:0.8;">${o.description ? o.description.substring(0, 40) : ''}...</div>
                         </div>
                     `).join('');
                 }
