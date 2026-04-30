@@ -3,150 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - Final Fix</title>
+    <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("aRCAx1NwvATaC4F-m");
+        })();
+    </script>
     <style>
         :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background-color: #f4f7f6; display: flex; flex-direction: column; min-height: 100vh; }
-
-        .header { background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); padding: 25px 20px; text-align: center; color: var(--w); border-radius: 0 0 30px 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header h1 { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 2px; }
-        .eng-title { font-size: 0.75rem; color: var(--w); letter-spacing: 0.5px; margin-bottom: 15px; opacity: 0.85; font-weight: normal; }
-        .auth-status { background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 25px; display: inline-block; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
-
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
-        .service-card { background: var(--w); padding: 18px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f0f0f0; }
-        .service-card i { font-size: 1.5rem; color: var(--pi-p); margin-bottom: 10px; display: block; }
-        .service-card span { font-weight: bold; font-size: 0.95rem; color: #333; }
-        .price-tag { background: #fff3e0; color: #e65100; font-size: 0.8rem; padding: 3px 10px; border-radius: 6px; margin-top: 8px; display: inline-block; font-weight: bold; }
-
-        .recent-orders { padding: 0 20px 20px; max-width: 500px; margin: 0 auto; width: 100%; flex-grow: 1; }
-        .section-title { font-size: 1rem; color: var(--pi-d); font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .section-title::after { content: ""; flex-grow: 1; height: 1px; background: #ddd; }
+        body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
-        .orders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .order-box { background: white; padding: 10px; border-radius: 12px; border-right: 4px solid var(--pi-g); box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .order-box b { font-size: 0.8rem; color: var(--pi-p); display: block; margin-bottom: 2px; }
-        .order-box p { font-size: 0.7rem; color: #666; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-
-        .footer { background: white; padding: 20px; text-align: center; border-top: 1px solid #eee; margin-top: auto; }
-        .footer-links a { text-decoration: none; color: var(--pi-p); font-size: 0.8rem; margin: 0 12px; font-weight: 600; }
-        .copy-text { font-size: 0.7rem; color: #aaa; margin-top: 5px; }
-
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 380px; padding: 25px; border-radius: 25px; }
-        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 30px; display: none; font-size: 0.85rem; z-index: 2000; }
+        .hero { padding: 40px 20px; background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%); text-align: center; color: var(--w); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); margin-bottom: 2px; font-weight: 800; }
+        
+        /* التعديل المطلوب: الجملة تحت العنوان وباللون الأبيض */
+        .eng-tagline { font-size: 0.8rem; color: var(--w); margin-bottom: 18px; opacity: 0.9; font-weight: normal; letter-spacing: 0.5px; }
+        
+        .welcome-msg { font-size: 0.9rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.3); }
+        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.3s; }
+        
+        .categories { padding: 25px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .cat-card { background: var(--w); padding: 20px 10px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-direction: column; }
+        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 18px; font-size: 1.6rem; margin-bottom: 12px; }
+        .cat-card span { font-weight: 700; color: var(--pi-d); font-size: 0.95rem; margin-bottom: 6px; }
+        .price-badge { font-size: 0.8rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 3px 10px; border-radius: 6px; }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
+        .modal-content { background: white; width: 92%; max-width: 400px; padding: 30px 20px; border-radius: 25px; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .modal-content h2 { color: var(--pi-d); font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
+        .modal-content textarea, .modal-content input { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 0.9rem; background: #f9f9f9; outline: none; }
+        .btn-submit { width: 100%; background: var(--pi-p); color: white; border: none; padding: 16px; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+        
+        .footer-container { margin-top: auto; padding: 20px 10px 40px; text-align: center; background: #fff; border-top: 1px solid #eee; }
+        .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 10px; }
+        .footer-links a { color: var(--pi-p); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .copyright { font-size: 0.75rem; color: #888; }
+        
+        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; border: 1px solid var(--pi-g); text-align: center; min-width: 200px; }
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <h1>جسر التواصل</h1>
-        <div class="eng-title">Freelance Platform via Pi Network</div>
-        <div id="authStatus" class="auth-status" onclick="login()">
-            <i class="fas fa-user-circle"></i> اضغط للتحقق عبر Pi
+    <section class="hero">
+        <div>
+            <h1 class="hero-title">جسر التواصل</h1>
+            <div class="eng-tagline">Freelance Platform via Pi Network</div>
+            <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
+            <p style="font-size: 0.85rem; margin-bottom: 18px; opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
+            <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
         </div>
-    </header>
-
-    <main class="services-grid">
-        <div class="service-card" onclick="handlePay(1.0, 'البرمجة')">
-            <i class="fas fa-code"></i> <span>البرمجة</span> <br> <div class="price-tag">1.0 Pi</div>
-        </div>
-        <div class="service-card" onclick="handlePay(0.8, 'التصميم')">
-            <i class="fas fa-palette"></i> <span>التصميم</span> <br> <div class="price-tag">0.8 Pi</div>
-        </div>
-        <div class="service-card" onclick="handlePay(0.5, 'الترجمة')">
-            <i class="fas fa-pen-nib"></i> <span>الترجمة</span> <br> <div class="price-tag">0.5 Pi</div>
-        </div>
-        <div class="service-card" onclick="handlePay(0.7, 'التسويق')">
-            <i class="fas fa-bullhorn"></i> <span>التسويق</span> <br> <div class="price-tag">0.7 Pi</div>
-        </div>
-    </main>
-
-    <section class="recent-orders">
-        <div class="section-title">آخر الطلبات</div>
-        <div id="ordersContainer" class="orders-grid"></div>
     </section>
 
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="#">سياسة الخصوصية</a>
-            <a href="#">شروط الاستخدام</a>
+    <section class="categories">
+        <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
+            <i class="fas fa-code"></i><span>Programming</span><span class="price-badge">Pi 1.0</span>
         </div>
-        <p class="copy-text">Bridge Freelance &copy; 2026</p>
-    </footer>
+        <div class="cat-card" onclick="processPayment(0.8, 'Design')">
+            <i class="fas fa-palette"></i><span>Design</span><span class="price-badge">Pi 0.8</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.7, 'Marketing')">
+            <i class="fas fa-bullhorn"></i><span>Marketing</span><span class="price-badge">Pi 0.7</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.5, 'Translation')">
+            <i class="fas fa-pen-nib"></i><span>Translation</span><span class="price-badge">Pi 0.5</span>
+        </div>
+    </section>
 
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; margin-bottom:15px; color:var(--pi-d);">تفاصيل الطلب 📥</h3>
-            <textarea id="orderMsg" rows="3" placeholder="تفاصيل الخدمة المطلوبة..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px;"></textarea>
-            <input type="email" id="userEmail" placeholder="بريدك الإلكتروني" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px; margin-top:10px;">
-            <button onclick="finalSubmit()" style="width:100%; background:var(--pi-p); color:white; border:none; padding:15px; border-radius:15px; margin-top:15px; font-weight:bold;">إتمام الحفظ</button>
+    <div id="reqModal" class="modal">
+        <div class="modal-content" id="modalContent">
+            <h2>📦 Order Details</h2>
+            <p style="font-size: 0.85rem; color: #666; text-align: center;">Payment successful! Please provide details:</p>
+            <textarea id="orderDetail" rows="4" placeholder="Describe the service you need..."></textarea>
+            <input type="email" id="contactInfo" placeholder="Your Email Address">
+            <button class="btn-submit" onclick="submitOrder()">Submit Order</button>
         </div>
     </div>
+
+    <footer class="footer-container">
+        <div class="footer-links">
+            <a href="#"><i class="fas fa-shield-alt"></i> سياسة الخصوصية</a>
+            <a href="#"><i class="fas fa-file-contract"></i> شروط الاستخدام</a>
+        </div>
+        <div class="copyright">© Bridge Freelance - Powered by Pi Network 2026</div>
+    </footer>
 
     <div id="toast"></div>
 
     <script>
-        const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-        let activeTx = "", activeAmt = 0, activeCat = "";
+        const toast = document.getElementById('toast');
+        let currentTxId = ""; 
+        let currentPrice = 0; 
+        let currentCategory = "";
 
-        function showToast(text) {
-            const t = document.getElementById('toast');
-            t.innerText = text; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
+        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function loadOrders() {
-            const { data } = await supabaseClient.from('services').select('*').order('created_at', {ascending: false}).limit(4);
-            if (data) document.getElementById('ordersContainer').innerHTML = data.map(o => `<div class="order-box"><b>${o.title}</b><p>${o.description}</p></div>`).join('');
-        }
-        window.onload = loadOrders;
+        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 4000); }
 
-        async function login() {
+        async function startApp() {
             try {
+                showMsg("Connecting to Pi Network...");
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                showMsg("Welcome " + auth.user.username);
                 window.currentUser = auth.user.username;
-                document.getElementById('authStatus').innerHTML = `<i class="fas fa-check" style="color:#2ecc71"></i> Verified: ${window.currentUser}`;
-            } catch (e) { showToast("Authentication Error"); }
+                document.getElementById('authBtn').innerText = "Verified Account ✅";
+                document.getElementById('authBtn').style.background = "#2ecc71";
+            } catch (e) { showMsg("Auth Failed: " + e.message); }
         }
 
-        async function handlePay(amt, cat) {
-            if (!window.currentUser) return showToast("يرجى التحقق أولاً");
-            activeAmt = amt; activeCat = cat;
+        async function processPayment(amt, name) {
+            if(!window.currentUser) { showMsg("Please login first"); return; }
+            currentPrice = amt;
+            currentCategory = name;
             try {
-                await window.Pi.createPayment({ amount: amt, memo: "Service Request: " + cat, metadata: { category: cat } }, {
+                showMsg(`Initializing ${amt} Pi for ${name}...`);
+                await window.Pi.createPayment({
+                    amount: amt,
+                    memo: "Service purchase: " + name,
+                    metadata: { service: name }
+                }, {
                     onReadyForServerApproval: (id) => {
-                        // رد فوري للسيرفر لتجاوز المهلة
-                        return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, action: 'approve' }) });
+                        // رد سريع جداً لتجاوز مشكلة Timeout
+                        return fetch('/api/payment-handler', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId: id, action: 'approve' })
+                        }).then(r => r.json());
                     },
-                    onConnectedToBlockchain: (id, tx) => { activeTx = tx; },
-                    onReadyForServerCompletion: (id, tx) => {
-                        document.getElementById('orderModal').style.display = 'flex';
-                        return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, tx, action: 'complete' }) });
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; showMsg("Transaction registered!"); },
+                    onReadyForServerCompletion: async (id, tx) => {
+                        try {
+                            const response = await fetch('/api/payment-handler', {
+                                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
+                            });
+                            const result = await response.json();
+                            if (response.ok) { document.getElementById('reqModal').style.display = 'flex'; }
+                        } catch (e) { showMsg("Completion Error"); }
                     },
-                    onCancel: () => showToast("عملية ملغاة"),
-                    onError: (e) => showToast("خطأ في العملية")
+                    onCancel: () => showMsg("Cancelled"),
+                    onError: (e) => showMsg("Error: " + e.message)
                 });
-            } catch (e) { showToast("النظام مشغول"); }
+            } catch (e) { showMsg("Process Error"); }
         }
 
-        async function finalSubmit() {
-            const desc = document.getElementById('orderMsg').value;
-            const email = document.getElementById('userEmail').value;
-            if (!desc || !email) return showToast("أكمل البيانات");
-            const { error } = await supabaseClient.from('services').insert([{
-                title: activeCat, description: desc, price: String(activeAmt),
-                category: activeCat, contact_info: email, user_pi: window.currentUser, txid: activeTx
-            }]);
-            if (!error) { showToast("تم بنجاح!"); setTimeout(() => location.reload(), 1500); }
-            else { showToast("خطأ في الحفظ"); }
+        async function submitOrder() {
+            const detail = document.getElementById('orderDetail').value;
+            const contact = document.getElementById('contactInfo').value;
+            if(!detail || !contact) { showMsg("Fill all fields"); return; }
+
+            showMsg("Saving Order...");
+            try {
+                const { error: dbError } = await _supabase
+                    .from('services') 
+                    .insert([{ 
+                        title: currentCategory,
+                        description: detail,
+                        price: String(currentPrice),
+                        category: currentCategory,
+                        contact_info: contact,
+                        user_pi: window.currentUser || "Unknown",
+                        txid: currentTxId
+                    }]);
+                if (dbError) throw dbError;
+
+                await emailjs.send("service_vuti648", "template_m6rq1ab", {
+                    username: window.currentUser || "abokareem", 
+                    service_detail: detail, 
+                    contact_info: contact, 
+                    order_id: currentTxId,
+                    price: currentPrice
+                });
+
+                document.getElementById('modalContent').innerHTML = `
+                    <div style="text-align: center;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71;"></i>
+                        <h2>Order Submitted!</h2>
+                        <button class="btn-submit" onclick="location.reload()">Close</button>
+                    </div>`;
+            } catch (error) {
+                showMsg("Database Save Error.");
+            }
         }
     </script>
 </body>
