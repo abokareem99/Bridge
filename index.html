@@ -3,54 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - High Speed v2</title>
+    <title>Bridge Freelance - Ultra Fast</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f8f9fa; display: flex; flex-direction: column; min-height: 100vh; }
-        .hero { padding: 30px 20px; background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); text-align: center; color: var(--w); border-radius: 0 0 30px 30px; }
-        .btn-auth { background: #2ecc71; color: white; border: none; padding: 12px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
-        .cat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
-        .price-tag { background: #fff3e0; color: #e65100; padding: 2px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; }
-        .feed-section { padding: 20px; max-width: 500px; margin: 0 auto; width: 100%; }
-        .feed-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 4px solid var(--pi-g); }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; display: none; z-index: 2000; }
+        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; }
+        body { background: #f4f4f9; font-family: sans-serif; margin: 0; padding: 0; }
+        .hero { background: var(--pi-d); color: white; text-align: center; padding: 25px; border-radius: 0 0 20px 20px; }
+        .btn-auth { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
+        .categories { display: flex; gap: 10px; padding: 20px; justify-content: center; }
+        .cat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; width: 45%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+        .price { color: #e65100; font-weight: bold; font-size: 0.9rem; }
+        .feed { padding: 20px; }
+        .item { background: white; padding: 12px; margin-bottom: 8px; border-radius: 10px; border-left: 4px solid var(--pi-g); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 350px; }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 15px; border-radius: 20px; display: none; }
     </style>
 </head>
 <body>
 
-<section class="hero">
-    <h1 style="color: var(--pi-g);">Bridge Freelance</h1>
-    <p style="font-size: 0.85rem; margin: 10px 0;">Fast & Secure Pi Payments</p>
-    <button id="authBtn" class="btn-auth" onclick="startApp()">Verify Account</button>
-</section>
+<div class="hero">
+    <h2 style="color:var(--pi-g)">Bridge Freelance</h2>
+    <p style="font-size: 0.8rem;">Verified Platform: abokareem999</p>
+    <button id="authBtn" class="btn-auth" onclick="login()">Verify Pi Account</button>
+</div>
 
-<section class="categories">
-    <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
-        <i class="fas fa-code"></i> <br> Programming <br> <span class="price-tag">Pi 1.0</span>
+<div class="categories">
+    <div class="cat-card" onclick="pay(1.0, 'Programming')">
+        <i class="fas fa-code"></i><br>Programming<br><span class="price">1.0 Pi</span>
     </div>
-    <div class="cat-card" onclick="processPayment(0.8, 'Design')">
-        <i class="fas fa-palette"></i> <br> Design <br> <span class="price-tag">Pi 0.8</span>
+    <div class="cat-card" onclick="pay(0.8, 'Design')">
+        <i class="fas fa-palette"></i><br>Design<br><span class="price">0.8 Pi</span>
     </div>
-</section>
+</div>
 
-<section class="feed-section" id="feedArea">
-    <h3 style="margin-bottom:10px; color:var(--pi-d);">Recent Activity</h3>
-    <div id="servicesFeed"></div>
-</section>
+<div class="feed">
+    <h4 style="color:var(--pi-d)">Latest Orders</h4>
+    <div id="list"></div>
+</div>
 
-<div id="reqModal" class="modal">
-    <div class="modal-content" id="modalUI">
-        <h2>Order Details</h2>
-        <textarea id="orderDetail" rows="4" placeholder="How can we help?"></textarea>
-        <input type="email" id="contactEmail" placeholder="Your Email">
-        <button style="width:100%; background:var(--pi-p); color:white; padding:12px; border:none; border-radius:10px;" onclick="submitToSupabase()">Submit Order</button>
+<div id="modal" class="modal">
+    <div class="modal-box">
+        <h3>Order Sent!</h3>
+        <p>Success. Please add your email:</p>
+        <input type="email" id="email" placeholder="Email Address" style="width:100%; padding:10px; margin:10px 0;">
+        <textarea id="desc" placeholder="Details..." style="width:100%; padding:10px;"></textarea>
+        <button onclick="save()" style="width:100%; background:var(--pi-p); color:white; padding:10px; border:none; margin-top:10px; border-radius:10px;">Save Order</button>
     </div>
 </div>
 
@@ -61,71 +61,52 @@
     const sbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
     const _sb = supabase.createClient(sbUrl, sbKey);
 
-    let curTx = "", curAmt = 0, curCat = "";
+    let _tx = "", _amt = 0, _cat = "";
 
-    function msg(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display='block'; setTimeout(()=>t.style.display='none', 4000); }
+    function msg(t) { const s = document.getElementById('toast'); s.innerText = t; s.style.display='block'; setTimeout(()=>s.style.display='none', 3000); }
 
-    async function loadFeed() {
-        const { data } = await _sb.from('services').select('*').order('created_at', {ascending: false}).limit(4);
-        if (data) {
-            document.getElementById('servicesFeed').innerHTML = data.map(i => `
-                <div class="feed-item">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.8rem; color:var(--pi-p);">
-                        <span>${i.title}</span> <span>${i.price} Pi</span>
-                    </div>
-                    <p style="font-size:0.75rem; color:#666;">${i.description}</p>
-                </div>
-            `).join('');
-        }
+    async function load() {
+        const { data } = await _sb.from('services').select('*').order('created_at', {ascending: false}).limit(3);
+        if(data) document.getElementById('list').innerHTML = data.map(i => `<div class="item"><b>${i.title}</b> - ${i.price} Pi</div>`).join('');
     }
+    window.onload = load;
 
-    window.onload = loadFeed;
-
-    async function startApp() {
+    async function login() {
         try {
             await window.Pi.init({ version: "2.0", sandbox: true });
             const auth = await window.Pi.authenticate(['username', 'payments'], (p)=>{});
             window.user = auth.user.username;
-            document.getElementById('authBtn').innerText = "Verified: " + window.user;
-        } catch (e) { msg("Auth Failed"); }
+            document.getElementById('authBtn').innerText = "Hi, " + window.user;
+        } catch(e) { msg("Login Error"); }
     }
 
-    async function processPayment(amt, name) {
-        if (!window.user) return msg("Please Verify First!");
-        curAmt = amt; curCat = name;
+    async function pay(amt, cat) {
+        if(!window.user) return msg("Login First!");
+        _amt = amt; _cat = cat;
         try {
             await window.Pi.createPayment({
-                amount: amt, memo: "Order: " + name, metadata: { cat: name }
+                amount: amt, memo: "Order " + cat, metadata: {cat}
             }, {
-                onReadyForServerApproval: (id) => {
-                    // Fast approval call
-                    return fetch('/api/pay', {method:'POST', body: JSON.stringify({id, action:'approve'})});
-                },
-                onConnectedToBlockchain: (id, tx) => { curTx = tx; },
+                onReadyForServerApproval: (id) => fetch('/api/pay', {method:'POST', body: JSON.stringify({id, action:'approve'})}),
+                onConnectedToBlockchain: (id, tx) => { _tx = tx; },
                 onReadyForServerCompletion: (id, tx) => {
-                    document.getElementById('reqModal').style.display = 'flex';
+                    document.getElementById('modal').style.display = 'flex';
                     return fetch('/api/pay', {method:'POST', body: JSON.stringify({id, tx, action:'complete'})});
                 },
                 onCancel: () => msg("Cancelled"),
-                onError: (e) => msg("Payment Error - Try Again")
+                onError: (e) => msg("Error - Try Again")
             });
-        } catch (e) { msg("System Busy"); }
+        } catch(e) { msg("Network Busy"); }
     }
 
-    async function submitToSupabase() {
-        const desc = document.getElementById('orderDetail').value;
-        const mail = document.getElementById('contactEmail').value;
-        if (!desc || !mail) return msg("Fields Required");
-
+    async function save() {
+        const e = document.getElementById('email').value;
+        const d = document.getElementById('desc').value;
+        if(!e || !d) return msg("Fill fields");
         const { error } = await _sb.from('services').insert([{
-            title: curCat, description: desc, price: String(curAmt),
-            category: curCat, contact_info: mail, user_pi: window.user, txid: curTx
+            title: _cat, description: d, price: String(_amt), category: _cat, contact_info: e, user_pi: window.user, txid: _tx
         }]);
-
-        if (!error) {
-            loadFeed();
-            document.getElementById('modalUI').innerHTML = "<h2 style='text-align:center;'>Success!</h2><button style='width:100%; background:green; color:white; padding:10px; margin-top:10px;' onclick='location.reload()'>Done</button>";
-        }
+        if(!error) location.reload();
     }
 </script>
 </body>
