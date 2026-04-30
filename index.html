@@ -14,38 +14,45 @@
     <style>
         :root { 
             --pi-p: #6a1b9a; 
-            --pi-d: #4a148c; /* لون باي الغامق */
-            --pi-g: #ffb74d; /* اللون الأصفر */
+            --pi-d: #4a148c; 
+            --pi-g: #ffb74d; 
+            --blue-msg: #007bff; /* لون أزرق واضح للرسائل */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        
         body { background-color: var(--pi-d); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-        
         .hero { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 5px; font-weight: 800; }
-        
-        /* تعديل رسالة الترحيب لتصبح بنفسجية واضحة */
-        .welcome-msg { font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; font-weight: bold; border: 2px solid var(--pi-g); }
-        
+        .welcome-msg { font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; font-weight: bold; }
         .btn-auth { background: #2ecc71; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-
         .categories { padding: 15px; max-width: 450px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
         .cat-card { background: var(--pi-g); padding: 12px 5px; border-radius: 18px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.1rem; margin: 0 auto 8px; }
         .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px; }
         .price-badge { font-size: 0.75rem; color: #fff; font-weight: bold; background: var(--pi-d); padding: 2px 8px; border-radius: 5px; }
-        
         .orders-section { padding: 10px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
         .section-title { color: var(--pi-g); margin-bottom: 10px; text-align: center; font-size: 0.95rem; font-weight: bold; }
         .order-item { background: var(--pi-g); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-right: 4px solid var(--pi-d); color: var(--pi-d); }
+        
+        [span_1](start_span)/* تعديل لون رسالة "جاري الاتصال" و "مرحبا" لتصبح زرقاء[span_1](end_span) */
+        #toast { 
+            position: fixed; 
+            bottom: 80px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--blue-msg); [span_2](start_span)/* لون أزرق[span_2](end_span) */
+            color: white; 
+            padding: 10px 25px; 
+            border-radius: 30px; 
+            display: none; 
+            z-index: 5000; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            border: 1px solid white; 
+        }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
         .modal-content { background: var(--pi-g); width: 90%; max-width: 380px; padding: 25px 20px; border-radius: 20px; text-align: right; color: var(--pi-d); }
-        
-        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; font-weight: bold; border: 1px solid var(--pi-d); }
-        
         textarea, input { background: rgba(255,255,255,0.3); border: 1px solid var(--pi-d); color: var(--pi-d); font-weight: bold; width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; }
-        ::placeholder { color: rgba(74, 20, 140, 0.7); }
     </style>
 </head>
 <body>
@@ -85,13 +92,6 @@
         </div>
     </div>
 
-    <footer class="footer-container" style="text-align: center; padding: 20px;">
-        <div style="display: flex; justify-content: center; gap: 15px; font-size: 0.8rem;">
-            <a href="#" style="color: var(--pi-g); text-decoration: none;">الخصوصية</a>
-            <a href="#" style="color: var(--pi-g); text-decoration: none;">الشروط</a>
-        </div>
-    </footer>
-
     <div id="toast"></div>
 
     <script>
@@ -101,7 +101,11 @@
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
+        function showMsg(m) { 
+            toast.innerText = m; 
+            toast.style.display = 'block'; 
+            setTimeout(() => toast.style.display='none', 3000); 
+        }
 
         async function startApp() {
             try {
@@ -113,8 +117,7 @@
                 document.getElementById('authBtn').style.background = "#2ecc71";
                 showMsg("مرحباً " + auth.user.username);
             } catch (e) { 
-                showMsg("فشل الدخول: تأكد من متصفح Pi");
-                console.error(e);
+                showMsg("فشل الدخول");
             }
         }
 
@@ -126,26 +129,16 @@
                 await window.Pi.createPayment({
                     amount: amt, memo: "طلب خدمة: " + name, metadata: { service: name }
                 }, {
-                    onReadyForServerApproval: (id) => {
-                        return fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ paymentId: id, action: 'approve' }) 
-                        }).then(r => r.json());
-                    },
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
-                        });
+                        await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("فشل الدفع: " + e.message),
+                    onError: (e) => showMsg("فشل الدفع"),
                     onCancel: () => showMsg("تم إلغاء الدفع")
                 });
-            } catch (e) { showMsg("حدث خطأ غير متوقع"); }
+            } catch (e) { showMsg("حدث خطأ"); }
         }
 
         async function submitOrder() {
@@ -164,7 +157,7 @@
                 });
                 showMsg("تم الإرسال بنجاح!");
                 setTimeout(() => location.reload(), 2000);
-            } catch (error) { showMsg("خطأ في الاتصال بالسيرفر"); }
+            } catch (error) { showMsg("خطأ في الإرسال"); }
         }
 
         async function loadOrders() {
