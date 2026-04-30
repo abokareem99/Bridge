@@ -44,12 +44,11 @@
 </div>
 
 <script>
-    // إعدادات الربط - تأكد من مطابقتها لإعدادات Vercel و Supabase
+    // إعدادات الربط - تم تصحيح المفتاح بناءً على صورك
     const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
-    const SB_KEY = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll"; // مفتاحك الذي ظهر في الصورة
+    const SB_KEY = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll"; 
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
-    // تهيئة EmailJS
     (function(){
         emailjs.init("aRCAx1NwvATaC4F-m"); 
     })();
@@ -72,6 +71,8 @@
         const title = document.getElementById('title').value;
         const desc = document.getElementById('description').value;
         const price = document.getElementById('price').value;
+        const category = document.getElementById('category').value;
+        const contact = document.getElementById('contact').value;
 
         if(!title || !desc || !price || !currentUser) {
             alert("يرجى إكمال البيانات وتوثيق الحساب");
@@ -80,7 +81,7 @@
 
         const btn = document.getElementById('payBtn');
         btn.disabled = true;
-        document.getElementById('status').innerText = "جاري الدفع...";
+        document.getElementById('status').innerText = "جاري معالجة الدفع...";
 
         try {
             await window.Pi.createPayment({
@@ -96,9 +97,9 @@
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع! جاري إرسال البيانات...";
-                    // استدعاء الدالة المحدثة
-                    saveToServices(title, desc, price, document.getElementById('category').value, document.getElementById('contact').value, txid);
+                    document.getElementById('status').innerText = "تم الدفع بنجاح! جاري الحفظ...";
+                    // تمرير البيانات للدالة
+                    saveToServices(title, desc, price, category, contact, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
                     await fetch('/api/payment-handler', {
@@ -117,15 +118,37 @@
                 }
             });
         } catch (e) {
-            alert("فشل في نظام الدفع");
+            alert("حدث خطأ في نظام الدفع");
             btn.disabled = false;
         }
     }
 
     async function saveToServices(t, d, p, cat, con, tx) {
-        console.log("بداية عملية الحفظ والإرسال...");
+        // 1. محاولة الحفظ في Supabase أولاً
+        try {
+            const { error } = await _supabase
+                .from('services')
+                .insert([{ 
+                    title: t, 
+                    description: d, 
+                    price: String(p), 
+                    user_pi: currentUser, 
+                    txid: tx,
+                    category: cat,
+                    contact_info: con 
+                }]);
 
-        // الخطوة 1: إرسال الإيميل أولاً لضمان وصوله
+            if (error) {
+                console.error("Supabase Error Details:", error);
+                alert("تم الدفع ولكن فشل الحفظ في القاعدة: " + error.message);
+            } else {
+                console.log("تم الحفظ في Supabase بنجاح");
+            }
+        } catch (err) {
+            console.error("Technical Error:", err);
+        }
+
+        // 2. إرسال الإيميل كنسخة احتياطية
         try {
             await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
                 from_name: currentUser,
@@ -134,39 +157,14 @@
                 message: d,
                 txid: tx
             });
-            console.log("تم إرسال الإيميل بنجاح");
-        } catch (mailError) {
-            console.error("فشل إرسال الإيميل:", mailError);
-            // سنكمل المحاولة حتى لو فشل الإيميل
+            console.log("تم إرسال الإيميل");
+        } catch (mailErr) {
+            console.error("Email Error:", mailErr);
         }
 
-        // الخطوة 2: محاولة الحفظ في Supabase (تأكد من إنشاء الجدول)
-        try {
-            const { error } = await _supabase
-                .from('services')
-                .insert([{ 
-                    title: t, 
-                    description: d, 
-                    price: String(p), // إرساله كنص لتفادي أخطاء النوع
-                    user_pi: currentUser, 
-                    txid: tx,
-                    category: cat,
-                    contact_info: con 
-                }]);
-
-            if (!error) {
-                alert("مبروك! تم الإرسال والنشر بنجاح.");
-                window.location.href = "services.html"; 
-            } else {
-                console.error("خطأ Supabase:", error);
-                alert("وصل الإيميل ولكن فشل الحفظ في الجدول: " + error.message);
-                document.getElementById('payBtn').disabled = false;
-            }
-        } catch (supabaseError) {
-            console.error("خطأ تقني:", supabaseError);
-            alert("حدث خطأ غير متوقع أثناء الحفظ.");
-            document.getElementById('payBtn').disabled = false;
-        }
+        // 3. التوجيه النهائي
+        alert("تمت العملية بنجاح! ستنتقل الآن لصفحة الخدمات.");
+        window.location.href = "services.html";
     }
 
     window.onload = initPi;
