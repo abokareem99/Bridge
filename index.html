@@ -72,11 +72,6 @@
     </div>
 
 <footer class="footer-container">
-    <div class="legal-links" style="margin-bottom: 15px;">
-        <a href="terms.html" style="color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px;">شروط الاستخدام</a> 
-        <span style="color: #ccc;">|</span>
-        <a href="privacy.html" style="color: var(--pi-p); text-decoration: none; font-weight: bold; margin: 0 10px;">سياسة الخصوصية</a>
-    </div>
     <div class="copyright">© Bridge Freelance - Powered by Pi Network 2026</div>
 </footer>
     <div id="toast"></div>
@@ -85,8 +80,8 @@
         const toast = document.getElementById('toast');
         let currentTxId = ""; 
         let currentPrice = 0; 
+        let currentCategory = "";
 
-        // الإعدادات المحدثة بالمفتاح الجديد
         const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -99,13 +94,15 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 showMsg("أهلاً بك " + auth.user.username);
+                window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerText = "الحساب موثق ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
             } catch (e) { showMsg("فشل التوثيق: " + e.message); }
         }
 
         async function processPayment(amt, name) {
-            currentPrice = amt; 
+            currentPrice = amt;
+            currentCategory = name;
             try {
                 showMsg(`جاري تهيئة دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
@@ -120,7 +117,6 @@
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; showMsg("تم تسجيل المعاملة على البلوكشين!"); },
                     onReadyForServerCompletion: async (id, tx) => {
                         try {
-                            showMsg("جاري تأكيد المعاملة...");
                             const response = await fetch('/api/payment-handler', {
                                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' })
@@ -128,34 +124,39 @@
                             const result = await response.json();
                             if (response.ok && result.completed) {
                                 document.getElementById('reqModal').style.display = 'flex';
-                                showMsg("تم التأكيد! فضلاً أدخل بيانات التواصل.");
-                            } else { showMsg("فشل التأكيد: " + (result.error || "حاول ثانية")); }
-                        } catch (e) { showMsg("خطأ في الاتصال بالسيرفر"); }
+                            }
+                        } catch (e) { showMsg("خطأ في الاتصال"); }
                     },
                     onCancel: () => showMsg("تم إلغاء العملية"),
-                    onError: (e) => showMsg("خطأ في الدفع: " + e.message)
+                    onError: (e) => showMsg("خطأ: " + e.message)
                 });
-            } catch (e) { showMsg("عذراً، حدث خطأ فني"); }
+            } catch (e) { showMsg("عذراً، حدث خطأ"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) { showMsg("يرجى ملء جميع البيانات"); return; }
+            if(!detail || !contact) { showMsg("يرجى ملء البيانات"); return; }
 
-            showMsg("جاري حفظ طلبك...");
+            showMsg("جاري الحفظ...");
             try {
+                // التعديل الأساسي: الإرسال لجدول services بدلاً من orders
                 const { error: dbError } = await _supabase
-                    .from('orders')
+                    .from('services') 
                     .insert([{ 
-                        service: detail,
-                        price: currentPrice
+                        title: currentCategory,
+                        description: detail,
+                        price: String(currentPrice),
+                        category: currentCategory,
+                        contact_info: contact,
+                        user_pi: window.currentUser || "Unknown",
+                        txid: currentTxId
                     }]);
 
                 if (dbError) throw dbError;
 
                 await emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: "abokareem", 
+                    username: window.currentUser || "abokareem", 
                     service_detail: detail, 
                     contact_info: contact, 
                     order_id: currentTxId,
@@ -163,14 +164,14 @@
                 });
 
                 document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 10px;">
-                        <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px;"></i>
-                        <h2 style="color: #333;">تم الإرسال بنجاح!</h2>
+                    <div style="text-align: center;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71;"></i>
+                        <h2>تم الإرسال لجدول الخدمات!</h2>
                         <button class="btn-submit" onclick="location.reload()">إغلاق</button>
                     </div>`;
             } catch (error) {
                 console.error(error);
-                showMsg("حدث خطأ أثناء الحفظ.");
+                showMsg("خطأ في الحفظ بالجدول.");
             }
         }
     </script>
