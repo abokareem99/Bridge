@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جسر التواصل - المطور</title>
+    <title>جسر التواصل - الإصدار المستقر</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -16,40 +16,46 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
+        /* الهيدر */
         .hero { padding: 30px 20px; background: linear-gradient(135deg, var(--pi-p) 0%, var(--pi-d) 100%); text-align: center; color: var(--w); border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 5px; font-weight: 800; }
-        .welcome-msg { font-size: 0.8rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.2); }
-        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        
+        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 10px; font-weight: 800; }
+        .welcome-msg { font-size: 0.85rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255,215,0,0.2); }
+        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; }
+
+        /* التصنيفات */
         .categories { padding: 20px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .cat-card { background: var(--w); padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(106, 27, 154, 0.08); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 45px; height: 45px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.3rem; margin-bottom: 8px; }
+        .cat-card { background: var(--w); padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 8px rgba(0,0,0,0.03); }
+        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 45px; height: 45px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; margin-bottom: 8px; }
         .cat-card span { display: block; font-weight: 700; color: var(--pi-d); font-size: 0.9rem; }
-        .price-badge { font-size: 0.75rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 2px 8px; border-radius: 5px; margin-top: 5px; display: inline-block; }
+        .price-badge { font-size: 0.75rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 2px 8px; border-radius: 5px; }
 
-        /* قسم الطلبات المنفذة - تحسين التصميم ليكون خفيفاً */
-        .orders-section { padding: 0 20px 25px; max-width: 500px; margin: 0 auto; width: 100%; flex-grow: 1; }
-        .section-header { font-size: 0.9rem; color: var(--pi-d); font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-        .section-header::after { content: ""; flex-grow: 1; height: 1px; background: #eee; }
+        /* قسم الطلبات - تصميم جديد وخفيف */
+        .orders-section { padding: 10px 20px 30px; max-width: 500px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        .section-header { font-size: 0.95rem; color: var(--pi-d); font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-header::after { content: ""; flex-grow: 1; height: 1px; background: #ddd; }
         .orders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .order-card { background: white; padding: 10px; border-radius: 15px; border-right: 3px solid var(--pi-g); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .order-card h4 { font-size: 0.8rem; color: var(--pi-p); margin-bottom: 3px; }
-        .order-card p { font-size: 0.7rem; color: #777; line-height: 1.3; height: 1.8rem; overflow: hidden; }
+        .order-card { background: white; padding: 10px; border-radius: 12px; border-right: 4px solid var(--pi-g); font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .order-card b { color: var(--pi-p); display: block; margin-bottom: 2px; }
 
-        .footer { padding: 15px; text-align: center; background: #fff; border-top: 1px solid #eee; margin-top: auto; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 25px; }
-        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.8rem; }
+        /* الفوتر - استعادة الروابط */
+        .footer-container { margin-top: auto; padding: 20px 10px; text-align: center; background: #fff; border-top: 1px solid #eee; }
+        .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 10px; }
+        .footer-links a { color: var(--pi-p); text-decoration: none; font-size: 0.8rem; font-weight: 600; }
+        .copyright { font-size: 0.7rem; color: #888; }
+        
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 4000; }
+        .modal-content { background: white; width: 90%; max-width: 380px; padding: 25px; border-radius: 25px; }
+        #toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <header class="hero">
+    <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
         <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-        <p style="font-size: 0.8rem; margin-bottom: 12px; opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
+        <p style="font-size: 0.85rem; margin-bottom: 15px; opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
         <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
-    </header>
+    </section>
 
     <main class="categories">
         <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
@@ -67,21 +73,25 @@
     </main>
 
     <section class="orders-section">
-        <div class="section-header">أحدث الطلبات المنفذة</div>
+        <div class="section-header">آخر الطلبات المنفذة</div>
         <div id="ordersContainer" class="orders-grid">
             </div>
     </section>
 
-    <footer class="footer">
-        <p style="font-size: 0.7rem; color: #999;">© Bridge Freelance 2026</p>
+    <footer class="footer-container">
+        <div class="footer-links">
+            <a href="#"><i class="fas fa-shield-alt"></i> سياسة الخصوصية</a>
+            <a href="#"><i class="fas fa-file-contract"></i> شروط الاستخدام</a>
+        </div>
+        <div class="copyright">© Bridge Freelance - Powered by Pi Network 2026</div>
     </footer>
 
     <div id="reqModal" class="modal">
         <div class="modal-content" id="modalContent">
-            <h2 style="text-align:center; color:var(--pi-d); font-size:1.1rem;">📦 تفاصيل الطلب</h2>
-            <textarea id="orderDetail" rows="4" placeholder="اشرح الخدمة..." style="width:100%; padding:10px; margin-top:12px; border:1px solid #eee; border-radius:12px; outline:none; text-align:right;"></textarea>
-            <input type="email" id="contactInfo" placeholder="إيميلك للتواصل" style="width:100%; padding:10px; margin-top:10px; border:1px solid #eee; border-radius:12px; outline:none; text-align:right;">
-            <button onclick="submitOrder()" style="width:100%; background:var(--pi-p); color:white; border:none; padding:15px; border-radius:12px; margin-top:15px; font-weight:bold;">إرسال</button>
+            <h2 style="text-align:center; color:var(--pi-d);">📦 تفاصيل الطلب</h2>
+            <textarea id="orderDetail" rows="4" placeholder="اكتب تفاصيل طلبك هنا..." style="width:100%; padding:12px; margin-top:15px; border:1px solid #eee; border-radius:12px; outline:none; text-align:right;"></textarea>
+            <input type="email" id="contactInfo" placeholder="إيميلك للتواصل" style="width:100%; padding:12px; margin-top:10px; border:1px solid #eee; border-radius:12px; outline:none; text-align:right;">
+            <button onclick="submitOrder()" style="width:100%; background:var(--pi-p); color:white; border:none; padding:15px; border-radius:12px; margin-top:15px; font-weight:bold;">تأكيد الحفظ</button>
         </div>
     </div>
 
@@ -96,22 +106,20 @@
 
         function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
 
-        // استخدام setTimeout لتأخير تحميل الطلبات لضمان استقرار المحفظة عند البدء
+        // التحميل يتم فقط بعد التأكد من أن الصفحة مستقرة تماماً
         async function fetchLiveOrders() {
-            setTimeout(async () => {
+            try {
                 const { data } = await _supabase.from('services').select('title, description').order('created_at', { ascending: false }).limit(4);
                 if (data) {
                     document.getElementById('ordersContainer').innerHTML = data.map(o => `
-                        <div class="order-card">
-                            <h4>${o.title}</h4>
-                            <p>${o.description}</p>
-                        </div>
+                        <div class="order-card"><b>${o.title}</b><p style="color:#666; font-size:0.7rem;">${o.description.substring(0, 30)}...</p></div>
                     `).join('');
                 }
-            }, 1000); // تأخير ثانية واحدة لراحة المتصفح
+            } catch (e) { console.log("Silent Error"); }
         }
 
-        window.onload = fetchLiveOrders;
+        // تشغيل التحميل بعد 3 ثوانٍ من فتح الصفحة لتجنب تداخل المحفظة
+        window.onload = () => { setTimeout(fetchLiveOrders, 3000); };
 
         async function startApp() {
             try {
@@ -124,15 +132,11 @@
         }
 
         async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("سجل دخولك أولاً"); return; }
+            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                // عند بدء الدفع، نعطل أي عمليات جلب بيانات أخرى مؤقتاً
-                await window.Pi.createPayment({
-                    amount: amt, memo: "Service order: " + name, metadata: { service: name }
-                }, {
+                await window.Pi.createPayment({ amount: amt, memo: "Order: " + name, metadata: { service: name } }, {
                     onReadyForServerApproval: (id) => {
-                        // استجابة فورية جداً للسيرفر
                         return fetch('/api/payment-handler', { method: 'POST', body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json());
                     },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
@@ -141,9 +145,9 @@
                         if (response.ok) document.getElementById('reqModal').style.display = 'flex';
                     },
                     onCancel: () => showMsg("ملغى"),
-                    onError: (e) => showMsg("خطأ")
+                    onError: (e) => showMsg("Error")
                 });
-            } catch (e) { showMsg("النظام مشغول"); }
+            } catch (e) { showMsg("خطأ في العملية"); }
         }
 
         async function submitOrder() {
