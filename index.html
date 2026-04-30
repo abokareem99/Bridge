@@ -3,217 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>جسر التواصل - Bridge Freelance</title>
+    <title>جسر التواصل - سجل المشتريات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="text/javascript">
-        (function() { emailjs.init("aRCAx1NwvATaC4F-m"); })();
-    </script>
     <style>
-        :root { 
-            --pi-p: #6a1b9a; 
-            --pi-d: #4a148c; /* البنفسجي الغامق */
-            --pi-g: #ffb74d; /* الأصفر */
-            --blue-msg: #007bff; 
-        }
+        :root { --pi-d: #4a148c; --pi-g: #ffb74d; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--pi-d); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; color: white; }
+        body { background-color: var(--pi-d); color: white; min-height: 100vh; display: flex; flex-direction: column; }
         
-        .hero { padding: 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .hero-title { font-size: 1.6rem; color: var(--pi-g); font-weight: 800; }
-        .welcome-msg { font-size: 0.75rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 3px 12px; border-radius: 15px; margin: 5px 0; font-weight: bold; }
-        
-        .btn-auth { background: #2ecc71; color: white; border: none; padding: 8px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.85rem; margin-top: 5px; }
+        /* التنسيقات العامة */
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .view-switcher { display: flex; justify-content: center; gap: 10px; padding: 15px; }
+        .switch-btn { flex: 1; max-width: 120px; padding: 8px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        .active { background: var(--pi-g); color: var(--pi-d); }
+        .inactive { background: rgba(255,255,255,0.1); color: white; }
 
-        /* أزرار التبديل */
-        .view-switcher { display: flex; justify-content: center; gap: 10px; padding: 15px 10px; }
-        .switch-btn { flex: 1; max-width: 150px; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .active-btn { background: var(--pi-g); color: var(--pi-d); }
-        .inactive-btn { background: rgba(255,255,255,0.1); color: white; }
+        /* قسم المشتري (السوق) */
+        .market-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { background: var(--pi-g); padding: 15px; border-radius: 15px; color: var(--pi-d); text-align: center; cursor: pointer; }
 
-        /* واجهة السوق (المشتري) */
-        .market-grid { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 500px; margin: 0 auto; width: 100%; }
-        .cat-card { background: var(--pi-g); padding: 15px 10px; border-radius: 18px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
-        .cat-card:active { transform: scale(0.95); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 10px; margin: 0 auto 8px; }
-        .price-badge { font-size: 0.7rem; color: #fff; background: var(--pi-d); padding: 2px 8px; border-radius: 5px; font-weight: bold; }
+        /* قسم سجل المشتريات الجديد */
+        .my-orders { padding: 15px; background: rgba(0,0,0,0.2); margin-top: auto; border-top-left-radius: 25px; border-top-right-radius: 25px; }
+        .order-row { background: white; color: var(--pi-d); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .status-badge { background: #2ecc71; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; }
 
-        /* واجهة إضافة خدمة (العارض) */
-        .seller-form { display: none; padding: 15px; max-width: 450px; margin: 0 auto; width: 100%; }
-        .form-container { background: var(--pi-g); padding: 20px; border-radius: 20px; color: var(--pi-d); }
-        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid var(--pi-d); font-weight: bold; }
-
-        /* التنبيهات (Toast) */
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--blue-msg); color: white; padding: 10px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; font-weight: bold; border: 1px solid white; text-align: center; }
-
-        /* المودال */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: var(--pi-g); width: 90%; max-width: 380px; padding: 25px; border-radius: 20px; text-align: right; color: var(--pi-d); }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <section class="hero">
-        <h1 class="hero-title">جسر التواصل</h1>
-        <div class="welcome-msg" id="userWelcome">مرحباً بك في منصة abokareem 🌐</div>
-        <br>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
-    </section>
-
-    <div class="view-switcher">
-        <button id="btnBuyer" class="switch-btn active-btn" onclick="switchView('buyer')">تصفح الخدمات</button>
-        <button id="btnSeller" class="switch-btn inactive-btn" onclick="switchView('seller')">أضف خدمتك</button>
+    <div class="header">
+        <h2 style="color: var(--pi-g);">جسر التواصل</h2>
+        <button id="authBtn" onclick="startApp()" style="background:#2ecc71; color:white; border:none; padding:5px 15px; border-radius:20px; margin-top:10px;">تحقق عبر Pi</button>
     </div>
 
-    <section id="buyerView">
-        <div id="dynamicGigs" class="market-grid">
-            </div>
-    </section>
+    <div class="view-switcher">
+        <button class="switch-btn active" id="bTab" onclick="show('buyer')">سوق الخدمات</button>
+        <button class="switch-btn inactive" id="sTab" onclick="show('seller')">أضف خدمة</button>
+    </div>
 
-    <section id="sellerView" class="seller-form">
-        <div class="form-container">
-            <h3 style="text-align: center;">عرض خدمة جديدة</h3>
-            <input type="text" id="gigTitle" placeholder="عنوان الخدمة (مثلاً: برمجة تطبيق)">
-            <input type="number" id="gigPrice" placeholder="السعر بـ Pi">
-            <textarea id="gigDesc" rows="3" placeholder="اشرح ما ستدمه في هذه الخدمة..."></textarea>
-            <button onclick="publishGig()" style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:15px; border-radius:12px; margin-top:15px; font-weight:bold; cursor:pointer;">نشر الخدمة في السوق</button>
+    <div id="buyerView" class="market-grid"></div>
+
+    <div id="sellerView" style="display:none; padding:20px;">
+        <div style="background:var(--pi-g); padding:20px; border-radius:20px; color:var(--pi-d);">
+            <input type="text" id="gTitle" placeholder="عنوان الخدمة" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px;">
+            <input type="number" id="gPrice" placeholder="السعر بـ Pi" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px;">
+            <button onclick="publish()" style="width:100%; background:var(--pi-d); color:white; padding:12px; border:none; border-radius:10px; font-weight:bold;">نشر الآن</button>
         </div>
-    </section>
+    </div>
 
-    <div id="reqModal" class="modal">
-        <div class="modal-content">
-            <h2 style="text-align:center;">اكتمل الدفع! 🎉</h2>
-            <p style="font-size:0.8rem; margin:10px 0;">اكتب تفاصيل طلبك ليقوم العارض بالتواصل معك:</p>
-            <textarea id="orderDetail" rows="3" placeholder="التفاصيل..."></textarea>
-            <input type="email" id="contactInfo" placeholder="بريدك الإلكتروني أو وسيلة تواصل">
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold;" onclick="submitOrder()">إرسال الطلب للعارض</button>
+    <div class="my-orders">
+        <h4 style="margin-bottom:10px; color:var(--pi-g); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+            <i class="fas fa-history"></i> سجل مشترياتي
+        </h4>
+        <div id="myOrdersList">
+            <p style="text-align:center; font-size:0.7rem; opacity:0.6;">سجل دخولك لرؤية طلباتك</p>
         </div>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        const toast = document.getElementById('toast');
-        let currentTxId = "", currentPrice = 0, currentCategory = "";
-        
-        // إعدادات سوبابيز الخاصة بك
         const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
+        function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
 
-        // تبديل الواجهات
-        function switchView(view) {
-            if(view === 'buyer') {
-                document.getElementById('buyerView').style.display = 'block';
-                document.getElementById('sellerView').style.display = 'none';
-                document.getElementById('btnBuyer').className = 'switch-btn active-btn';
-                document.getElementById('btnSeller').className = 'switch-btn inactive-btn';
-                loadDynamicGigs();
-            } else {
-                document.getElementById('buyerView').style.display = 'none';
-                document.getElementById('sellerView').style.display = 'block';
-                document.getElementById('btnSeller').className = 'switch-btn active-btn';
-                document.getElementById('btnBuyer').className = 'switch-btn inactive-btn';
-            }
+        function show(v) {
+            document.getElementById('buyerView').style.display = v==='buyer'?'grid':'none';
+            document.getElementById('sellerView').style.display = v==='seller'?'block':'none';
+            document.getElementById('bTab').className = v==='buyer'?'switch-btn active':'switch-btn inactive';
+            document.getElementById('sTab').className = v==='seller'?'switch-btn active':'switch-btn inactive';
         }
 
-        // الدخول عبر Pi
         async function startApp() {
             try {
-                showMsg("جاري الاتصال بـ Pi Network...");
                 await window.Pi.init({ version: "2.0", sandbox: false });
-                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                const auth = await window.Pi.authenticate(['username'], (p)=>{});
                 window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
-                document.getElementById('userWelcome').innerText = "مرحباً " + auth.user.username;
-                showMsg("أهلاً بك يا " + auth.user.username);
-            } catch (e) { showMsg("يرجى الفتح من متصفح Pi"); }
+                document.getElementById('authBtn').innerText = "مرحباً " + auth.user.username;
+                loadMyOrders(); // تحميل مشتريات المستخدم فور دخوله
+                loadMarket();
+            } catch (e) { showMsg("افتح من متصفح Pi"); }
         }
 
-        // نشر خدمة (للعارضين)
-        async function publishGig() {
-            const title = document.getElementById('gigTitle').value;
-            const price = document.getElementById('gigPrice').value;
-            const desc = document.getElementById('gigDesc').value;
-
-            if(!title || !price || !window.currentUser) {
-                showMsg("سجل دخولك أولاً وأكمل البيانات");
-                return;
+        // دالة عرض الخدمات في السوق
+        async function loadMarket() {
+            const { data } = await _supabase.from('market_gigs').select('*');
+            if(data) {
+                document.getElementById('buyerView').innerHTML = data.map(g => `
+                    <div class="card" onclick="pay(${g.price}, '${g.title}')">
+                        <div style="font-weight:bold;">${g.title}</div>
+                        <div style="font-size:0.8rem; margin-top:5px;">${g.price} Pi</div>
+                    </div>
+                `).join('');
             }
-
-            try {
-                showMsg("جاري النشر في السوق...");
-                await _supabase.from('market_gigs').insert([{ 
-                    title, price, description: desc, seller_name: window.currentUser 
-                }]);
-                showMsg("تم نشر خدمتك بنجاح!");
-                switchView('buyer');
-            } catch (e) { showMsg("خطأ في الاتصال"); }
         }
 
-        // جلب الخدمات المعروضة (للمشترين)
-        async function loadDynamicGigs() {
-            try {
-                const { data } = await _supabase.from('market_gigs').select('*').order('id', { ascending: false });
-                if (data && data.length > 0) {
-                    document.getElementById('dynamicGigs').innerHTML = data.map(g => `
-                        <div class="cat-card" onclick="processPayment(${g.price}, '${g.title}')">
-                            <i class="fas fa-briefcase"></i>
-                            <span style="display:block; font-weight:bold; font-size:0.85rem;">${g.title}</span>
-                            <span class="price-badge">${g.price} Pi</span>
-                            <div style="font-size:0.6rem; margin-top:5px; opacity:0.7;">البائع: ${g.seller_name}</div>
+        // دالة جلب سجل مشتريات الشخص الحالي فقط
+        async function loadMyOrders() {
+            if(!window.currentUser) return;
+            const { data } = await _supabase.from('services')
+                .select('*')
+                .eq('user_pi', window.currentUser) // جلب الطلبات الخاصة بهذا اليوزر فقط
+                .order('id', { ascending: false });
+
+            if(data && data.length > 0) {
+                document.getElementById('myOrdersList').innerHTML = data.map(o => `
+                    <div class="order-row">
+                        <div>
+                            <strong>${o.title}</strong><br>
+                            <span style="font-size:0.6rem; opacity:0.7;">${o.price} Pi</span>
                         </div>
-                    `).join('');
-                } else {
-                    document.getElementById('dynamicGigs').innerHTML = "<p style='grid-column:span 2; text-align:center;'>لا يوجد خدمات معروضة حالياً</p>";
-                }
-            } catch (e) { console.error(e); }
+                        <span class="status-badge">مكتمل ✅</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('myOrdersList').innerHTML = "<p style='text-align:center; font-size:0.7rem;'>لا يوجد مشتريات سابقة</p>";
+            }
         }
 
-        // معالجة الدفع (للمشتري)
-        async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("سجل دخولك أولاً"); return; }
-            currentPrice = amt; currentCategory = name;
-            try {
-                showMsg("جاري معالجة الدفع...");
-                await window.Pi.createPayment({
-                    amount: amt, memo: "شراء خدمة: " + name, metadata: { service: name }
-                }, {
-                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
-                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
-                    onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
-                        document.getElementById('reqModal').style.display = 'flex';
-                    },
-                    onError: (e) => showMsg("فشل الدفع")
-                });
-            } catch (e) { showMsg("حدث خطأ"); }
+        async function publish() {
+            const t = document.getElementById('gTitle').value;
+            const p = document.getElementById('gPrice').value;
+            if(!t || !p || !window.currentUser) return showMsg("أكمل البيانات");
+            await _supabase.from('market_gigs').insert([{ title:t, price:p, seller_name:window.currentUser }]);
+            showMsg("تم النشر!");
+            show('buyer');
+            loadMarket();
         }
 
-        // إرسال الطلب النهائي للسيرفر والإيميل
-        async function submitOrder() {
-            const detail = document.getElementById('orderDetail').value;
-            const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("أكمل البيانات");
-            try {
-                showMsg("جاري إرسال طلبك...");
-                await _supabase.from('services').insert([{ 
-                    title: currentCategory, description: detail, price: String(currentPrice),
-                    contact_info: contact, user_pi: window.currentUser, txid: currentTxId
-                }]);
-                await emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice
-                });
-                showMsg("تم طلب الخدمة بنجاح!");
-                setTimeout(() => location.reload(), 2000);
-            } catch (error) { showMsg("خطأ في الحفظ"); }
-        }
-
-        window.onload = loadDynamicGigs;
+        window.onload = loadMarket;
     </script>
 </body>
 </html>
