@@ -44,10 +44,12 @@
 </div>
 
 <script>
+    // إعدادات الربط - تأكد من مطابقتها لإعدادات Vercel و Supabase
     const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
-    const SB_KEY = "Sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
+    const SB_KEY = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll"; // مفتاحك الذي ظهر في الصورة
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
+    // تهيئة EmailJS
     (function(){
         emailjs.init("aRCAx1NwvATaC4F-m"); 
     })();
@@ -70,15 +72,13 @@
         const title = document.getElementById('title').value;
         const desc = document.getElementById('description').value;
         const price = document.getElementById('price').value;
-        const cat = document.getElementById('category').value;
-        const con = document.getElementById('contact').value;
-        const btn = document.getElementById('payBtn');
 
         if(!title || !desc || !price || !currentUser) {
-            alert("يرجى إكمال البيانات");
+            alert("يرجى إكمال البيانات وتوثيق الحساب");
             return;
         }
 
+        const btn = document.getElementById('payBtn');
         btn.disabled = true;
         document.getElementById('status').innerText = "جاري الدفع...";
 
@@ -96,8 +96,9 @@
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع! يتم النشر الآن...";
-                    saveToServices(title, desc, price, cat, con, txid);
+                    document.getElementById('status').innerText = "تم الدفع! جاري إرسال البيانات...";
+                    // استدعاء الدالة المحدثة
+                    saveToServices(title, desc, price, document.getElementById('category').value, document.getElementById('contact').value, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
                     await fetch('/api/payment-handler', {
@@ -106,41 +107,64 @@
                         body: JSON.stringify({ paymentId, txid, action: 'complete' })
                     });
                 },
-                onCancel: () => { document.getElementById('status').innerText = "ألغي"; btn.disabled = false; },
-                onError: (error) => { alert("خطأ دفع: " + error.message); btn.disabled = false; }
+                onCancel: () => { 
+                    document.getElementById('status').innerText = "تم إلغاء الدفع"; 
+                    btn.disabled = false; 
+                },
+                onError: (error) => { 
+                    alert("خطأ في الدفع: " + error.message); 
+                    btn.disabled = false; 
+                }
             });
         } catch (e) {
-            alert("فشل نظام الدفع");
+            alert("فشل في نظام الدفع");
             btn.disabled = false;
         }
     }
 
     async function saveToServices(t, d, p, cat, con, tx) {
-        // تم تغيير اسم الجدول هنا من order إلى services
-        const { error } = await _supabase
-            .from('services')
-            .insert([{ 
-                title: t, 
-                description: d, 
-                price: parseFloat(p), 
-                user_pi: currentUser, 
-                txid: tx,
-                category: cat,
-                contact_info: con 
-            }]);
+        console.log("بداية عملية الحفظ والإرسال...");
 
-        if (!error) {
-            emailjs.send("Service_vuti648", "Template_m6rq1ab", {
+        // الخطوة 1: إرسال الإيميل أولاً لضمان وصوله
+        try {
+            await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
                 from_name: currentUser,
                 service_title: t,
                 service_price: p,
                 message: d,
                 txid: tx
             });
-            alert("مبروك! تم الحفظ في جدول الخدمات بنجاح.");
-            window.location.href = "services.html"; 
-        } else {
-            alert("فشل الحفظ في الخدمات: " + error.message);
+            console.log("تم إرسال الإيميل بنجاح");
+        } catch (mailError) {
+            console.error("فشل إرسال الإيميل:", mailError);
+            // سنكمل المحاولة حتى لو فشل الإيميل
+        }
+
+        // الخطوة 2: محاولة الحفظ في Supabase (تأكد من إنشاء الجدول)
+        try {
+            const { error } = await _supabase
+                .from('services')
+                .insert([{ 
+                    title: t, 
+                    description: d, 
+                    price: String(p), // إرساله كنص لتفادي أخطاء النوع
+                    user_pi: currentUser, 
+                    txid: tx,
+                    category: cat,
+                    contact_info: con 
+                }]);
+
+            if (!error) {
+                alert("مبروك! تم الإرسال والنشر بنجاح.");
+                window.location.href = "services.html"; 
+            } else {
+                console.error("خطأ Supabase:", error);
+                alert("وصل الإيميل ولكن فشل الحفظ في الجدول: " + error.message);
+                document.getElementById('payBtn').disabled = false;
+            }
+        } catch (supabaseError) {
+            console.error("خطأ تقني:", supabaseError);
+            alert("حدث خطأ غير متوقع أثناء الحفظ.");
             document.getElementById('payBtn').disabled = false;
         }
     }
