@@ -84,10 +84,11 @@
     <script>
         const toast = document.getElementById('toast');
         let currentTxId = ""; 
-        let currentPrice = 0; // القيمة الحقيقية للخدمة
+        let currentPrice = 0; 
 
+        // الإعدادات المحدثة بالمفتاح الجديد
         const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
-        const supabaseKey = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 4000); }
@@ -104,7 +105,7 @@
         }
 
         async function processPayment(amt, name) {
-            currentPrice = amt; // حفظ السعر عند الضغط
+            currentPrice = amt; 
             try {
                 showMsg(`جاري تهيئة دفع ${amt} Pi لخدمة ${name}...`);
                 await window.Pi.createPayment({
@@ -144,7 +145,6 @@
 
             showMsg("جاري حفظ طلبك...");
             try {
-                // حفظ في Supabase مع القيمة الحقيقية
                 const { error: dbError } = await _supabase
                     .from('orders')
                     .insert([{ 
@@ -154,7 +154,6 @@
 
                 if (dbError) throw dbError;
 
-                // إرسال عبر EmailJS
                 await emailjs.send("service_vuti648", "template_m6rq1ab", {
                     username: "abokareem", 
                     service_detail: detail, 
