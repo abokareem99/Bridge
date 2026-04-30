@@ -3,62 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>جسر التواصل - سجل المشتريات</title>
+    <title>جسر التواصل - نسخة التست نت</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="text/javascript">
+        (function() { emailjs.init("aRCAx1NwvATaC4F-m"); })();
+    </script>
     <style>
         :root { --pi-d: #4a148c; --pi-g: #ffb74d; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--pi-d); color: white; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        /* التنسيقات العامة */
         .header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .welcome-badge { background: #e67e22; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-top: 10px; cursor: pointer; }
         .view-switcher { display: flex; justify-content: center; gap: 10px; padding: 15px; }
-        .switch-btn { flex: 1; max-width: 120px; padding: 8px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        .switch-btn { flex: 1; max-width: 150px; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
         .active { background: var(--pi-g); color: var(--pi-d); }
         .inactive { background: rgba(255,255,255,0.1); color: white; }
-
-        /* قسم المشتري (السوق) */
-        .market-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .card { background: var(--pi-g); padding: 15px; border-radius: 15px; color: var(--pi-d); text-align: center; cursor: pointer; }
-
-        /* قسم سجل المشتريات الجديد */
-        .my-orders { padding: 15px; background: rgba(0,0,0,0.2); margin-top: auto; border-top-left-radius: 25px; border-top-right-radius: 25px; }
-        .order-row { background: white; color: var(--pi-d); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
-        .status-badge { background: #2ecc71; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; }
-
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; font-weight: bold; }
+        .market-grid { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { background: var(--pi-g); padding: 15px; border-radius: 18px; color: var(--pi-d); text-align: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .price-tag { background: var(--pi-d); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 5px; margin-top: 5px; display: inline-block; }
+        .seller-form { background: var(--pi-g); margin: 15px; padding: 20px; border-radius: 20px; color: var(--pi-d); display: none; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid var(--pi-d); font-weight: bold; }
+        .my-orders { padding: 15px; background: rgba(0,0,0,0.2); margin-top: auto; border-radius: 25px 25px 0 0; }
+        .order-row { background: white; color: var(--pi-d); padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 5000; }
+        .modal-content { background: var(--pi-g); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; color: var(--pi-d); text-align: right; }
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--pi-d); color: var(--pi-g); padding: 10px 20px; border-radius: 30px; display: none; z-index: 6000; font-weight: bold; border: 2px solid var(--pi-g); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="color: var(--pi-g);">جسر التواصل</h2>
-        <button id="authBtn" onclick="startApp()" style="background:#2ecc71; color:white; border:none; padding:5px 15px; border-radius:20px; margin-top:10px;">تحقق عبر Pi</button>
+        <h1 style="color: var(--pi-g);">جسر التواصل (Testnet)</h1>
+        <div id="authBtn" class="welcome-badge" onclick="startApp()">تحقق عبر Pi Testnet</div>
     </div>
 
     <div class="view-switcher">
-        <button class="switch-btn active" id="bTab" onclick="show('buyer')">سوق الخدمات</button>
-        <button class="switch-btn inactive" id="sTab" onclick="show('seller')">أضف خدمة</button>
+        <button id="btnBuyer" class="switch-btn active" onclick="switchView('buyer')">سوق الخدمات</button>
+        <button id="btnSeller" class="switch-btn inactive" onclick="switchView('seller')">أضف خدمة</button>
     </div>
 
-    <div id="buyerView" class="market-grid"></div>
+    <div id="buyerView">
+        <div id="dynamicGigs" class="market-grid"></div>
+    </div>
 
-    <div id="sellerView" style="display:none; padding:20px;">
-        <div style="background:var(--pi-g); padding:20px; border-radius:20px; color:var(--pi-d);">
-            <input type="text" id="gTitle" placeholder="عنوان الخدمة" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px;">
-            <input type="number" id="gPrice" placeholder="السعر بـ Pi" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px;">
-            <button onclick="publish()" style="width:100%; background:var(--pi-d); color:white; padding:12px; border:none; border-radius:10px; font-weight:bold;">نشر الآن</button>
-        </div>
+    <div id="sellerView" class="seller-form">
+        <h3 style="text-align: center;">عرض خدمة جديدة</h3>
+        <input type="text" id="gTitle" placeholder="اسم الخدمة">
+        <input type="number" id="gPrice" placeholder="السعر بـ Test Pi">
+        <textarea id="gDesc" rows="3" placeholder="وصف مهاراتك..."></textarea>
+        <button onclick="publishGig()" style="width:100%; background:var(--pi-d); color:white; padding:15px; border:none; border-radius:12px; margin-top:15px; font-weight:bold;">نشر التجربة</button>
     </div>
 
     <div class="my-orders">
-        <h4 style="margin-bottom:10px; color:var(--pi-g); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
-            <i class="fas fa-history"></i> سجل مشترياتي
-        </h4>
-        <div id="myOrdersList">
-            <p style="text-align:center; font-size:0.7rem; opacity:0.6;">سجل دخولك لرؤية طلباتك</p>
+        <h4 style="margin-bottom:10px; color:var(--pi-g);"><i class="fas fa-history"></i> سجل مشترياتي التريبية</h4>
+        <div id="myOrdersList"></div>
+    </div>
+
+    <div id="reqModal" class="modal">
+        <div class="modal-content">
+            <h2 style="text-align:center;">نجح دفع التست! 🧪</h2>
+            <p>اكتب للعارض ماذا تريد منه:</p>
+            <textarea id="orderDetail" rows="3" placeholder="التفاصيل..."></textarea>
+            <input type="text" id="contactInfo" placeholder="وسيلة التواصل">
+            <button onclick="submitOrder()" style="width:100%; background:var(--pi-d); color:white; padding:12px; border:none; border-radius:10px; margin-top:15px; font-weight:bold;">إرسال الطلب</button>
         </div>
     </div>
 
@@ -69,70 +79,97 @@
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        let currentTxId = "", currentPrice = 0, currentCategory = "";
+
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
 
-        function show(v) {
-            document.getElementById('buyerView').style.display = v==='buyer'?'grid':'none';
+        function switchView(v) {
+            document.getElementById('buyerView').style.display = v==='buyer'?'block':'none';
             document.getElementById('sellerView').style.display = v==='seller'?'block':'none';
-            document.getElementById('bTab').className = v==='buyer'?'switch-btn active':'switch-btn inactive';
-            document.getElementById('sTab').className = v==='seller'?'switch-btn active':'switch-btn inactive';
+            document.getElementById('btnBuyer').className = v==='buyer'?'switch-btn active':'switch-btn inactive';
+            document.getElementById('btnSeller').className = v==='seller'?'switch-btn active':'switch-btn inactive';
         }
 
         async function startApp() {
             try {
-                await window.Pi.init({ version: "2.0", sandbox: false });
-                const auth = await window.Pi.authenticate(['username'], (p)=>{});
+                // تفعيل وضع الساند بوكس للتجربة
+                await window.Pi.init({ version: "2.0", sandbox: true });
+                const auth = await window.Pi.authenticate(['username', 'payments'], (p)=>{});
                 window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerText = "مرحباً " + auth.user.username;
-                loadMyOrders(); // تحميل مشتريات المستخدم فور دخوله
+                document.getElementById('authBtn').innerText = "فحص: " + auth.user.username;
+                loadMyOrders();
                 loadMarket();
-            } catch (e) { showMsg("افتح من متصفح Pi"); }
+            } catch (e) { showMsg("تأكد من فتح Pi Browser"); }
         }
 
-        // دالة عرض الخدمات في السوق
         async function loadMarket() {
-            const { data } = await _supabase.from('market_gigs').select('*');
+            const { data } = await _supabase.from('market_gigs').select('*').order('id', {ascending: false});
             if(data) {
-                document.getElementById('buyerView').innerHTML = data.map(g => `
-                    <div class="card" onclick="pay(${g.price}, '${g.title}')">
-                        <div style="font-weight:bold;">${g.title}</div>
-                        <div style="font-size:0.8rem; margin-top:5px;">${g.price} Pi</div>
+                document.getElementById('dynamicGigs').innerHTML = data.map(g => `
+                    <div class="card" onclick="processPayment(${g.price}, '${g.title}')">
+                        <i class="fas fa-vial" style="font-size:1.2rem; margin-bottom:5px;"></i>
+                        <div style="font-weight:bold; font-size:0.85rem;">${g.title}</div>
+                        <div class="price-tag">${g.price} Test Pi</div>
                     </div>
                 `).join('');
             }
         }
 
-        // دالة جلب سجل مشتريات الشخص الحالي فقط
+        async function processPayment(amt, name) {
+            if(!window.currentUser) return showMsg("سجل دخولك أولاً");
+            currentPrice = amt; currentCategory = name;
+            try {
+                showMsg("فتح محفظة التست نت...");
+                await window.Pi.createPayment({
+                    amount: amt, memo: "تجربة شراء: " + name, metadata: { service: name }
+                }, {
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({paymentId:id, action:'approve'}) }).then(r=>r.json()),
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
+                    onReadyForServerCompletion: async (id, tx) => {
+                        await fetch('/api/payment-handler', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({paymentId:id, txid:tx, action:'complete'}) });
+                        document.getElementById('reqModal').style.display = 'flex';
+                    },
+                    onError: (e) => showMsg("فشل دفع التست")
+                });
+            } catch (e) { showMsg("حدث خطأ في الاتصال"); }
+        }
+
+        async function submitOrder() {
+            const detail = document.getElementById('orderDetail').value;
+            const contact = document.getElementById('contactInfo').value;
+            if(!detail || !contact) return showMsg("أكمل البيانات");
+            try {
+                await _supabase.from('services').insert([{ 
+                    title: currentCategory, description: detail, price: String(currentPrice),
+                    contact_info: contact, user_pi: window.currentUser, txid: currentTxId
+                }]);
+                showMsg("تم إرسال طلب التجربة!");
+                setTimeout(() => location.reload(), 1500);
+            } catch (e) { showMsg("خطأ في الحفظ"); }
+        }
+
+        async function publishGig() {
+            const t = document.getElementById('gTitle').value;
+            const p = document.getElementById('gPrice').value;
+            const d = document.getElementById('gDesc').value;
+            if(!t || !p || !window.currentUser) return showMsg("أكمل البيانات");
+            await _supabase.from('market_gigs').insert([{ title:t, price:p, description:d, seller_name:window.currentUser }]);
+            showMsg("تم النشر تجريبياً!");
+            switchView('buyer');
+            loadMarket();
+        }
+
         async function loadMyOrders() {
             if(!window.currentUser) return;
-            const { data } = await _supabase.from('services')
-                .select('*')
-                .eq('user_pi', window.currentUser) // جلب الطلبات الخاصة بهذا اليوزر فقط
-                .order('id', { ascending: false });
-
+            const { data } = await _supabase.from('services').select('*').eq('user_pi', window.currentUser).order('id', {ascending:false});
             if(data && data.length > 0) {
                 document.getElementById('myOrdersList').innerHTML = data.map(o => `
                     <div class="order-row">
-                        <div>
-                            <strong>${o.title}</strong><br>
-                            <span style="font-size:0.6rem; opacity:0.7;">${o.price} Pi</span>
-                        </div>
-                        <span class="status-badge">مكتمل ✅</span>
+                        <div style="font-size:0.75rem;"><strong>${o.title}</strong><br>${o.price} Test Pi</div>
+                        <div style="background:#e67e22; color:white; padding:3px 8px; border-radius:5px; font-size:0.6rem;">تجربة ناجحة ✅</div>
                     </div>
                 `).join('');
-            } else {
-                document.getElementById('myOrdersList').innerHTML = "<p style='text-align:center; font-size:0.7rem;'>لا يوجد مشتريات سابقة</p>";
             }
-        }
-
-        async function publish() {
-            const t = document.getElementById('gTitle').value;
-            const p = document.getElementById('gPrice').value;
-            if(!t || !p || !window.currentUser) return showMsg("أكمل البيانات");
-            await _supabase.from('market_gigs').insert([{ title:t, price:p, seller_name:window.currentUser }]);
-            showMsg("تم النشر!");
-            show('buyer');
-            loadMarket();
         }
 
         window.onload = loadMarket;
