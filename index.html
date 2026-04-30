@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>جسر التواصل - نسخة مستقرة</title>
+    <title>جسر التواصل - إصلاح الاتصال</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,23 +12,24 @@
         body { background: var(--pi-p); color: white; font-family: sans-serif; margin: 0; padding-bottom: 30px; }
         .header { padding: 20px; text-align: center; background: #5e1bbf; border-bottom: 3px solid var(--pi-y); }
         .auth-btn { background: #2ecc71; color: white; padding: 10px 20px; border-radius: 20px; display: inline-block; margin-top: 10px; font-weight: bold; cursor: pointer; }
-        .tabs { display: flex; gap: 10px; padding: 15px; justify-content: center; }
-        .tab { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1); color: white; }
-        .tab.active { background: var(--pi-y); color: var(--pi-p); }
         .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .buy-card { background: var(--pi-y); color: var(--pi-p); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; }
+        .buy-card { background: var(--pi-y); color: var(--pi-p); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .buy-card:active { border-color: white; transform: scale(0.98); }
         .price-badge { background: var(--pi-p); color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block; }
+        .tabs { display: flex; gap: 10px; padding: 15px; justify-content: center; }
+        .tab { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; background: rgba(255,255,255,0.1); color: white; }
+        .tab.active { background: var(--pi-y); color: var(--pi-p); }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-y); color: var(--pi-p); padding: 10px 20px; border-radius: 30px; display: none; font-weight: bold; z-index: 2000; border: 2px solid white; }
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; color: var(--pi-p); padding: 25px; border-radius: 25px; width: 90%; }
         input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-y); color: var(--pi-p); padding: 10px 20px; border-radius: 30px; display: none; font-weight: bold; border: 2px solid white; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1 style="color:var(--pi-y);">جسر التواصل</h1>
-        <div id="btnAuth" class="auth-btn" onclick="initPi()">اضغط للتحقق</div>
+        <div id="btnAuth" class="auth-btn" onclick="initPi()">إضغط للتحقق بنجاح</div>
     </div>
 
     <div class="tabs">
@@ -36,23 +37,22 @@
         <button id="t2" class="tab" onclick="show('publish')">أضف خدمة</button>
     </div>
 
-    <div id="pageMarket" class="market-grid">
-        </div>
+    <div id="pageMarket" class="market-grid"></div>
 
     <div id="pagePublish" style="display:none; padding:20px;">
         <div style="background:var(--pi-y); color:var(--pi-p); padding:20px; border-radius:20px;">
             <input type="text" id="gTitle" placeholder="اسم الخدمة">
-            <input type="number" id="gPrice" placeholder="السعر">
+            <input type="number" id="gPrice" placeholder="السعر بـ Pi">
             <button onclick="publish()" style="width:100%; background:var(--pi-p); color:white; padding:15px; border-radius:12px; margin-top:15px; border:none; font-weight:bold;">نشر الآن</button>
         </div>
     </div>
 
     <div id="payModal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center;">تم الدفع! ✅</h3>
-            <input type="email" id="uMail" placeholder="الإيميل">
-            <textarea id="uNotes" placeholder="التفاصيل"></textarea>
-            <button onclick="save()" style="width:100%; background:var(--pi-p); color:white; padding:15px; border-radius:12px; margin-top:15px; border:none;">إرسال</button>
+            <h3 style="text-align:center; color:#2ecc71;">تم الدفع بنجاح! ✅</h3>
+            <input type="email" id="uMail" placeholder="بريدك الإلكتروني للتواصل">
+            <textarea id="uNotes" placeholder="ما هي متطلباتك؟"></textarea>
+            <button onclick="saveData()" style="width:100%; background:var(--pi-p); color:white; padding:15px; border-radius:12px; margin-top:15px; border:none; font-weight:bold;">إرسال الطلب</button>
         </div>
     </div>
 
@@ -60,9 +60,10 @@
 
     <script>
         const _sb = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
-        let current = { t: "", p: 0, tx: "" };
+        let payData = { t: "", p: 0, tx: "" };
 
-        function msg(t) { const e=document.getElementById('toast'); e.innerText=t; e.style.display='block'; setTimeout(()=>e.style.display='none',3000); }
+        function msg(t) { const e=document.getElementById('toast'); e.innerText=t; e.style.display='block'; setTimeout(()=>e.style.display='none',3500); }
+        
         function show(p) {
             document.getElementById('pageMarket').style.display = p==='market'?'grid':'none';
             document.getElementById('pagePublish').style.display = p==='publish'?'block':'none';
@@ -77,61 +78,65 @@
                 window.piUser = auth.user.username;
                 document.getElementById('btnAuth').innerText = "مرحباً: " + window.piUser;
                 load();
-            } catch (e) { msg("افتح من Pi Browser"); }
+            } catch (e) { msg("يرجى الفتح من Pi Browser"); }
         }
 
         async function load() {
             const { data } = await _sb.from('services').select('*').order('id', {ascending:false});
             if(data) {
                 document.getElementById('pageMarket').innerHTML = data.map(i => `
-                    <div class="buy-card" onclick="pay(${i.price}, '${i.title}')">
-                        <i class="fas fa-shopping-bag"></i><br>
-                        <b>${i.title}</b><br>
+                    <div class="buy-card" onclick="startPay(${i.price}, '${i.title}')">
+                        <i class="fas fa-shopping-bag" style="font-size:1.5rem;"></i><br>
+                        <div style="margin-top:8px; font-weight:bold;">${i.title}</div>
                         <span class="price-badge">${i.price} Pi</span>
                     </div>
                 `).join('');
             }
         }
 
-        async function pay(amt, tit) {
-            if(!window.piUser) return msg("تحقق أولاً");
+        async function startPay(amt, tit) {
+            if(!window.piUser) return msg("يجب التحقق أولاً");
+            msg("جاري فتح المحفظة...");
             try {
-                // الطريقة البسيطة التي كانت تعمل
+                // تعديل الاتصال ليكون متوافقاً تماماً مع السيرفر
                 await window.Pi.createPayment({
-                    amount: parseFloat(amt), 
-                    memo: "شراء " + tit, 
-                    metadata: { service: tit }
+                    amount: parseFloat(amt),
+                    memo: "شراء خدمة: " + tit,
+                    metadata: { name: tit }
                 }, {
                     onReadyForServerApproval: (id) => {
                         return fetch('/api/payment-handler', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' }, // إضافة الهيدر لضمان الاتصال
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId: id, action: 'approve' })
-                        }).then(r => r.json());
+                        }).then(res => res.json());
                     },
+                    onConnectedToBlockchain: (id, tx) => { payData.tx = tx; },
                     onReadyForServerCompletion: (id, tx) => {
-                        current = { t: tit, p: amt, tx: tx };
+                        payData.t = tit; payData.p = amt;
                         document.getElementById('payModal').style.display = 'flex';
-                    }
+                    },
+                    onError: (err) => { msg("خطأ في المحفظة: حاول لاحقاً"); }
                 });
-            } catch (e) { msg("خطأ في الاتصال"); }
+            } catch (e) { msg("خطأ في الاتصال بالشبكة"); }
         }
 
         async function publish() {
             const t = document.getElementById('gTitle').value;
             const p = document.getElementById('gPrice').value;
-            if(!t || !p) return msg("أكمل البيانات");
-            await _sb.from('services').insert([{ title:t, price:p, user_pi:window.piUser }]);
-            msg("تم النشر!");
+            if(!t || !p || !window.piUser) return msg("أكمل البيانات وسجل دخولك");
+            await _sb.from('services').insert([{ title: t, price: p, user_pi: window.piUser }]);
+            msg("تم النشر بنجاح!");
             show('market'); load();
         }
 
-        async function save() {
+        async function saveData() {
             const m = document.getElementById('uMail').value;
             const n = document.getElementById('uNotes').value;
-            await _sb.from('services').update({ contact_info: m, description: n, txid: current.tx })
-                     .match({ title: current.t, user_pi: window.piUser });
-            msg("تم الإرسال!");
+            if(!m || !n) return msg("أكمل البيانات");
+            await _sb.from('services').update({ contact_info: m, description: n, txid: payData.tx })
+                     .match({ title: payData.t, user_pi: window.piUser });
+            msg("تم إرسال طلبك!");
             document.getElementById('payModal').style.display = 'none';
         }
 
