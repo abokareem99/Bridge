@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نشر خدمة - Bridge Freelance</title>
+    <title>Post a Service - Bridge Freelance</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -12,41 +12,42 @@
         :root { --pi-p: #6a1b9a; }
         body { background: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        h2 { text-align: center; color: var(--pi-p); }
+        h2 { text-align: center; color: var(--pi-p); margin-bottom: 5px; }
         .fee-badge { text-align: center; background: #fff3e0; color: #e65100; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; }
         input, textarea, select { width: 100%; padding: 14px; margin-top: 15px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; outline: none; box-sizing: border-box; }
-        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 18px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-pay:disabled { background: #ccc; }
+        .btn-pay { width: 100%; background: var(--pi-p); color: white; border: none; padding: 18px; border-radius: 12px; margin-top: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .btn-pay:hover { background: #4a148c; }
+        .btn-pay:disabled { background: #ccc; cursor: not-allowed; }
         #status { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>نشر خدمة جديدة</h2>
-    <div class="fee-badge">رسوم النشر: 1.0 Pi</div>
+    <h2>Post New Service</h2>
+    <div class="fee-badge">Listing Fee: 1.0 Pi</div>
     
-    <input type="text" id="title" placeholder="عنوان الخدمة">
-    <textarea id="description" rows="4" placeholder="وصف الخدمة بالتفصيل..."></textarea>
+    <input type="text" id="title" placeholder="Service Title">
+    <textarea id="description" rows="4" placeholder="Detailed description..."></textarea>
     
     <select id="category">
-        <option value="برمجة">برمجة وتطوير</option>
-        <option value="تصميم">تصميم جرافيك</option>
-        <option value="تسويق">تسويق إلكتروني</option>
-        <option value="أخرى" selected>أخرى</option>
+        <option value="Programming">Programming & Tech</option>
+        <option value="Design">Graphic Design</option>
+        <option value="Marketing">Digital Marketing</option>
+        <option value="Other" selected>Other Services</option>
     </select>
 
-    <input type="number" id="price" placeholder="السعر المطلوب (Pi)">
-    <input type="text" id="contact" placeholder="وسيلة التواصل (واتساب/إيميل)">
+    <input type="number" id="price" placeholder="Required Price (Pi)">
+    <input type="text" id="contact" placeholder="Contact Info (WhatsApp/Email)">
     
-    <button class="btn-pay" id="payBtn" onclick="handlePayment()">دفع 1.0 Pi ونشر الخدمة</button>
-    <div id="status">جاري الاتصال بـ Pi...</div>
+    <button class="btn-pay" id="payBtn" onclick="handlePayment()">Pay 1.0 Pi & Post</button>
+    <div id="status">Connecting to Pi Network...</div>
 </div>
 
 <script>
-    // إعدادات الربط - تم تصحيح المفتاح بناءً على صورك
+    // Configuration - Updated with your provided anon key
     const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
-    const SB_KEY = "sb_publishable_PzP2Iko5vX3xlonGzF3a4w_qMogivll"; 
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w"; 
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
     (function(){
@@ -60,10 +61,11 @@
             await window.Pi.init({ version: "2.0", sandbox: true });
             const auth = await window.Pi.authenticate(['username', 'payments']);
             currentUser = auth.user.username;
-            document.getElementById('status').innerText = "متصل: " + currentUser;
+            document.getElementById('status').innerText = "Connected as: " + currentUser;
             document.getElementById('status').style.color = "green";
         } catch (e) {
-            document.getElementById('status').innerText = "يرجى استخدام متصفح Pi";
+            document.getElementById('status').innerText = "Please use Pi Browser";
+            document.getElementById('status').style.color = "red";
         }
     }
 
@@ -75,18 +77,18 @@
         const contact = document.getElementById('contact').value;
 
         if(!title || !desc || !price || !currentUser) {
-            alert("يرجى إكمال البيانات وتوثيق الحساب");
+            alert("Please fill all fields and authenticate your account.");
             return;
         }
 
         const btn = document.getElementById('payBtn');
         btn.disabled = true;
-        document.getElementById('status').innerText = "جاري معالجة الدفع...";
+        document.getElementById('status').innerText = "Processing Payment...";
 
         try {
             await window.Pi.createPayment({
                 amount: 1.0,
-                memo: "نشر خدمة: " + title,
+                memo: "Listing Service: " + title,
                 metadata: { type: "listing_fee" }
             }, {
                 onReadyForServerApproval: async (paymentId) => {
@@ -97,8 +99,7 @@
                     });
                 },
                 onConnectedToBlockchain: (paymentId, txid) => {
-                    document.getElementById('status').innerText = "تم الدفع بنجاح! جاري الحفظ...";
-                    // تمرير البيانات للدالة
+                    document.getElementById('status').innerText = "Payment Successful! Saving...";
                     saveToServices(title, desc, price, category, contact, txid);
                 },
                 onReadyForServerCompletion: async (paymentId, txid) => {
@@ -109,22 +110,21 @@
                     });
                 },
                 onCancel: () => { 
-                    document.getElementById('status').innerText = "تم إلغاء الدفع"; 
+                    document.getElementById('status').innerText = "Payment Cancelled"; 
                     btn.disabled = false; 
                 },
                 onError: (error) => { 
-                    alert("خطأ في الدفع: " + error.message); 
+                    alert("Payment Error: " + error.message); 
                     btn.disabled = false; 
                 }
             });
         } catch (e) {
-            alert("حدث خطأ في نظام الدفع");
+            alert("Payment System Error");
             btn.disabled = false;
         }
     }
 
     async function saveToServices(t, d, p, cat, con, tx) {
-        // 1. محاولة الحفظ في Supabase أولاً
         try {
             const { error } = await _supabase
                 .from('services')
@@ -139,16 +139,15 @@
                 }]);
 
             if (error) {
-                console.error("Supabase Error Details:", error);
-                alert("تم الدفع ولكن فشل الحفظ في القاعدة: " + error.message);
+                console.error("Supabase Error:", error);
+                alert("Payment received, but failed to save to database: " + error.message);
             } else {
-                console.log("تم الحفظ في Supabase بنجاح");
+                console.log("Saved to Supabase successfully");
             }
         } catch (err) {
             console.error("Technical Error:", err);
         }
 
-        // 2. إرسال الإيميل كنسخة احتياطية
         try {
             await emailjs.send("Service_vuti648", "Template_m6rq1ab", {
                 from_name: currentUser,
@@ -157,13 +156,12 @@
                 message: d,
                 txid: tx
             });
-            console.log("تم إرسال الإيميل");
+            console.log("Backup Email Sent");
         } catch (mailErr) {
             console.error("Email Error:", mailErr);
         }
 
-        // 3. التوجيه النهائي
-        alert("تمت العملية بنجاح! ستنتقل الآن لصفحة الخدمات.");
+        alert("Success! Your service has been posted.");
         window.location.href = "services.html";
     }
 
