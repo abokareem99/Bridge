@@ -16,13 +16,11 @@
         .btn-auth { background: #2ecc71; color: white; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
         .cat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
-        .cat-card:active { transform: scale(0.95); border-color: var(--pi-g); }
         .cat-card i { font-size: 1.5rem; color: var(--pi-p); margin-bottom: 8px; display: block; }
         .price-tag { display: inline-block; background: #fff3e0; color: #e65100; padding: 2px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
         .feed-section { padding: 20px; max-width: 500px; margin: 0 auto; width: 100%; }
         .feed-title { color: var(--pi-d); font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .feed-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 4px solid var(--pi-g); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .feed-user { font-size: 0.7rem; color: #888; margin-top: 8px; }
+        .feed-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 4px solid var(--pi-g); }
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; }
         input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
@@ -35,7 +33,7 @@
 <section class="hero">
     <h1 style="color: var(--pi-g);">Bridge Freelance</h1>
     <div class="welcome-badge">Welcome to abokareem platform 🌐</div>
-    <p style="font-size: 0.8rem; margin-bottom: 15px;">Your Gateway to Services via Pi Network</p>
+    <br>
     <button id="authBtn" class="btn-auth" onclick="startApp()">Login with Pi Network</button>
 </section>
 
@@ -53,8 +51,7 @@
         <span>Recent Services</span>
         <i class="fas fa-sync-alt" onclick="loadFeed()" style="cursor: pointer; color: var(--pi-p);"></i>
     </div>
-    <div id="servicesFeed">
-        </div>
+    <div id="servicesFeed"></div>
 </section>
 
 <div id="reqModal" class="modal">
@@ -65,14 +62,6 @@
         <button class="btn-send" onclick="submitToSupabase()">Submit Order</button>
     </div>
 </div>
-
-<footer style="margin-top: auto; padding: 20px; text-align: center; font-size: 0.7rem; color: #999; border-top: 1px solid #eee;">
-    <div style="margin-bottom: 5px;">
-        <a href="#" style="color: var(--pi-p); text-decoration: none; margin: 0 10px;">Privacy Policy</a>
-        <a href="#" style="color: var(--pi-p); text-decoration: none; margin: 0 10px;">Terms of Use</a>
-    </div>
-    © 2026 Bridge Freelance - Powered by Pi Network
-</footer>
 
 <div id="toast"></div>
 
@@ -89,12 +78,12 @@
         const { data, error } = await _sb.from('services').select('*').order('created_at', {ascending: false}).limit(5);
         if (!error && data) {
             document.getElementById('servicesFeed').innerHTML = data.map(i => `
-                <div class="feed-item">
+                <div class="feed-item" style="padding:15px; margin-bottom:10px; background:white; border-radius:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--pi-p);">
                         <span>${i.title}</span> <span style="color:#e65100;">Pi ${i.price}</span>
                     </div>
                     <p style="font-size:0.8rem; color:#555; margin-top:5px;">${i.description}</p>
-                    <div class="feed-user"><i class="fas fa-user-circle"></i> Ordered by: ${i.user_pi}</div>
+                    <div style="font-size:0.7rem; color:#888; margin-top:8px;"><i class="fas fa-user-circle"></i> Ordered by: ${i.user_pi}</div>
                 </div>
             `).join('');
         }
@@ -115,17 +104,19 @@
         if (!window.user) { msg("Please Login First!"); return; }
         curAmt = amt; curCat = name;
         try {
-            msg(`Opening Pi Wallet for ${name}...`);
             await window.Pi.createPayment({
                 amount: amt, memo: "Order: " + name, metadata: { cat: name }
             }, {
-                onReadyForServerApproval: (id) => fetch('/api/pay', {method:'POST', body: JSON.stringify({id, action:'approve'})}),
+                onReadyForServerApproval: (id) => {
+                    return fetch('/api/pay', {method:'POST', body: JSON.stringify({id, action:'approve'})});
+                },
                 onConnectedToBlockchain: (id, tx) => { curTx = tx; },
                 onReadyForServerCompletion: (id, tx) => {
                     document.getElementById('reqModal').style.display = 'flex';
-                    fetch('/api/pay', {method:'POST', body: JSON.stringify({id, tx, action:'complete'})});
+                    return fetch('/api/pay', {method:'POST', body: JSON.stringify({id, tx, action:'complete'})});
                 },
-                onError: (e) => msg("Payment Error")
+                onCancel: () => { msg("Payment Cancelled"); },
+                onError: (e) => { msg("Payment Error: " + e.message); }
             });
         } catch (e) { msg("Error: " + e.message); }
     }
