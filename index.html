@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - Professional</title>
+    <title>Bridge Freelance - Final Fix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,10 +12,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: #f4f7f6; display: flex; flex-direction: column; min-height: 100vh; }
 
-        .header { background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); padding: 20px; text-align: center; color: var(--w); border-radius: 0 0 30px 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .eng-title { font-size: 0.85rem; color: var(--pi-g); letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; opacity: 0.9; }
-        .header h1 { font-size: 1.7rem; margin-bottom: 12px; }
-        .auth-status { background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 25px; display: inline-block; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .header { background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); padding: 25px 20px; text-align: center; color: var(--w); border-radius: 0 0 30px 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 2px; }
+        .eng-title { font-size: 0.75rem; color: var(--w); letter-spacing: 0.5px; margin-bottom: 15px; opacity: 0.85; font-weight: normal; }
+        .auth-status { background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 25px; display: inline-block; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
 
         .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
         .service-card { background: var(--w); padding: 18px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f0f0f0; }
@@ -44,10 +44,10 @@
 <body>
 
     <header class="header">
-        <div class="eng-title">Freelance Platform via Pi Network</div>
         <h1>جسر التواصل</h1>
+        <div class="eng-title">Freelance Platform via Pi Network</div>
         <div id="authStatus" class="auth-status" onclick="login()">
-            <i class="fas fa-user-shield"></i> تحقق من الحساب
+            <i class="fas fa-user-circle"></i> اضغط للتحقق عبر Pi
         </div>
     </header>
 
@@ -82,9 +82,9 @@
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center; margin-bottom:15px; color:var(--pi-d);">تفاصيل الطلب 📥</h3>
-            <textarea id="orderMsg" rows="3" placeholder="تفاصيل الخدمة..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px;"></textarea>
-            <input type="email" id="userEmail" placeholder="إيميلك للتواصل" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px; margin-top:10px;">
-            <button onclick="finalSubmit()" style="width:100%; background:var(--pi-p); color:white; border:none; padding:15px; border-radius:15px; margin-top:15px; font-weight:bold;">إرسال للجدول</button>
+            <textarea id="orderMsg" rows="3" placeholder="تفاصيل الخدمة المطلوبة..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px;"></textarea>
+            <input type="email" id="userEmail" placeholder="بريدك الإلكتروني" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px; margin-top:10px;">
+            <button onclick="finalSubmit()" style="width:100%; background:var(--pi-p); color:white; border:none; padding:15px; border-radius:15px; margin-top:15px; font-weight:bold;">إتمام الحفظ</button>
         </div>
     </div>
 
@@ -113,16 +113,17 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                document.getElementById('authStatus').innerHTML = `<i class="fas fa-check-circle" style="color:#2ecc71"></i> المتصل: ${window.currentUser}`;
-            } catch (e) { showToast("خطأ في التوثيق"); }
+                document.getElementById('authStatus').innerHTML = `<i class="fas fa-check" style="color:#2ecc71"></i> Verified: ${window.currentUser}`;
+            } catch (e) { showToast("Authentication Error"); }
         }
 
         async function handlePay(amt, cat) {
             if (!window.currentUser) return showToast("يرجى التحقق أولاً");
             activeAmt = amt; activeCat = cat;
             try {
-                await window.Pi.createPayment({ amount: amt, memo: "طلب: " + cat, metadata: { category: cat } }, {
+                await window.Pi.createPayment({ amount: amt, memo: "Service Request: " + cat, metadata: { category: cat } }, {
                     onReadyForServerApproval: (id) => {
+                        // رد فوري للسيرفر لتجاوز المهلة
                         return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, action: 'approve' }) });
                     },
                     onConnectedToBlockchain: (id, tx) => { activeTx = tx; },
@@ -130,24 +131,22 @@
                         document.getElementById('orderModal').style.display = 'flex';
                         return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, tx, action: 'complete' }) });
                     },
-                    onCancel: () => showToast("تم الإلغاء"),
+                    onCancel: () => showToast("عملية ملغاة"),
                     onError: (e) => showToast("خطأ في العملية")
                 });
-            } catch (e) { showToast("النظام غير متاح"); }
+            } catch (e) { showToast("النظام مشغول"); }
         }
 
         async function finalSubmit() {
             const desc = document.getElementById('orderMsg').value;
             const email = document.getElementById('userEmail').value;
-            if (!desc || !email) return showToast("يرجى إكمال البيانات");
-
+            if (!desc || !email) return showToast("أكمل البيانات");
             const { error } = await supabaseClient.from('services').insert([{
                 title: activeCat, description: desc, price: String(activeAmt),
                 category: activeCat, contact_info: email, user_pi: window.currentUser, txid: activeTx
             }]);
-
-            if (!error) { showToast("تم الحفظ بنجاح!"); setTimeout(() => location.reload(), 1500); }
-            else { showToast("خطأ في قاعدة البيانات"); }
+            if (!error) { showToast("تم بنجاح!"); setTimeout(() => location.reload(), 1500); }
+            else { showToast("خطأ في الحفظ"); }
         }
     </script>
 </body>
