@@ -3,57 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - Final Fix</title>
+    <title>جسر التواصل - الاحترافي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --w: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f8f9fa; height: 100vh; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* الهيدر المحسن */
+        .header { background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); padding: 25px 20px; text-align: center; color: var(--w); border-radius: 0 0 30px 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 12px; }
+        .auth-status { background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 25px; display: inline-block; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* شبكة الخدمات - حجم متوازن */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
+        .service-card { background: var(--w); padding: 18px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f0f0f0; }
+        .service-card:active { transform: scale(0.96); }
+        .service-card i { font-size: 1.5rem; color: var(--pi-p); margin-bottom: 10px; display: block; }
+        .service-card span { font-weight: bold; font-size: 0.95rem; color: #333; }
+        .price-tag { background: #fff3e0; color: #e65100; font-size: 0.8rem; padding: 3px 10px; border-radius: 6px; margin-top: 8px; display: inline-block; font-weight: bold; }
+
+        /* آخر الطلبات - صفين متقابلين وأنيقين */
+        .recent-orders { padding: 0 20px 20px; max-width: 500px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        .section-title { font-size: 1rem; color: var(--pi-d); font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title::after { content: ""; flex-grow: 1; height: 1px; background: #ddd; }
         
-        .hero { padding: 15px; background: linear-gradient(135deg, var(--pi-p), var(--pi-d)); text-align: center; color: var(--w); border-radius: 0 0 20px 20px; }
-        .hero-title { font-size: 1.3rem; color: var(--pi-g); font-weight: 800; margin-bottom: 5px; }
-        .btn-auth { background: #27ae60; color: white; border: none; padding: 6px 15px; border-radius: 50px; font-size: 0.75rem; cursor: pointer; }
+        .orders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .order-box { background: white; padding: 10px; border-radius: 12px; border-right: 4px solid var(--pi-g); box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .order-box b { font-size: 0.8rem; color: var(--pi-p); display: block; margin-bottom: 2px; }
+        .order-box p { font-size: 0.7rem; color: #666; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
-        .categories { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 400px; margin: 0 auto; }
-        .cat-card { background: var(--w); padding: 8px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #f0f0f0; }
-        .cat-card i { color: var(--pi-p); font-size: 0.9rem; margin-bottom: 3px; }
-        .cat-card span { font-size: 0.75rem; font-weight: bold; display: block; }
-        .price-badge { font-size: 0.65rem; color: #e65100; font-weight: bold; background: #fff3e0; padding: 1px 6px; border-radius: 4px; }
+        /* الفوتر الثابت في الأسفل */
+        .footer { background: white; padding: 20px; text-align: center; border-top: 1px solid #eee; margin-top: auto; }
+        .footer-links { margin-bottom: 8px; }
+        .footer-links a { text-decoration: none; color: var(--pi-p); font-size: 0.8rem; margin: 0 12px; font-weight: 600; }
+        .copy-text { font-size: 0.7rem; color: #aaa; }
 
-        .feed-section { padding: 10px; flex-grow: 1; overflow-y: auto; }
-        .feed-title { font-size: 0.85rem; color: var(--pi-d); font-weight: 700; margin-bottom: 8px; border-right: 3px solid var(--pi-g); padding-right: 8px; }
-        .feed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .feed-item { background: var(--w); padding: 6px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .feed-item b { font-size: 0.7rem; color: var(--pi-p); }
-        .feed-item p { font-size: 0.6rem; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .footer { padding: 15px; text-align: center; background: white; border-top: 1px solid #eee; }
-        .footer-links a { color: var(--pi-p); text-decoration: none; font-size: 0.7rem; margin: 0 10px; }
-
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 9999; }
-        .modal-box { background: white; width: 85%; padding: 15px; border-radius: 15px; }
-        #toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 6px 15px; border-radius: 20px; display: none; font-size: 0.7rem; }
+        /* المودال والتوست */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 380px; padding: 25px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 30px; display: none; font-size: 0.85rem; z-index: 2000; }
     </style>
 </head>
 <body>
 
-    <section class="hero">
-        <h1 class="hero-title">جسر التواصل</h1>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">تحقق عبر Pi</button>
-    </section>
+    <header class="header">
+        <h1>جسر التواصل</h1>
+        <div id="authStatus" class="auth-status" onclick="login()">
+            <i class="fas fa-user-shield"></i> اضغط للتحقق عبر Pi
+        </div>
+    </header>
 
-    <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'البرمجة')"><i class="fas fa-code"></i><span>البرمجة</span><span class="price-badge">1.0 Pi</span></div>
-        <div class="cat-card" onclick="processPayment(0.8, 'التصميم')"><i class="fas fa-palette"></i><span>التصميم</span><span class="price-badge">0.8 Pi</span></div>
-        <div class="cat-card" onclick="processPayment(0.5, 'الترجمة')"><i class="fas fa-pen-nib"></i><span>الترجمة</span><span class="price-badge">0.5 Pi</span></div>
-        <div class="cat-card" onclick="processPayment(0.7, 'التسويق')"><i class="fas fa-bullhorn"></i><span>التسويق</span><span class="price-badge">0.7 Pi</span></div>
-    </section>
+    <main class="services-grid">
+        <div class="service-card" onclick="handlePay(1.0, 'البرمجة')">
+            <i class="fas fa-code"></i> <span>البرمجة</span> <br> <div class="price-tag">1.0 Pi</div>
+        </div>
+        <div class="service-card" onclick="handlePay(0.8, 'التصميم')">
+            <i class="fas fa-palette"></i> <span>التصميم</span> <br> <div class="price-tag">0.8 Pi</div>
+        </div>
+        <div class="service-card" onclick="handlePay(0.5, 'الترجمة')">
+            <i class="fas fa-pen-nib"></i> <span>الترجمة</span> <br> <div class="price-badge price-tag">0.5 Pi</div>
+        </div>
+        <div class="service-card" onclick="handlePay(0.7, 'التسويق')">
+            <i class="fas fa-bullhorn"></i> <span>التسويق</span> <br> <div class="price-tag">0.7 Pi</div>
+        </div>
+    </main>
 
-    <section class="feed-section">
-        <div class="feed-title">آخر الطلبات</div>
-        <div id="servicesFeed" class="feed-grid"></div>
+    <section class="recent-orders">
+        <div class="section-title">آخر الطلبات</div>
+        <div id="ordersContainer" class="orders-grid">
+            </div>
     </section>
 
     <footer class="footer">
@@ -61,76 +82,86 @@
             <a href="#">سياسة الخصوصية</a>
             <a href="#">شروط الاستخدام</a>
         </div>
-        <p style="font-size: 0.6rem; color: #ccc; margin-top: 5px;">Bridge Freelance © 2026</p>
+        <p class="copy-text">Bridge Freelance &copy; 2026 Powered by Pi Network</p>
     </footer>
 
-    <div id="reqModal" class="modal">
-        <div class="modal-box" id="modalUI">
-            <h4 style="text-align:center;">إكمال الطلب</h4>
-            <textarea id="orderDetail" rows="2" placeholder="تفاصيل الخدمة..." style="width:100%; margin-top:10px; padding:8px; border-radius:8px; border:1px solid #eee;"></textarea>
-            <input type="email" id="contactEmail" placeholder="إيميلك" style="width:100%; margin-top:8px; padding:8px; border-radius:8px; border:1px solid #eee;">
-            <button style="width:100%; background:var(--pi-p); color:white; padding:10px; margin-top:10px; border:none; border-radius:10px;" onclick="submitToSupabase()">إرسال للجدول</button>
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align:center; margin-bottom:15px; color:var(--pi-d);">تفاصيل الطلب 📥</h3>
+            <textarea id="orderMsg" rows="3" placeholder="اكتب تفاصيل الخدمة المطلوبة هنا..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px; outline:none;"></textarea>
+            <input type="email" id="userEmail" placeholder="بريدك الإلكتروني لمتابعة الطلب" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px; margin-top:10px; outline:none;">
+            <button onclick="finalSubmit()" style="width:100%; background:var(--pi-p); color:white; border:none; padding:15px; border-radius:15px; margin-top:15px; font-weight:bold; cursor:pointer;">إرسال للجدول</button>
         </div>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        const sbUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
-        const sbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-        const _sb = supabase.createClient(sbUrl, sbKey);
-        let curTx = "", curAmt = 0, curCat = "";
+        const SB_URL = "https://xolwuawlnruvzqowxxbh.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        function msg(t) { const s=document.getElementById('toast'); s.innerText=t; s.style.display='block'; setTimeout(()=>s.style.display='none', 3000); }
+        let activeTx = "", activeAmt = 0, activeCat = "";
 
-        async function loadFeed() {
-            const { data } = await _sb.from('services').select('*').order('created_at', { ascending: false }).limit(6);
+        function showToast(text) {
+            const t = document.getElementById('toast');
+            t.innerText = text; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3500);
+        }
+
+        async function loadOrders() {
+            const { data } = await supabaseClient.from('services').select('*').order('created_at', {ascending: false}).limit(4);
             if (data) {
-                document.getElementById('servicesFeed').innerHTML = data.map(i => `
-                    <div class="feed-item">
-                        <b>${i.title} (${i.price} Pi)</b>
-                        <p>${i.description}</p>
+                document.getElementById('ordersContainer').innerHTML = data.map(o => `
+                    <div class="order-box">
+                        <b>${o.title}</b>
+                        <p>${o.description}</p>
                     </div>
                 `).join('');
             }
         }
-        window.onload = loadFeed;
+        window.onload = loadOrders;
 
-        async function startApp() {
+        async function login() {
             try {
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                window.user = auth.user.username;
-                document.getElementById('authBtn').innerText = "تم التحقق: " + window.user;
-            } catch (e) { msg("خطأ في الاتصال"); }
+                window.currentUser = auth.user.username;
+                document.getElementById('authStatus').innerHTML = `<i class="fas fa-check-circle" style="color:#2ecc71"></i> متصل: ${window.currentUser}`;
+            } catch (e) { showToast("خطأ في الاتصال بالشبكة"); }
         }
 
-        async function processPayment(amt, name) {
-            if (!window.user) return msg("يرجى التحقق أولاً");
-            curAmt = amt; curCat = name;
+        async function handlePay(amt, cat) {
+            if (!window.currentUser) return showToast("يرجى تسجيل الدخول أولاً");
+            activeAmt = amt; activeCat = cat;
             try {
-                msg("جاري المعالجة...");
-                await window.Pi.createPayment({ amount: amt, memo: "Order: " + name, metadata: { cat: name } }, {
+                await window.Pi.createPayment({ amount: amt, memo: "طلب: " + cat, metadata: { category: cat } }, {
                     onReadyForServerApproval: (id) => fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, action: 'approve' }) }),
-                    onConnectedToBlockchain: (id, tx) => { curTx = tx; },
-                    onReadyForServerCompletion: (id, tx) => { 
-                        document.getElementById('reqModal').style.display = 'flex';
+                    onConnectedToBlockchain: (id, tx) => { activeTx = tx; },
+                    onReadyForServerCompletion: (id, tx) => {
+                        document.getElementById('orderModal').style.display = 'flex';
                         return fetch('/api/pay', { method: 'POST', body: JSON.stringify({ id, tx, action: 'complete' }) });
                     },
-                    onCancel: () => msg("تم الإلغاء"),
-                    onError: (e) => msg("فشل الدفع - حاول مجدداً")
+                    onCancel: () => showToast("تم إلغاء الدفع"),
+                    onError: (e) => showToast("حدث خطأ في العملية")
                 });
-            } catch (e) { msg("النظام مشغول"); }
+            } catch (e) { showToast("النظام غير متاح حالياً"); }
         }
 
-        async function submitToSupabase() {
-            const desc = document.getElementById('orderDetail').value;
-            const mail = document.getElementById('contactEmail').value;
-            if(!desc || !mail) return msg("أكمل البيانات");
-            const { error } = await _sb.from('services').insert([{ 
-                title: curCat, description: desc, price: String(curAmt), category: curCat, contact_info: mail, user_pi: window.user, txid: curTx 
+        async function finalSubmit() {
+            const desc = document.getElementById('orderMsg').value;
+            const email = document.getElementById('userEmail').value;
+            if (!desc || !email) return showToast("يرجى تعبئة جميع البيانات");
+
+            const { error } = await supabaseClient.from('services').insert([{
+                title: activeCat, description: desc, price: String(activeAmt),
+                category: activeCat, contact_info: email, user_pi: window.currentUser, txid: activeTx
             }]);
-            if (!error) location.reload();
+
+            if (!error) {
+                showToast("تم الحفظ بنجاح!");
+                setTimeout(() => location.reload(), 1500);
+            } else { showToast("خطأ في حفظ البيانات"); }
         }
     </script>
 </body>
