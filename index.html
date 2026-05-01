@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جسر التواصل - Bridge Freelance</title>
+    <title>Bridge Freelance - Services</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -17,8 +17,8 @@
     <style>
         :root { 
             --pi-p: #6a1b9a; 
-            --pi-d: #4a148c; /* لون باي البنفسجي الغامق */
-            --pi-g: #ffb74d; /* اللون الأصفر الذهبي المطلوب للتلوين */
+            --pi-d: #4a148c; /* Pi Purple */
+            --pi-g: #ffb74d; /* Golden Yellow */
             --white: #ffffff;
         }
         
@@ -33,18 +33,15 @@
             color: var(--white);
         }
         
-        /* تلوين الهيرو */
         .hero { padding: 30px 15px; text-align: center; border-bottom: 1px solid rgba(255,183,77,0.1); }
         .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 10px; font-weight: 800; }
         
-        /* تلوين رسالة الترحيب */
         .welcome-msg { 
             font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); 
             display: inline-block; padding: 8px 20px; border-radius: 25px; 
             margin-bottom: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(255,183,77,0.3);
         }
         
-        /* تلوين زر الدخول (تم تلوينه بالأصفر كما في الطلب) */
         .btn-auth { 
             background: var(--pi-g); color: var(--pi-d); border: none; 
             padding: 12px 30px; border-radius: 50px; font-weight: bold; 
@@ -52,13 +49,11 @@
         }
         .btn-auth:active { transform: scale(0.95); }
 
-        /* تلوين شبكة البطاقات */
         .categories { 
             padding: 20px 15px; max-width: 450px; margin: 0 auto; 
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; 
         }
         
-        /* تلوين البطاقة لتكون خلفيتها صفراء */
         .cat-card { 
             background: var(--pi-g); padding: 15px 5px; border-radius: 20px; 
             text-align: center; cursor: pointer; color: var(--pi-d); font-weight: bold;
@@ -66,7 +61,6 @@
         }
         .cat-card:active { transform: scale(0.95); }
         
-        /* تلوين الأيقونات داخل البطاقة لتكون بنفسجية غامقة للتضاد */
         .cat-card i { 
             color: var(--pi-g); background: var(--pi-d); width: 40px; height: 40px;
             display: flex; align-items: center; justify-content: center; 
@@ -75,35 +69,29 @@
         
         .cat-card span { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 5px; }
         
-        /* تلوين شارة السعر لتكون بنفسجية */
         .price-badge { 
             font-size: 0.8rem; color: #fff; font-weight: bold; 
             background: var(--pi-d); padding: 3px 10px; border-radius: 8px; 
         }
         
-        /* تلوين قسم الطلبات */
         .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
         .section-title { color: var(--pi-g); margin-bottom: 12px; text-align: center; font-size: 1rem; font-weight: bold; }
         
-        /* تلوين حدود عناصر الطلبات */
         .order-item { 
             background: rgba(255, 255, 255, 0.1); padding: 12px; 
-            border-radius: 15px; margin-bottom: 10px; border-right: 4px solid var(--pi-g);
+            border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--pi-g);
         }
 
-        /* تلوين المودال */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); display: none; align-items: center; 
             justify-content: center; z-index: 4000; 
         }
-        /* خلفية المودال بيضاء ولكن العناصر ملونة */
         .modal-content { 
             background: var(--white); width: 90%; max-width: 380px; padding: 25px; 
-            border-radius: 20px; text-align: right; color: var(--pi-d); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 20px; text-align: left; color: var(--pi-d); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         
-        /* تلوين التنبيه (Toast) بالأصفر */
         #toast { 
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
             background: var(--pi-g); color: var(--pi-d); padding: 12px 25px;
@@ -115,26 +103,16 @@
             background: #f1f1f1; border: 1px solid #ddd; color: var(--pi-d); 
             width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; font-weight: bold;
         }
-
-        /* تلوين الزر العائم بالأصفر */
-        .fab {
-            position: fixed; bottom: 25px; right: 25px;
-            background: var(--pi-g); color: var(--pi-d);
-            width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; box-shadow: 0 4px 15px rgba(255,183,77,0.4);
-            cursor: pointer; z-index: 1000; border: 2px solid var(--pi-d);
-        }
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <h1 class="hero-title">جسر التواصل</h1>
-        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-        <p style="font-size: 0.8rem; color: var(--pi-g); margin-bottom: 15px;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
-    </section>
+        <h1 class="hero-title">Bridge Freelance</h1>
+        <div class="welcome-msg">Welcome to abokareem Platform 🌐</div>
+        <p style="font-size: 0.8rem; color: var(--pi-g); margin-bottom: 15px;">Your Gateway to Freelance Services via Pi Network</p>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">Login via Pi Network</button>
+    </header>
 
     <section class="categories">
         <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
@@ -152,23 +130,22 @@
     </section>
 
     <section class="orders-section">
-        <div class="section-title">📦 الطلبات الأخيرة</div>
+        <div class="section-title">📦 Recent Orders</div>
         <div id="ordersList"></div>
     </section>
 
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center; margin-bottom:15px; color: var(--pi-g)">اكتمل الدفع! 🎉</h2>
-            <textarea id="orderDetail" rows="3" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
-            <input type="email" id="contactInfo" placeholder="بريدك الإلكتروني">
-            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:14px; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب</button>
+            <h2 style="text-align:center; margin-bottom:15px; color: var(--pi-g)">Payment Complete! 🎉</h2>
+            <textarea id="orderDetail" rows="3" placeholder="Enter your order details here..."></textarea>
+            <input type="email" id="contactInfo" placeholder="Your Email Address">
+            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:14px; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">Submit Order</button>
         </div>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        // الكود البرمجي يبقى كما هو دون أي تغيير لضمان عمل كافة الوظائف
         const toast = document.getElementById('toast');
         let currentTxId = "", currentPrice = 0, currentCategory = "";
         
@@ -184,31 +161,30 @@
 
         async function startApp() {
             try {
-                showMsg("جاري الاتصال...");
+                showMsg("Connecting...");
                 await window.Pi.init({ version: "2.0", sandbox: true }); 
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 
-                document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
-                // يمكن تلوين الزر بالأخضر عند النجاح للتنبيه
+                document.getElementById('authBtn').innerHTML = "Verified ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
-                showMsg("مرحباً " + auth.user.username);
+                showMsg("Welcome " + auth.user.username);
             } catch (e) { 
-                showMsg("فشل الدخول: يرجى المحاولة من متصفح Pi");
+                showMsg("Login failed: Please try via Pi Browser");
                 console.error(e);
             }
         }
 
         async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول أولاً"); return; }
+            if(!window.currentUser) { showMsg("Please login first"); return; }
             currentPrice = amt; 
             currentCategory = name;
             
             try {
-                showMsg("بدء عملية الدفع...");
+                showMsg("Starting payment...");
                 await window.Pi.createPayment({
                     amount: amt, 
-                    memo: "طلب خدمة: " + name, 
+                    memo: "Service Order: " + name, 
                     metadata: { service: name }
                 }, {
                     onReadyForServerApproval: (id) => {
@@ -227,19 +203,19 @@
                         });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("فشل الدفع"),
-                    onCancel: () => showMsg("تم إلغاء الدفع")
+                    onError: (e) => showMsg("Payment Failed"),
+                    onCancel: () => showMsg("Payment Cancelled")
                 });
-            } catch (e) { showMsg("حدث خطأ في نظام الدفع"); }
+            } catch (e) { showMsg("Payment system error"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("يرجى إكمال البيانات");
+            if(!detail || !contact) return showMsg("Please complete all fields");
 
             try {
-                showMsg("جاري حفظ الطلب...");
+                showMsg("Saving order...");
                 
                 await _supabase.from('services').insert([{
                     title: currentCategory, 
@@ -259,10 +235,10 @@
                     price: currentPrice
                 });
 
-                showMsg("تم الإرسال بنجاح!");
+                showMsg("Submitted successfully!");
                 setTimeout(() => location.reload(), 2000);
             } catch (error) { 
-                showMsg("خطأ في الاتصال بالسيرفر");
+                showMsg("Server connection error");
                 console.error(error);
             }
         }
