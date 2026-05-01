@@ -14,117 +14,64 @@
     <style>
         :root { 
             --pi-p: #6a1b9a;
-            --pi-d: #4a148c; /* لون البنفسجي الغامق الأساسي */
-            --pi-g: #ffb74d; /* اللون البرتقالي/الأصفر */
+            --pi-d: #4a148c; /* لون باي البنفسجي الغامق */
+            --pi-g: #ffb74d; /* اللون الذهبي/الأصفر */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
-        body { 
-            background-color: var(--pi-d) !important; /* التأكيد على لون الخلفية */
-            color: white;
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        body { background-color: var(--pi-d); min-height: 100vh; color: white; display: flex; flex-direction: column; }
         
         .hero { padding: 30px 15px; text-align: center; }
-        .hero-title { font-size: 2.2rem; color: var(--pi-g); font-weight: 900; margin-bottom: 10px; }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); font-weight: 800; margin-bottom: 10px; }
         
         .welcome-msg { 
-            font-size: 0.9rem; 
-            background: var(--pi-g); 
-            color: var(--pi-d); 
-            display: inline-block; 
-            padding: 8px 20px; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            margin-bottom: 15px;
+            font-size: 0.9rem; background: var(--pi-g); color: var(--pi-d); 
+            display: inline-block; padding: 8px 20px; border-radius: 50px; 
+            font-weight: bold; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
         .btn-auth { 
-            background: #2ecc71; 
-            color: white; 
-            border: none; 
-            padding: 12px 35px; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer;
+            background: #2ecc71; color: white; border: none; padding: 12px 30px; 
+            border-radius: 50px; font-weight: bold; cursor: pointer;
         }
 
         .categories { 
-            padding: 15px; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            max-width: 500px; 
-            margin: 0 auto; 
+            padding: 15px; max-width: 450px; margin: 0 auto; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; 
         }
         
         .cat-card { 
-            background: rgba(255, 255, 255, 0.95); /* بطاقة بيضاء ناصعة لتظهر الأيقونات */
-            padding: 20px 10px; 
-            border-radius: 20px; 
-            text-align: center; 
-            color: var(--pi-d); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            cursor: pointer;
+            background: var(--pi-g); /* لون البطاقة الذهبي الواضح */
+            padding: 20px 10px; border-radius: 22px; text-align: center; 
+            cursor: pointer; color: var(--pi-d); font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
         }
-        
+
         .cat-card i { 
-            color: var(--pi-g); 
-            background: var(--pi-d); 
-            width: 50px; 
-            height: 50px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 15px; 
-            font-size: 1.4rem; 
-            margin: 0 auto 10px; 
+            color: var(--pi-g); background: var(--pi-d); 
+            width: 45px; height: 45px; display: flex; align-items: center; 
+            justify-content: center; border-radius: 12px; font-size: 1.3rem; margin: 0 auto 12px;
         }
 
-        .cat-card span { font-weight: 800; display: block; margin-bottom: 5px; font-size: 1rem; }
-        
         .price-badge { 
-            background: #fff3e0; 
-            color: var(--pi-d); 
-            font-weight: bold; 
-            padding: 5px 15px; 
-            border-radius: 10px; 
-            border: 1px solid var(--pi-g);
-            display: inline-block;
-            font-size: 0.85rem;
+            font-size: 0.85rem; color: #fff; font-weight: bold; background: var(--pi-d);
+            padding: 3px 12px; border-radius: 8px; display: inline-block; margin-top: 5px;
         }
-
+        
         .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
         .section-title { color: var(--pi-g); margin-bottom: 15px; text-align: center; font-weight: bold; }
-        
-        .order-item { 
-            background: rgba(255, 255, 255, 0.1); 
-            padding: 12px; 
-            border-radius: 15px; 
-            margin-bottom: 10px; 
-            border-right: 4px solid var(--pi-g); 
-            color: white; 
-        }
+        .order-item { background: rgba(255,255,255,0.1); padding: 12px; border-radius: 15px; margin-bottom: 10px; border-right: 4px solid var(--pi-g); }
 
-        #toast { 
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
-            background: var(--pi-g); color: var(--pi-d); padding: 10px 25px;
-            border-radius: 30px; display: none; z-index: 5000; font-weight: bold; 
-        }
-
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 4000; }
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--pi-d); color: var(--pi-g); padding: 10px 25px; border-radius: 30px; display: none; z-index: 5000; font-weight: bold; border: 2px solid var(--pi-g); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
         .modal-content { background: white; width: 90%; max-width: 380px; padding: 25px; border-radius: 20px; color: var(--pi-d); }
     </style>
 </head>
 <body>
     <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
-        [span_4](start_span)<div class="welcome-msg">مرحباً بك في منصة abokareem 🌐[span_4](end_span)</div>
-        [span_5](start_span)<p style="color: var(--pi-g); font-size: 0.85rem; margin-bottom: 20px;">بوابتك لخدمات العمل الحر عبر Pi Network[span_5](end_span)</p>
-        [span_6](start_span)<button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network[span_6](end_span)</button>
+        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
     </section>
 
     <section class="categories">
@@ -143,23 +90,23 @@
     </section>
 
     <section class="orders-section">
-        [span_7](start_span)<div class="section-title">📦 الطلبات الأخيرة[span_7](end_span)</div>
+        <div class="section-title">📦 الطلبات الأخيرة</div>
         <div id="ordersList"></div>
     </section>
 
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center;">اكتمل الدفع! [span_8](start_span)🎉</h2>
-            <textarea id="orderDetail" rows="3" style="width:100%; margin-top:10px;" placeholder="اكتب تفاصيل طلبك..."></textarea>
-            <input type="email" id="contactInfo" style="width:100%; margin-top:10px;" placeholder="بريدك الإلكتروني">
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold;" onclick="submitOrder()">إرسال الطلب[span_8](end_span)</button>
+            <h2 style="text-align:center;">اكتمل الدفع! 🎉</h2>
+            <textarea id="orderDetail" rows="3" style="width:100%; margin-top:10px; padding:10px;" placeholder="اكتب تفاصيل طلبك..."></textarea>
+            <input type="email" id="contactInfo" style="width:100%; margin-top:10px; padding:10px;" placeholder="بريدك الإلكتروني">
+            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب</button>
         </div>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        [span_9](start_span)// الكود البرمجي (Script) يظل كما هو دون أي تعديل لضمان استقرار الدفع والربط[span_9](end_span)
+        [span_2](start_span)[span_3](start_span)[span_4](start_span)// الكود البرمجي الأصلي الخاص بك لضمان استمرار الدفع وربط البيانات[span_2](end_span)[span_3](end_span)[span_4](end_span)
         const toast = document.getElementById('toast');
         let currentTxId = "", currentPrice = 0, currentCategory = "";
         const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
@@ -176,7 +123,7 @@
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
                 showMsg("مرحباً " + auth.user.username);
-            } catch (e) { showMsg("فشل الدخول: تأكد من متصفح Pi"); }
+            } catch (e) { showMsg("فشل الدخول"); }
         }
 
         async function processPayment(amt, name) {
@@ -232,7 +179,6 @@
                             <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--pi-g);">
                                 <span>${o.title}</span><span>${o.price} Pi</span>
                             </div>
-                            <div style="font-size:0.75rem; opacity:0.8;">${o.description ? o.description.substring(0, 40) : ''}...</div>
                         </div>
                     `).join('');
                 }
