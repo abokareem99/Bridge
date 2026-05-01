@@ -3,74 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم Bridge Freelance</title>
+    <title>إدارة Bridge Freelance</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; background: #4a148c; color: white; padding: 20px; text-align: center; }
-        .container { max-width: 500px; margin: 0 auto; background: white; color: #333; padding: 20px; border-radius: 15px; }
-        input, select { width: 90%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
-        button { background: #ffb74d; color: #4a148c; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 95%; }
-        .service-item { border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-delete { background: #ff5252; color: white; padding: 5px 10px; font-size: 12px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #4a148c; color: white; padding: 20px; }
+        .card { background: white; color: #333; padding: 20px; border-radius: 15px; max-width: 500px; margin: 10px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input { width: 90%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .btn { background: #ffb74d; color: #4a148c; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 95%; margin-top: 10px; }
+        .service-row { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; flex-direction: column; gap: 8px; }
+        .actions { display: flex; gap: 10px; }
+        .btn-update { background: #4caf50; color: white; flex: 1; padding: 8px; border-radius: 5px; border: none; cursor: pointer; }
+        .btn-delete { background: #f44336; color: white; padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; }
+        h2, h3 { text-align: center; color: #ffb74d; }
     </style>
 </head>
 <body>
 
-    <h2>لوحة تحكم المدير 🛠️</h2>
-    
-    <div class="container" id="loginBox">
-        <h3>تسجيل الدخول</h3>
-        <input type="password" id="adminPass" placeholder="أدخل كلمة المرور">
-        <button onclick="checkPass()">دخول</button>
+    <h2>لوحة التحكم 🛠️</h2>
+
+    <div id="loginSection" class="card">
+        <h3>أدخل كلمة المرور</h3>
+        <input type="password" id="passInput">
+        <button class="btn" onclick="login()">دخول</button>
     </div>
 
-    <div class="container" id="adminContent" style="display:none;">
-        <h3>إضافة خدمة جديدة</h3>
-        <input type="text" id="title" placeholder="اسم الخدمة (مثلاً: ترجمة)">
-        <input type="number" step="0.1" id="price" placeholder="السعر بـ Pi">
-        <button onclick="addService()">إضافة الخدمة فوراً</button>
-        
-        <hr>
-        <h3>الخدمات الحالية</h3>
-        <div id="servicesList"></div>
+    <div id="adminSection" style="display:none;">
+        <div class="card">
+            <h3>إضافة خدمة جديدة</h3>
+            <input type="text" id="newTitle" placeholder="اسم الخدمة">
+            <input type="number" step="0.1" id="newPrice" placeholder="السعر">
+            <button class="btn" onclick="addService()">إضافة</button>
+        </div>
+
+        <div class="card">
+            <h3>الخدمات الحالية وتعديل الأسعار</h3>
+            <div id="servicesContainer"></div>
+        </div>
     </div>
 
     <script>
         const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
 
-        function checkPass() {
-            if(document.getElementById('adminPass').value === "ateya2026") {
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                loadAdminServices();
-            } else {
-                alert("كلمة مرور خاطئة");
-            }
+        function login() {
+            if(document.getElementById('passInput').value === "ateya2026") {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+                loadServices();
+            } else { alert("كلمة السر خطأ"); }
         }
 
-        async function loadAdminServices() {
-            const { data } = await _supabase.from('services').select('*');
-            const list = document.getElementById('servicesList');
-            list.innerHTML = data.map(s => `
-                <div class="service-item">
-                    <span>${s.title} (${s.price} Pi)</span>
-                    <button class="btn-delete" onclick="deleteService(${s.id})">حذف</button>
+        async function loadServices() {
+            const { data } = await _supabase.from('services').select('*').order('id', { ascending: true });
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = data.map(s => `
+                <div class="service-row">
+                    <strong>${s.title}</strong>
+                    <input type="number" step="0.1" value="${s.price}" id="price-${s.id}">
+                    <div class="actions">
+                        <button class="btn-update" onclick="updatePrice(${s.id})">تحديث السعر ✅</button>
+                        <button class="btn-delete" onclick="deleteService(${s.id})">حذف</button>
+                    </div>
                 </div>
             `).join('');
         }
 
+        async function updatePrice(id) {
+            const newPrice = document.getElementById(`price-${id}`).value;
+            await _supabase.from('services').update({ price: newPrice }).eq('id', id);
+            alert("تم تحديث السعر بنجاح!");
+            loadServices();
+        }
+
         async function addService() {
-            const t = document.getElementById('title').value;
-            const p = document.getElementById('price').value;
+            const t = document.getElementById('newTitle').value;
+            const p = document.getElementById('newPrice').value;
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active' }]);
             alert("تمت الإضافة");
-            loadAdminServices();
+            loadServices();
         }
 
         async function deleteService(id) {
-            if(confirm("هل أنت متأكد من الحذف؟")) {
+            if(confirm("هل تريد حذف هذه الخدمة؟")) {
                 await _supabase.from('services').delete().eq('id', id);
-                loadAdminServices();
+                loadServices();
             }
         }
     </script>
