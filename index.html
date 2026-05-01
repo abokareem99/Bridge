@@ -1,265 +1,119 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جسر التواصل - Bridge Freelance</title>
+    <title>Bridge Freelance - Professional Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <script type="text/javascript">
-        (function() { emailjs.init("aRCAx1NwvATaC4F-m"); })();
-    </script>
-
     <style>
         :root { 
-            --pi-p: #6a1b9a; 
-            --pi-d: #4a148c; /* لون باي الغامق */
-            --pi-g: #ffb74d; /* اللون الأصفر/الذهبي */
+            --pi-d: #4a148c; /* Deep Purple */
+            --pi-g: #ffb74d; /* Golden Yellow */
+            --white: #ffffff;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: var(--pi-d); color: var(--white); min-height: 100vh; padding-bottom: 90px; }
         
-        body { 
-            background-color: var(--pi-d); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden; 
-            color: white;
-        }
+        .hero { padding: 40px 15px; text-align: center; }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); font-weight: 800; margin-bottom: 10px; }
         
-        .hero { padding: 30px 15px; text-align: center; position: relative; z-index: 5; }
-        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 10px; font-weight: 800; }
-        
-        .welcome-msg { 
-            font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); 
-            display: inline-block; padding: 8px 20px; border-radius: 25px; 
-            margin-bottom: 15px; font-weight: bold; border: 2px solid var(--pi-g);
-        }
-        
-        /* تحسين زر الدخول لضمان القابلية للنقر */
+        /* Auth Button - All English */
         .btn-auth { 
-            background: #2ecc71; color: white; border: none; 
-            padding: 12px 30px; border-radius: 50px; font-weight: bold; 
-            cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            position: relative; z-index: 10; transition: 0.3s;
-        }
-        .btn-auth:active { transform: scale(0.95); }
-
-        .categories { 
-            padding: 15px; max-width: 450px; margin: 0 auto; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; 
-        }
-        
-        .cat-card { 
-            background: var(--pi-g); padding: 15px 5px; border-radius: 20px; 
-            text-align: center; cursor: pointer; color: var(--pi-d); 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3); transition: 0.2s;
-        }
-        .cat-card:active { transform: scale(0.95); }
-        
-        .cat-card i { 
-            color: var(--pi-g); background: var(--pi-d); width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center; 
-            border-radius: 12px; font-size: 1.2rem; margin: 0 auto 10px;
-        }
-        
-        .cat-card span { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 5px; }
-        
-        .price-badge { 
-            font-size: 0.8rem; color: #fff; font-weight: bold; 
-            background: var(--pi-d); padding: 3px 10px; border-radius: 8px; 
-        }
-        
-        .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
-        .section-title { color: var(--pi-g); margin-bottom: 12px; text-align: center; font-size: 1rem; font-weight: bold; }
-        
-        .order-item { 
-            background: rgba(255, 255, 255, 0.1); padding: 12px; 
-            border-radius: 15px; margin-bottom: 10px; border-right: 4px solid var(--pi-g);
+            background: var(--pi-g); color: var(--pi-d); border: none; padding: 12px 30px; 
+            border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(255,183,77,0.3);
         }
 
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); display: none; align-items: center; 
-            justify-content: center; z-index: 4000; 
+        /* Services Grid */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
+        .service-card { 
+            background: rgba(255,255,255,0.05); border: 2px solid var(--pi-g); border-radius: 20px; 
+            padding: 20px 10px; text-align: center; cursor: pointer;
         }
-        .modal-content { 
-            background: white; width: 90%; max-width: 380px; padding: 25px; 
-            border-radius: 20px; text-align: right; color: var(--pi-d); 
+        .service-card i { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 10px; display: block; }
+        .pi-badge { background: var(--pi-g); color: var(--pi-d); padding: 2px 8px; border-radius: 5px; font-size: 0.8rem; margin-top: 8px; display: inline-block; font-weight: 800; }
+
+        /* Orders Section - Improved UI */
+        .orders-section { padding: 20px 15px; max-width: 500px; margin: 0 auto; }
+        .section-header { 
+            display: flex; justify-content: center; align-items: center; gap: 10px; 
+            margin-bottom: 20px; color: var(--pi-g); font-weight: bold; font-size: 1.2rem;
+        }
+
+        .order-card { 
+            background: rgba(255,255,255,0.08); border-radius: 18px; padding: 15px; 
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid rgba(255,183,77,0.1);
         }
         
-        #toast { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            background: var(--pi-d); color: var(--pi-g); padding: 12px 25px;
-            border-radius: 30px; display: none; z-index: 5000; font-size: 0.9rem; 
-            font-weight: bold; border: 2px solid var(--pi-g); box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        /* Yellow Icon Boxes for Orders */
+        .order-icon-box { 
+            width: 45px; height: 45px; background: var(--pi-g); color: var(--pi-d); 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
         
-        textarea, input { 
-            background: #f1f1f1; border: 1px solid #ddd; color: var(--pi-d); 
-            width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; 
+        .order-details { flex: 1; margin-left: 15px; text-align: left; }
+        .order-details h4 { font-size: 0.95rem; color: var(--pi-g); }
+        .order-details p { font-size: 0.75rem; opacity: 0.7; }
+
+        /* Floating Button - English */
+        .fab { 
+            position: fixed; bottom: 25px; left: 25px; background: var(--pi-g); color: var(--pi-d); 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; box-shadow: 0 5px 20px rgba(0,0,0,0.4); 
+            z-index: 1000; cursor: pointer; display: flex; align-items: center; gap: 10px;
         }
+
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 30px; border-radius: 50px; font-weight: bold; display: none; z-index: 9999; }
     </style>
 </head>
 <body>
 
-    <section class="hero">
-        <h1 class="hero-title">جسر التواصل</h1>
-        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-        <p style="font-size: 0.8rem; color: var(--pi-g); margin-bottom: 15px;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
-    </section>
-
-    <section class="categories">
-        <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
-            <i class="fas fa-code"></i><span>البرمجة</span><span class="price-badge">1.0 Pi</span>
-        </div>
-        <div class="cat-card" onclick="processPayment(0.8, 'Design')">
-            <i class="fas fa-palette"></i><span>التصميم</span><span class="price-badge">0.8 Pi</span>
-        </div>
-        <div class="cat-card" onclick="processPayment(0.7, 'Marketing')">
-            <i class="fas fa-bullhorn"></i><span>التسويق</span><span class="price-badge">0.7 Pi</span>
-        </div>
-        <div class="cat-card" onclick="processPayment(0.5, 'Translation')">
-            <i class="fas fa-language"></i><span>الترجمة</span><span class="price-badge">0.5 Pi</span>
-        </div>
-    </section>
-
-    <section class="orders-section">
-        <div class="section-title">📦 الطلبات الأخيرة</div>
-        <div id="ordersList"></div>
-    </section>
-
-    <div id="reqModal" class="modal">
-        <div class="modal-content">
-            <h2 style="text-align:center; margin-bottom:15px;">اكتمل الدفع! 🎉</h2>
-            <textarea id="orderDetail" rows="3" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
-            <input type="email" id="contactInfo" placeholder="بريدك الإلكتروني">
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:14px; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب</button>
-        </div>
-    </div>
-
     <div id="toast"></div>
 
+    <header class="hero">
+        <h1 class="hero-title">Bridge Freelance</h1>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">Verify Identity ✅</button>
+    </header>
+
+    <section class="services-grid">
+        <div class="service-card" onclick="pay(1.0, 'Programming')"><i class="fas fa-code"></i><span>Programming</span><br><div class="pi-badge">1.0 Pi</div></div>
+        <div class="service-card" onclick="pay(0.8, 'Design')"><i class="fas fa-palette"></i><span>Design</span><br><div class="pi-badge">0.8 Pi</div></div>
+    </section>
+
+    <div class="orders-section">
+        <div class="section-header">
+            <i class="fas fa-bolt"></i> <span>Recent Services</span>
+        </div>
+        <div id="ordersContainer">
+            </div>
+    </div>
+
+    <div class="fab" onclick="showPublishModal()">
+        <i class="fas fa-plus"></i> <span>Post Service (0.1 Pi)</span>
+    </div>
+
     <script>
-        const toast = document.getElementById('toast');
-        let currentTxId = "", currentPrice = 0, currentCategory = "";
-        
-        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        function showMsg(m) {
-            toast.innerText = m; 
-            toast.style.display = 'block'; 
-            setTimeout(() => toast.style.display='none', 3000); 
-        }
-
-        async function startApp() {
-            try {
-                showMsg("جاري الاتصال...");
-                // التأكد من تهيئة SDK
-                await window.Pi.init({ version: "2.0", sandbox: true }); 
-                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                window.currentUser = auth.user.username;
-                
-                document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
-                document.getElementById('authBtn').style.background = "#2ecc71";
-                showMsg("مرحباً " + auth.user.username);
-            } catch (e) { 
-                showMsg("فشل الدخول: يرجى المحاولة من متصفح Pi");
-                console.error(e);
-            }
-        }
-
-        async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول أولاً"); return; }
-            currentPrice = amt; 
-            currentCategory = name;
-            
-            try {
-                showMsg("بدء عملية الدفع...");
-                await window.Pi.createPayment({
-                    amount: amt, 
-                    memo: "طلب خدمة: " + name, 
-                    metadata: { service: name }
-                }, {
-                    onReadyForServerApproval: (id) => {
-                        return fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ paymentId: id, action: 'approve' }) 
-                        }).then(r => r.json());
-                    },
-                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
-                    onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
-                        });
-                        document.getElementById('reqModal').style.display = 'flex';
-                    },
-                    onError: (e) => showMsg("فشل الدفع"),
-                    onCancel: () => showMsg("تم إلغاء الدفع")
-                });
-            } catch (e) { showMsg("حدث خطأ في نظام الدفع"); }
-        }
-
-        async function submitOrder() {
-            const detail = document.getElementById('orderDetail').value;
-            const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("يرجى إكمال البيانات");
-
-            try {
-                showMsg("جاري حفظ الطلب...");
-                
-                // 1. الحفظ في Supabase
-                await _supabase.from('services').insert([{
-                    title: currentCategory, 
-                    description: detail, 
-                    price: String(currentPrice),
-                    category: currentCategory, 
-                    contact_info: contact,
-                    user_pi: window.currentUser, 
-                    txid: currentTxId
-                }]);
-
-                // 2. الإرسال عبر EmailJS
-                await emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: window.currentUser, 
-                    service_detail: detail, 
-                    contact_info: contact, 
-                    order_id: currentTxId, 
-                    price: currentPrice
-                });
-
-                showMsg("تم الإرسال بنجاح!");
-                setTimeout(() => location.reload(), 2000);
-            } catch (error) { 
-                showMsg("خطأ في الاتصال بالسيرفر");
-                console.error(error);
-            }
-        }
-
+        // الـ JavaScript يدعم الآن عرض البيانات بالإنجليزية
         async function loadOrders() {
-            try {
-                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
-                if (data) {
-                    document.getElementById('ordersList').innerHTML = data.map(o => `
-                        <div class="order-item">
-                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--pi-g);">
-                                <span>${o.title}</span><span>${o.price} Pi</span>
+            const { data } = await _supabase.from('services').select('*').order('id', { ascending: false });
+            if(data) {
+                document.getElementById('ordersContainer').innerHTML = data.map(s => `
+                    <div class="order-card">
+                        <div style="display:flex; align-items:center;">
+                            <div class="order-icon-box">
+                                <i class="fas fa-briefcase"></i>
                             </div>
-                            <div style="font-size:0.75rem; opacity:0.8; margin-top:5px; color:white;">${o.description ? o.description.substring(0, 40) : ''}...</div>
+                            <div class="order-details">
+                                <h4>${s.title}</h4>
+                                <p>Freelancer: ${s.user_pi}</p>
+                            </div>
                         </div>
-                    `).join('');
-                }
-            } catch (e) {}
+                        <div style="font-weight:900; color:var(--pi-g)">0.1 Pi</div>
+                    </div>
+                `).join('');
+            }
         }
         window.onload = loadOrders;
     </script>
