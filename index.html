@@ -1,123 +1,288 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - Order Services</title>
+    <title>جسر التواصل - Bridge Freelance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script type="text/javascript">
+        (function() { emailjs.init("aRCAx1NwvATaC4F-m"); })();
+    </script>
+
     <style>
         :root { 
-            --pi-purple: #311b92; 
-            --pi-gold: #ffb300; 
-            --glass: rgba(255, 255, 255, 0.08);
+            --pi-p: #6a1b9a; 
+            --pi-d: #4a148c; /* لون باي البنفسجي الغامق */
+            --pi-g: #ffb74d; /* اللون الأصفر الذهبي المطلوب للتلوين */
+            --white: #ffffff;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--pi-purple); color: white; text-align: center; padding-bottom: 50px; }
-
-        header { padding: 40px 20px; }
-        .logo { color: var(--pi-gold); font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
         
-        .status-badge { 
-            background: var(--pi-gold); color: var(--pi-purple); padding: 8px 20px; 
-            border-radius: 20px; font-weight: bold; display: inline-block; font-size: 0.9rem;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body { 
+            background-color: var(--pi-d); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden; 
+            color: var(--white);
+        }
+        
+        /* تلوين الهيرو */
+        .hero { padding: 30px 15px; text-align: center; border-bottom: 1px solid rgba(255,183,77,0.1); }
+        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 10px; font-weight: 800; }
+        
+        /* تلوين رسالة الترحيب */
+        .welcome-msg { 
+            font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); 
+            display: inline-block; padding: 8px 20px; border-radius: 25px; 
+            margin-bottom: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(255,183,77,0.3);
+        }
+        
+        /* تلوين زر الدخول (تم تلوينه بالأصفر كما في الطلب) */
+        .btn-auth { 
+            background: var(--pi-g); color: var(--pi-d); border: none; 
+            padding: 12px 30px; border-radius: 50px; font-weight: bold; 
+            cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(255,183,77,0.3);
+        }
+        .btn-auth:active { transform: scale(0.95); }
+
+        /* تلوين شبكة البطاقات */
+        .categories { 
+            padding: 20px 15px; max-width: 450px; margin: 0 auto; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; 
+        }
+        
+        /* تلوين البطاقة لتكون خلفيتها صفراء */
+        .cat-card { 
+            background: var(--pi-g); padding: 15px 5px; border-radius: 20px; 
+            text-align: center; cursor: pointer; color: var(--pi-d); font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3); transition: 0.2s;
+        }
+        .cat-card:active { transform: scale(0.95); }
+        
+        /* تلوين الأيقونات داخل البطاقة لتكون بنفسجية غامقة للتضاد */
+        .cat-card i { 
+            color: var(--pi-g); background: var(--pi-d); width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 12px; font-size: 1.2rem; margin: 0 auto 10px;
+        }
+        
+        .cat-card span { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        
+        /* تلوين شارة السعر لتكون بنفسجية */
+        .price-badge { 
+            font-size: 0.8rem; color: #fff; font-weight: bold; 
+            background: var(--pi-d); padding: 3px 10px; border-radius: 8px; 
+        }
+        
+        /* تلوين قسم الطلبات */
+        .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
+        .section-title { color: var(--pi-g); margin-bottom: 12px; text-align: center; font-size: 1rem; font-weight: bold; }
+        
+        /* تلوين حدود عناصر الطلبات */
+        .order-item { 
+            background: rgba(255, 255, 255, 0.1); padding: 12px; 
+            border-radius: 15px; margin-bottom: 10px; border-right: 4px solid var(--pi-g);
         }
 
-        /* Order Cards Grid */
-        .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
-        .order-card { 
-            background: var(--pi-gold); border-radius: 20px; padding: 25px 15px; color: var(--pi-purple);
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none;
+        /* تلوين المودال */
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); display: none; align-items: center; 
+            justify-content: center; z-index: 4000; 
         }
-        .order-card i { font-size: 2rem; display: block; margin-bottom: 10px; }
-        .order-card h3 { font-size: 1rem; margin-bottom: 12px; font-weight: 800; }
-        .price-label { background: var(--pi-purple); color: white; padding: 4px 12px; border-radius: 10px; font-weight: 900; font-size: 0.8rem; }
-
-        /* Recent Orders Section - GOLD ICONS */
-        .recent-orders { margin-top: 30px; padding: 0 20px; max-width: 500px; margin: 0 auto; text-align: left; }
-        .section-title { color: var(--pi-gold); font-weight: bold; margin-bottom: 20px; text-align: center; font-size: 1.1rem; }
-
-        .order-history-item { 
-            background: var(--glass); border-radius: 15px; padding: 15px; margin-bottom: 12px;
-            display: flex; align-items: center; justify-content: space-between;
+        /* خلفية المودال بيضاء ولكن العناصر ملونة */
+        .modal-content { 
+            background: var(--white); width: 90%; max-width: 380px; padding: 25px; 
+            border-radius: 20px; text-align: right; color: var(--pi-d); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* تلوين التنبيه (Toast) بالأصفر */
+        #toast { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: var(--pi-g); color: var(--pi-d); padding: 12px 25px;
+            border-radius: 30px; display: none; z-index: 5000; font-size: 0.9rem; 
+            font-weight: bold; border: 2px solid var(--pi-d); box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        
+        textarea, input { 
+            background: #f1f1f1; border: 1px solid #ddd; color: var(--pi-d); 
+            width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; font-weight: bold;
         }
 
-        /* The Bright Yellow Icon Box */
-        .gold-icon-box { 
-            width: 45px; height: 45px; background: var(--pi-gold); color: var(--pi-purple); 
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin-right: 15px;
+        /* تلوين الزر العائم بالأصفر */
+        .fab {
+            position: fixed; bottom: 25px; right: 25px;
+            background: var(--pi-g); color: var(--pi-d);
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; box-shadow: 0 4px 15px rgba(255,183,77,0.4);
+            cursor: pointer; z-index: 1000; border: 2px solid var(--pi-d);
         }
-
-        .order-details { flex: 1; }
-        .order-details h4 { font-size: 0.95rem; color: var(--pi-gold); font-weight: bold; }
-        .order-details p { font-size: 0.75rem; opacity: 0.6; }
-
-        .order-pi { font-weight: 900; color: var(--pi-gold); font-size: 0.9rem; }
-
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-gold); color: var(--pi-purple); padding: 12px 30px; border-radius: 50px; font-weight: bold; display: none; z-index: 9999; }
     </style>
 </head>
 <body>
 
+    <section class="hero">
+        <h1 class="hero-title">جسر التواصل</h1>
+        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
+        <p style="font-size: 0.8rem; color: var(--pi-g); margin-bottom: 15px;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
+    </section>
+
+    <section class="categories">
+        <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
+            <i class="fas fa-code"></i><span>Programming</span><span class="price-badge">1.0 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.8, 'Design')">
+            <i class="fas fa-palette"></i><span>Design</span><span class="price-badge">0.8 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.7, 'Marketing')">
+            <i class="fas fa-bullhorn"></i><span>Marketing</span><span class="price-badge">0.7 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.5, 'Translation')">
+            <i class="fas fa-language"></i><span>Translation</span><span class="price-badge">0.5 Pi</span>
+        </div>
+    </section>
+
+    <section class="orders-section">
+        <div class="section-title">📦 الطلبات الأخيرة</div>
+        <div id="ordersList"></div>
+    </section>
+
+    <div id="reqModal" class="modal">
+        <div class="modal-content">
+            <h2 style="text-align:center; margin-bottom:15px; color: var(--pi-g)">اكتمل الدفع! 🎉</h2>
+            <textarea id="orderDetail" rows="3" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
+            <input type="email" id="contactInfo" placeholder="بريدك الإلكتروني">
+            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:14px; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب</button>
+        </div>
+    </div>
+
     <div id="toast"></div>
 
-    <header>
-        <h1 class="logo">Bridge Freelance</h1>
-        <div class="status-badge" id="userBadge">Verify Pi Identity ✅</div>
-    </header>
-
-    <div class="order-grid">
-        <div class="order-card" onclick="processOrder(1.0, 'Programming')">
-            <i class="fas fa-code"></i>
-            <h3>Programming</h3>
-            <span class="price-label">1.0 Pi</span>
-        </div>
-        <div class="order-card" onclick="processOrder(0.8, 'Design')">
-            <i class="fas fa-palette"></i>
-            <h3>Design</h3>
-            <span class="price-label">0.8 Pi</span>
-        </div>
-    </div>
-
-    <div class="recent-orders">
-        <div class="section-title">📦 Recent Orders</div>
-        <div id="ordersList">
-            </div>
-    </div>
-
     <script>
-        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
+        // الكود البرمجي يبقى كما هو دون أي تغيير لضمان عمل كافة الوظائف
+        const toast = document.getElementById('toast');
+        let currentTxId = "", currentPrice = 0, currentCategory = "";
+        
+        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
-
-        async function processOrder(amount, service) {
-            showMsg("Processing " + service + " order...");
-            // Pi Payment logic would trigger here
+        function showMsg(m) {
+            toast.innerText = m; 
+            toast.style.display = 'block'; 
+            setTimeout(() => toast.style.display='none', 3000); 
         }
 
-        async function loadHistory() {
-            const { data } = await _supabase.from('services').select('*').limit(5).order('id', { ascending: false });
-            if (data) {
-                document.getElementById('ordersList').innerHTML = data.map(o => `
-                    <div class="order-history-item">
-                        <div style="display: flex; align-items: center;">
-                            <div class="gold-icon-box">
-                                <i class="fas ${o.title.toLowerCase().includes('design') ? 'fa-palette' : 'fa-code'}"></i>
-                            </div>
-                            <div class="order-details">
-                                <h4>${o.title}</h4>
-                                <p>Requested by: ${o.user_pi || 'User'}</p>
-                            </div>
-                        </div>
-                        <div class="order-pi">Pi ${o.id % 2 === 0 ? '1.0' : '0.8'}</div>
-                    </div>
-                `).join('');
+        async function startApp() {
+            try {
+                showMsg("جاري الاتصال...");
+                await window.Pi.init({ version: "2.0", sandbox: true }); 
+                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
+                window.currentUser = auth.user.username;
+                
+                document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
+                // يمكن تلوين الزر بالأخضر عند النجاح للتنبيه
+                document.getElementById('authBtn').style.background = "#2ecc71";
+                showMsg("مرحباً " + auth.user.username);
+            } catch (e) { 
+                showMsg("فشل الدخول: يرجى المحاولة من متصفح Pi");
+                console.error(e);
             }
         }
 
-        window.onload = loadHistory;
+        async function processPayment(amt, name) {
+            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول أولاً"); return; }
+            currentPrice = amt; 
+            currentCategory = name;
+            
+            try {
+                showMsg("بدء عملية الدفع...");
+                await window.Pi.createPayment({
+                    amount: amt, 
+                    memo: "طلب خدمة: " + name, 
+                    metadata: { service: name }
+                }, {
+                    onReadyForServerApproval: (id) => {
+                        return fetch('/api/payment-handler', { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
+                            body: JSON.stringify({ paymentId: id, action: 'approve' }) 
+                        }).then(r => r.json());
+                    },
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
+                    onReadyForServerCompletion: async (id, tx) => {
+                        await fetch('/api/payment-handler', { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
+                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
+                        });
+                        document.getElementById('reqModal').style.display = 'flex';
+                    },
+                    onError: (e) => showMsg("فشل الدفع"),
+                    onCancel: () => showMsg("تم إلغاء الدفع")
+                });
+            } catch (e) { showMsg("حدث خطأ في نظام الدفع"); }
+        }
+
+        async function submitOrder() {
+            const detail = document.getElementById('orderDetail').value;
+            const contact = document.getElementById('contactInfo').value;
+            if(!detail || !contact) return showMsg("يرجى إكمال البيانات");
+
+            try {
+                showMsg("جاري حفظ الطلب...");
+                
+                await _supabase.from('services').insert([{
+                    title: currentCategory, 
+                    description: detail, 
+                    price: String(currentPrice),
+                    category: currentCategory, 
+                    contact_info: contact,
+                    user_pi: window.currentUser, 
+                    txid: currentTxId
+                }]);
+
+                await emailjs.send("service_vuti648", "template_m6rq1ab", {
+                    username: window.currentUser, 
+                    service_detail: detail, 
+                    contact_info: contact, 
+                    order_id: currentTxId, 
+                    price: currentPrice
+                });
+
+                showMsg("تم الإرسال بنجاح!");
+                setTimeout(() => location.reload(), 2000);
+            } catch (error) { 
+                showMsg("خطأ في الاتصال بالسيرفر");
+                console.error(error);
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
+                if (data) {
+                    document.getElementById('ordersList').innerHTML = data.map(o => `
+                        <div class="order-item">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--pi-g);">
+                                <span>${o.title}</span><span>${o.price} Pi</span>
+                            </div>
+                            <div style="font-size:0.75rem; opacity:0.9; margin-top:5px; color:white;">${o.description ? o.description.substring(0, 40) : ''}...</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {}
+        }
+        window.onload = loadOrders;
     </script>
 </body>
 </html>
