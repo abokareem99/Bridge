@@ -16,91 +16,33 @@
 
     <style>
         :root { 
-            --pi-p: #6a1b9a; 
-            --pi-d: #4a148c; 
-            --pi-g: #ffb74d; 
-            --white: #ffffff;
+            --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --white: #ffffff;
         }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        
-        body { 
-            background-color: var(--pi-d); 
-            min-height: 100vh; 
-            color: var(--white);
-            display: block; 
-        }
-        
+        body { background-color: var(--pi-d); min-height: 100vh; color: var(--white); display: block; }
         .hero { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,183,77,0.1); }
         .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 8px; font-weight: 800; }
-        
-        .welcome-msg { 
-            font-size: 0.75rem; background: var(--pi-g); color: var(--pi-d); 
-            display: inline-block; padding: 6px 15px; border-radius: 20px; 
-            margin-bottom: 10px; font-weight: bold;
-        }
-        
-        .btn-auth { 
-            background: var(--pi-g); color: var(--pi-d); border: none; 
-            padding: 10px 25px; border-radius: 50px; font-weight: bold; 
-            cursor: pointer; font-size: 0.9rem; display: block; margin: 0 auto;
-        }
-
-        .categories { 
-            padding: 15px; max-width: 450px; margin: 0 auto; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-        }
-        
-        .cat-card { 
-            background: var(--pi-g); padding: 15px 5px; border-radius: 18px; 
-            text-align: center; cursor: pointer; color: var(--pi-d);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
-        .cat-card:active { transform: scale(0.95); }
-        
-        .cat-card i { 
-            color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px;
-            display: flex; align-items: center; justify-content: center; 
-            border-radius: 10px; font-size: 1rem; margin: 0 auto 8px;
-        }
-        
+        .welcome-msg { font-size: 0.75rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 6px 15px; border-radius: 20px; margin-bottom: 10px; font-weight: bold; }
+        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem; display: block; margin: 0 auto; }
+        .categories { padding: 15px; max-width: 450px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .cat-card { background: var(--pi-g); padding: 15px 5px; border-radius: 18px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1rem; margin: 0 auto 8px; }
         .cat-card span { font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 4px; }
-        
-        .price-badge { 
-            font-size: 0.65rem; color: #fff; font-weight: bold; 
-            background: var(--pi-d); padding: 2px 8px; border-radius: 6px; 
-        }
-        
+        .price-badge { font-size: 0.65rem; color: #fff; font-weight: bold; background: var(--pi-d); padding: 2px 8px; border-radius: 6px; }
         .orders-section { padding: 15px; max-width: 450px; margin: 0 auto; }
         .section-title { color: var(--pi-g); margin-bottom: 10px; text-align: center; font-size: 0.9rem; font-weight: bold; }
-        
-        .order-item { 
-            background: rgba(255, 255, 255, 0.1); padding: 10px; 
-            border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g);
-        }
-
-        footer { padding: 25px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); position: relative; }
+        .order-item { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g); }
+        footer { padding: 10px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); }
         .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; }
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; margin-top: 4px; }
-
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); display: none; align-items: center; 
-            justify-content: center; z-index: 4000; 
-        }
-        .modal-content { 
-            background: var(--white); width: 90%; max-width: 350px; padding: 20px; 
-            border-radius: 15px; text-align: left; color: var(--pi-d); 
-        }
-
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
+        .modal-content { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; text-align: left; color: var(--pi-d); }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
-        
-        textarea, input { width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; border: 1px solid #ddd; }
-        
-        /* المنطقة السرية - مخفية تماماً في الركن */
-        .admin-trigger { position: fixed; bottom: 0; left: 0; width: 40px; height: 40px; cursor: pointer; z-index: 9999; background: transparent; }
+        textarea, input { width: 100%; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; border: 1px solid #ddd; }
+
+        /* منطقة سرية للدخول للوحة التحكم */
+        .admin-secret { position: fixed; bottom: 0; left: 0; width: 40px; height: 40px; cursor: pointer; z-index: 9999; }
     </style>
 </head>
 <body>
@@ -124,28 +66,25 @@
             <a href="#" onclick="alert('Terms of Use: Use this platform for legal services.')">Terms of Use</a>
         </div>
         <p class="copy-text">&copy; 2026 Bridge Freelance. All rights reserved.</p>
-        <div class="admin-trigger" onclick="openAdmin()"></div>
     </footer>
 
-    <div id="adminPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; overflow-y:auto; padding:20px;">
-        <div style="max-width:400px; margin:auto; background:#fff; color:#333; padding:20px; border-radius:15px; margin-top:20px;">
-            <h2 style="text-align:center; color:#4a148c; margin-bottom:15px;">Admin Control 🛠️</h2>
+    <div class="admin-secret" onclick="openAdmin()"></div>
+    <div id="adminPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; padding:20px; color:#333; overflow-y:auto;">
+        <div style="background:#fff; padding:20px; border-radius:15px; max-width:400px; margin:20px auto;">
+            <h3 style="text-align:center; margin-bottom:15px;">Admin Control 🛠️</h3>
             <div id="adminAuth">
-                <input type="password" id="adminPass" placeholder="Enter Admin Password">
-                <button onclick="checkAdmin()" style="width:100%; padding:12px; background:#4a148c; color:#ffb74d; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">Login</button>
+                <input type="password" id="adminPass" placeholder="Password">
+                <button onclick="checkAdmin()" style="width:100%; padding:10px; margin-top:10px; background:#4a148c; color:#ffb74d; border:none; border-radius:8px; font-weight:bold;">Login</button>
             </div>
-            
-            <div id="adminControls" style="display:none;">
-                <div style="background:#f0f0f0; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4 style="margin-bottom:10px; color:#4a148c;">Add New Service</h4>
-                    <input type="text" id="addTitle" placeholder="Service Name (e.g. Marketing)">
-                    <input type="number" step="0.1" id="addPrice" placeholder="Price in Pi">
-                    <button onclick="addNewService()" style="width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">+ Add to Website</button>
-                </div>
-
-                <h4 style="margin-bottom:10px;">Existing Services:</h4>
-                <div id="servicesEditList" style="max-height:300px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:10px;"></div>
-                <button onclick="document.getElementById('adminPanel').style.display='none'" style="width:100%; margin-top:20px; padding:12px; background:#eee; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Exit Admin Panel</button>
+            <div id="adminContent" style="display:none;">
+                <p style="font-weight:bold; margin-bottom:5px;">Add Service:</p>
+                <input type="text" id="newTitle" placeholder="Title (e.g. Marketing)">
+                <input type="number" step="0.1" id="newPrice" placeholder="Price in Pi">
+                <button onclick="addNewService()" style="width:100%; padding:10px; margin:10px 0; background:#27ae60; color:#fff; border:none; border-radius:8px; font-weight:bold;">+ Add Now</button>
+                <hr>
+                <p style="font-weight:bold; margin:10px 0;">Current Services:</p>
+                <div id="editList" style="max-height:200px; overflow-y:auto; border:1px solid #eee; padding:5px;"></div>
+                <button onclick="document.getElementById('adminPanel').style.display='none'" style="width:100%; margin-top:15px; padding:8px; background:#ddd; border:none; border-radius:8px;">Close</button>
             </div>
         </div>
     </div>
@@ -153,8 +92,8 @@
     <div id="reqModal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; font-size: 1.2rem; margin-bottom:10px; color: var(--pi-d)">Payment Complete! 🎉</h2>
-            <textarea id="orderDetail" rows="3" placeholder="Describe what you need..."></textarea>
-            <input type="email" id="contactInfo" placeholder="Your Email for contact">
+            <textarea id="orderDetail" rows="3" placeholder="Enter order details..."></textarea>
+            <input type="email" id="contactInfo" placeholder="Your Email">
             <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">Submit Order</button>
         </div>
     </div>
@@ -163,7 +102,7 @@
         <div class="modal-content" style="text-align: center;">
             <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71; margin-bottom: 15px;"></i>
             <h2 style="color: var(--pi-d); margin-bottom: 10px;">Order Received!</h2>
-            <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Thank you. We will contact you soon.</p>
+            <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Thank you for choosing <b>Bridge Freelance</b>. <br> We will contact you via email shortly.</p>
             <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="location.reload()">Back to Home</button>
         </div>
     </div>
@@ -185,140 +124,112 @@
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Verified ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
-                showMsg("Verified: " + auth.user.username);
-            } catch (e) { showMsg("Pi Login Failed"); }
-        }
-
-        // دالة ذكية لاختيار الأيقونة بناءً على اسم الخدمة
-        function getIconFor(title) {
-            const t = title.toLowerCase();
-            if(t.includes('market')) return 'fa-bullhorn';
-            if(t.includes('program') || t.includes('code')) return 'fa-code';
-            if(t.includes('design') || t.includes('paint')) return 'fa-palette';
-            if(t.includes('translat')) return 'fa-language';
-            if(t.includes('writ')) return 'fa-pen-fancy';
-            return 'fa-briefcase'; // أيقونة افتراضية
+                showMsg("Welcome " + auth.user.username);
+            } catch (e) { showMsg("Login failed"); }
         }
 
         async function loadServices() {
             const container = document.getElementById('servicesContainer');
             try {
-                const { data } = await _supabase.from('services').select('*').neq('category', 'Order');
-                const activeOnes = data.filter(s => s.status && s.status.includes('active'));
-
+                const { data } = await _supabase.from('services').select('*');
+                // تصفية الخدمات فقط وتجنب الطلبات
+                const activeOnes = data.filter(s => s.status && s.status.includes('activ') && (!s.category || s.category !== 'Order'));
+                
                 if (activeOnes.length > 0) {
-                    container.innerHTML = activeOnes.map(s => `
-                        <div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
-                            <i class="fas ${getIconFor(s.title)}"></i>
-                            <span>${s.title}</span>
-                            <span class="price-badge">${s.price} Pi</span>
-                        </div>
-                    `).join('');
+                    container.innerHTML = activeOnes.map(s => {
+                        // منطق الأيقونات الأصلي الخاص بك
+                        let icon = s.title.includes('Design') ? 'fa-palette' : 
+                                   s.title.includes('Program') ? 'fa-code' : 
+                                   s.title.includes('Market') ? 'fa-bullhorn' : 
+                                   s.title.includes('Translat') ? 'fa-language' : 'fa-briefcase';
+  
+                        return `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
+                                <i class="fas ${icon}"></i>
+                                <span>${s.title}</span>
+                                <span class="price-badge">${s.price} Pi</span>
+                            </div>`;
+                    }).join('');
+                } else {
+                    container.innerHTML = "<p style='grid-column:1/3; font-size:0.7rem; opacity:0.5; text-align:center;'>No services found.</p>";
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.log(e); }
         }
 
+        // دوال لوحة التحكم
+        function openAdmin() { document.getElementById('adminPanel').style.display = 'block'; }
+        function checkAdmin() {
+            if(document.getElementById('adminPass').value === "ateya2026") {
+                document.getElementById('adminAuth').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadAdminList();
+            } else { alert("Access Denied"); }
+        }
+        async function loadAdminList() {
+            const { data } = await _supabase.from('services').select('*').neq('category', 'Order');
+            document.getElementById('editList').innerHTML = data.map(s => `
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">
+                    <span>${s.title}</span>
+                    <button onclick="deleteS(${s.id})" style="color:red; border:none; background:none; cursor:pointer;">Delete</button>
+                </div>
+            `).join('');
+        }
+        async function addNewService() {
+            const t = document.getElementById('newTitle').value;
+            const p = document.getElementById('newPrice').value;
+            if(!t || !p) return;
+            await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
+            alert("Added!"); location.reload();
+        }
+        async function deleteS(id) {
+            if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); }
+        }
+
+        // الدفع والطلبات (كما في كودك)
         async function processPayment(amt, name) {
             if(!window.currentUser) { showMsg("Please login first"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                showMsg("Initiating Pi Payment...");
-                await window.Pi.createPayment({ amount: amt, memo: "Order: " + name, metadata: { service: name } }, {
+                showMsg("Starting payment...");
+                await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
                     onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
                         await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: () => showMsg("Transaction Failed"),
-                    onCancel: () => showMsg("Payment Cancelled")
+                    onError: () => showMsg("Payment Failed"),
+                    onCancel: () => showMsg("Cancelled")
                 });
-            } catch (e) { showMsg("System Error"); }
+            } catch (e) { showMsg("Error"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("Please fill all fields");
+            if(!detail || !contact) return showMsg("Fill all fields");
             try {
-                showMsg("Recording your order...");
+                showMsg("Sending Request...");
                 await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: 'Order', contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'active' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
-            } catch (error) { showMsg("Error saving order"); }
+            } catch (error) { showMsg("Error sending request"); }
         }
 
         async function loadOrders() {
             try {
                 const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(4);
-                if (data && data.length > 0) {
+                if (data) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
                         <div class="order-item">
-                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.75rem; color:var(--pi-g);">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.7rem; color:var(--pi-g);">
                                 <span>${o.title}</span><span>${o.price} Pi</span>
                             </div>
-                            <div style="font-size:0.65rem; opacity:0.8; margin-top:4px;">User: ${o.user_pi || 'Anonymous'}</div>
+                            <div style="font-size:0.65rem; opacity:0.8; margin-top:3px;">User: ${o.user_pi || 'Guest'}</div>
                         </div>
                     `).join('');
                 }
             } catch (e) {}
-        }
-
-        // وظائف المدير
-        function openAdmin() { document.getElementById('adminPanel').style.display = 'block'; }
-
-        function checkAdmin() {
-            if(document.getElementById('adminPass').value === "ateya2026") {
-                document.getElementById('adminAuth').style.display = 'none';
-                document.getElementById('adminControls').style.display = 'block';
-                fetchAdminServices();
-            } else { alert("Incorrect Password"); }
-        }
-
-        async function fetchAdminServices() {
-            const { data } = await _supabase.from('services').select('*').neq('category', 'Order').order('id', { ascending: true });
-            const list = document.getElementById('servicesEditList');
-            list.innerHTML = data.map(s => `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #eee;">
-                    <div style="font-size:12px;">
-                        <i class="fas ${getIconFor(s.title)}" style="margin-right:5px; color:#4a148c;"></i>
-                        <b>${s.title}</b>
-                    </div>
-                    <div style="display:flex; gap:5px;">
-                        <input type="number" step="0.1" id="price-${s.id}" value="${s.price}" style="width:55px; padding:5px; margin:0; text-align:center;">
-                        <button onclick="saveNewPrice(${s.id})" style="background:#27ae60; color:white; border:none; padding:6px; border-radius:5px; cursor:pointer;">Update</button>
-                        <button onclick="deleteService(${s.id})" style="background:#e74c3c; color:white; border:none; padding:6px; border-radius:5px; cursor:pointer;">X</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function addNewService() {
-            const t = document.getElementById('addTitle').value;
-            const p = document.getElementById('addPrice').value;
-            if(!t || !p) return alert("Please enter name and price");
-            const { error } = await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            if(!error) { 
-                alert("New Service Added Successfully!"); 
-                document.getElementById('addTitle').value = "";
-                document.getElementById('addPrice').value = "";
-                fetchAdminServices(); 
-                loadServices(); 
-            }
-        }
-
-        async function saveNewPrice(id) {
-            const p = document.getElementById('price-'+id).value;
-            const { error } = await _supabase.from('services').update({ price: p }).eq('id', id);
-            if(!error) { alert("Price updated!"); fetchAdminServices(); loadServices(); }
-        }
-
-        async function deleteService(id) {
-            if(confirm("Are you sure you want to remove this service from the website?")) {
-                const { error } = await _supabase.from('services').delete().eq('id', id);
-                if(!error) { fetchAdminServices(); loadServices(); }
-            }
         }
 
         window.onload = () => { loadServices(); loadOrders(); };
