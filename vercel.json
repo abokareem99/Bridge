@@ -7,8 +7,8 @@
       "destination": "/api/payment-handler.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/admin",
+      "destination": "/admin.html"
     }
   ]
 }
