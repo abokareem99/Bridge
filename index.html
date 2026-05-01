@@ -78,7 +78,7 @@
             border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g);
         }
 
-        footer { padding: 10px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); }
+        footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); position: relative; }
         .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; }
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; margin-top: 4px; }
@@ -96,6 +96,18 @@
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
         
         textarea, input { width: 100%; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; border: 1px solid #ddd; }
+        
+        /* المنطقة السرية للمدير - شفافة في الركن السفلي */
+        .admin-trigger {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.02); /* شفافة جداً */
+        }
     </style>
 </head>
 <body>
@@ -106,8 +118,7 @@
         <button id="authBtn" class="btn-auth" onclick="startApp()">Login via Pi Network</button>
     </section>
 
-    <section class="categories" id="servicesContainer">
-        </section>
+    <section class="categories" id="servicesContainer"></section>
 
     <section class="orders-section">
         <div class="section-title">📦 Recent Orders</div>
@@ -120,7 +131,25 @@
             <a href="#" onclick="alert('Terms of Use: Use this platform for legal services.')">Terms of Use</a>
         </div>
         <p class="copy-text">&copy; 2026 Bridge Freelance. All rights reserved.</p>
+        
+        <div class="admin-trigger" onclick="openAdmin()"></div>
     </footer>
+
+    <div id="adminPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; overflow-y:auto; padding:20px; color:white;">
+        <div style="max-width:400px; margin:auto; background:#fff; color:#333; padding:20px; border-radius:15px; margin-top:50px;">
+            <h2 style="text-align:center; color:#4a148c; margin-bottom:15px;">Admin Control 🛠️</h2>
+            <div id="adminAuth">
+                <input type="password" id="adminPass" placeholder="Password" style="margin-bottom:10px;">
+                <button onclick="checkAdmin()" style="width:100%; padding:12px; background:#4a148c; color:#ffb74d; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Login</button>
+            </div>
+            
+            <div id="adminControls" style="display:none;">
+                <h4 style="margin-bottom:10px;">Edit Service Prices:</h4>
+                <div id="servicesEditList" style="max-height:300px; overflow-y:auto; border:1px solid #eee; padding:10px; border-radius:8px;"></div>
+                <button onclick="document.getElementById('adminPanel').style.display='none'" style="width:100%; margin-top:15px; padding:10px; background:#ddd; border:none; border-radius:8px; cursor:pointer;">Close</button>
+            </div>
+        </div>
+    </div>
 
     <div id="reqModal" class="modal">
         <div class="modal-content">
@@ -167,16 +196,18 @@
         async function loadServices() {
             const container = document.getElementById('servicesContainer');
             try {
-                // تعديل ذكي: سيجلب الخدمات التي تحتوي على active سواء بعلامات تنصيص أو بدونها
                 const { data } = await _supabase.from('services').select('*');
-                
-                // تصفية النتائج برمجياً لضمان الدقة
-                const activeOnes = data.filter(s => s.status.includes('active'));
+                // جلب الخدمات المفعلة فقط
+                const activeOnes = data.filter(s => s.status && s.status.includes('active'));
 
                 if (activeOnes.length > 0) {
                     container.innerHTML = activeOnes.map(s => {
-                        let icon = s.title.includes('Design') ? 'fa-palette' : 
-                                   s.title.includes('Program') ? 'fa-code' : 'fa-briefcase';
+                        let icon = 'fa-briefcase';
+                        if(s.title.includes('Program')) icon = 'fa-code';
+                        if(s.title.includes('Design')) icon = 'fa-palette';
+                        if(s.title.includes('Market')) icon = 'fa-bullhorn';
+                        if(s.title.includes('Translation')) icon = 'fa-language';
+
                         return `
                             <div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
                                 <i class="fas ${icon}"></i>
@@ -186,7 +217,7 @@
                         `;
                     }).join('');
                 } else {
-                    container.innerHTML = "<p style='grid-column:1/3; font-size:0.7rem; opacity:0.5;'>Setup services in Supabase first.</p>";
+                    container.innerHTML = "<p style='grid-column:1/3; font-size:0.7rem; opacity:0.5;'>Loading services...</p>";
                 }
             } catch (e) { console.log(e); }
         }
@@ -224,8 +255,9 @@
 
         async function loadOrders() {
             try {
-                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
-                if (data) {
+                // جلب الطلبات الأخيرة فقط (التي تصنيفها Order)
+                const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(4);
+                if (data && data.length > 0) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
                         <div class="order-item">
                             <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.7rem; color:var(--pi-g);">
@@ -237,58 +269,39 @@
                 }
             } catch (e) {}
         }
+
+        // دوال لوحة التحكم
+        function openAdmin() { document.getElementById('adminPanel').style.display = 'block'; }
+
+        function checkAdmin() {
+            if(document.getElementById('adminPass').value === "ateya2026") {
+                document.getElementById('adminAuth').style.display = 'none';
+                document.getElementById('adminControls').style.display = 'block';
+                fetchAdminServices();
+            } else { alert("Access Denied"); }
+        }
+
+        async function fetchAdminServices() {
+            const { data } = await _supabase.from('services').select('*').neq('category', 'Order').order('id', { ascending: true });
+            const list = document.getElementById('servicesEditList');
+            list.innerHTML = data.map(s => `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:13px; font-weight:bold;">${s.title}</span>
+                    <div style="display:flex; gap:8px;">
+                        <input type="number" step="0.1" id="price-${s.id}" value="${s.price}" style="width:60px; text-align:center; margin:0; padding:4px;">
+                        <button onclick="saveNewPrice(${s.id})" style="background:#2ecc71; color:white; border:none; padding:5px 10px; border-radius:5px; font-size:11px; cursor:pointer;">Update</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function saveNewPrice(id) {
+            const p = document.getElementById('price-'+id).value;
+            const { error } = await _supabase.from('services').update({ price: p }).eq('id', id);
+            if(!error) { alert("Price Updated! ✅"); fetchAdminServices(); loadServices(); }
+        }
+
         window.onload = () => { loadServices(); loadOrders(); };
     </script>
-    <div onclick="openAdmin()" style="position:fixed; bottom:0; left:0; width:20px; height:20px; cursor:pointer; z-index:9999; opacity:0.05;">.</div>
-
-<div id="adminPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; overflow-y:auto; padding:20px; color:white; font-family:sans-serif;">
-    <div style="max-width:400px; margin:auto; background:#fff; color:#333; padding:20px; border-radius:15px; margin-top:50px;">
-        <h2 style="text-align:center; color:#4a148c;">إدارة Bridge Freelance 🛠️</h2>
-        <div id="adminAuth">
-            <input type="password" id="adminPass" placeholder="كلمة المرور" style="width:95%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
-            <button onclick="checkAdmin()" style="width:100%; padding:10px; background:#ffb74d; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">دخول للمدير</button>
-        </div>
-        
-        <div id="adminControls" style="display:none;">
-            <h4 style="margin-bottom:5px;">تعديل الأسعار الحالية:</h4>
-            <div id="servicesEditList" style="max-height:300px; overflow-y:auto; border:1px solid #eee; padding:10px; border-radius:8px;"></div>
-            <button onclick="document.getElementById('adminPanel').style.display='none'" style="width:100%; margin-top:15px; padding:10px; background:#ddd; border:none; border-radius:8px; cursor:pointer;">إغلاق</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // تفتيح لوحة التحكم عند الضغط على الزاوية السفلى اليسرى
-    function openAdmin() { document.getElementById('adminPanel').style.display = 'block'; }
-
-    function checkAdmin() {
-        if(document.getElementById('adminPass').value === "ateya2026") {
-            document.getElementById('adminAuth').style.display = 'none';
-            document.getElementById('adminControls').style.display = 'block';
-            fetchAdminServices();
-        } else { alert("كلمة السر خاطئة!"); }
-    }
-
-    async function fetchAdminServices() {
-        const { data } = await _supabase.from('services').select('*').order('id', { ascending: true });
-        const list = document.getElementById('servicesEditList');
-        list.innerHTML = data.map(s => `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:5px; border-bottom:1px solid #f0f0f0;">
-                <span style="font-size:12px;">${s.title}</span>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" step="0.1" id="price-${s.id}" value="${s.price}" style="width:50px; text-align:center;">
-                    <button onclick="saveNewPrice(${s.id})" style="background:#4caf50; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">تحديث</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    async function saveNewPrice(id) {
-        const p = document.getElementById('price-'+id).value;
-        const { error } = await _supabase.from('services').update({ price: p }).eq('id', id);
-        if(!error) { alert("تم تحديث السعر بنجاح! ✅"); fetchAdminServices(); }
-    }
-</script>
-
 </body>
 </html>
