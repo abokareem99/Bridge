@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Freelance - Official</title>
+    <title>Bridge Freelance - Order Services</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,143 +11,113 @@
         :root { 
             --pi-purple: #311b92; 
             --pi-gold: #ffb300; 
-            --card-glass: rgba(255, 255, 255, 0.08);
-            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.08);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: var(--pi-purple); color: var(--white); text-align: center; padding-bottom: 110px; min-height: 100vh; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--pi-purple); color: white; text-align: center; padding-bottom: 50px; }
 
-        /* Title Section */
-        header { padding: 45px 20px; }
-        .logo-text { color: var(--pi-gold); font-size: 2.4rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 15px; }
-        .user-badge { 
-            background: var(--pi-gold); color: var(--pi-purple); display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 22px; border-radius: 30px; font-weight: 800; font-size: 0.9rem; border: none; cursor: pointer;
-        }
-
-        /* Top Grid Categories */
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 20px; max-width: 480px; margin: 0 auto; }
-        .category-card { 
-            background: var(--pi-gold); border-radius: 24px; padding: 25px 15px; color: var(--pi-purple);
-            cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .category-card:active { transform: scale(0.96); }
-        .category-card i { font-size: 1.8rem; margin-bottom: 12px; display: block; }
-        .category-card h3 { font-size: 1rem; margin-bottom: 12px; font-weight: 700; }
-        .price-badge { background: var(--pi-purple); color: var(--white); padding: 5px 15px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; }
-
-        /* Recent Services Section - Focus on Yellow Icons */
-        .recent-section { margin-top: 40px; padding: 0 20px; max-width: 480px; margin-left: auto; margin-right: auto; text-align: left; }
-        .section-header { color: var(--pi-gold); font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; justify-content: center; }
-
-        .order-row { 
-            background: var(--card-glass); border-radius: 18px; padding: 15px; margin-bottom: 12px;
-            display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05);
-        }
+        header { padding: 40px 20px; }
+        .logo { color: var(--pi-gold); font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
         
-        /* The specific Bright Yellow Icon Box you requested */
-        .yellow-icon-container { 
-            width: 48px; height: 48px; background: var(--pi-gold); color: var(--pi-purple); 
-            border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; margin-right: 15px; flex-shrink: 0;
+        .status-badge { 
+            background: var(--pi-gold); color: var(--pi-purple); padding: 8px 20px; 
+            border-radius: 20px; font-weight: bold; display: inline-block; font-size: 0.9rem;
         }
 
-        .order-content { flex: 1; }
-        .order-content h4 { font-size: 1rem; color: var(--pi-gold); font-weight: 700; }
-        .order-content p { font-size: 0.75rem; opacity: 0.7; margin-top: 2px; }
-
-        .order-value { font-weight: 900; color: var(--pi-gold); font-size: 1rem; border-left: 1px solid rgba(255,179,0,0.3); padding-left: 12px; }
-
-        /* Global Footer Action Button */
-        .publish-fab { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            background: var(--white); color: var(--pi-purple); padding: 18px 0; 
-            border-radius: 50px; font-weight: 900; width: 88%; max-width: 400px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4); border: none; font-size: 1rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+        /* Order Cards Grid */
+        .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
+        .order-card { 
+            background: var(--pi-gold); border-radius: 20px; padding: 25px 15px; color: var(--pi-purple);
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none;
         }
+        .order-card i { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .order-card h3 { font-size: 1rem; margin-bottom: 12px; font-weight: 800; }
+        .price-label { background: var(--pi-purple); color: white; padding: 4px 12px; border-radius: 10px; font-weight: 900; font-size: 0.8rem; }
+
+        /* Recent Orders Section - GOLD ICONS */
+        .recent-orders { margin-top: 30px; padding: 0 20px; max-width: 500px; margin: 0 auto; text-align: left; }
+        .section-title { color: var(--pi-gold); font-weight: bold; margin-bottom: 20px; text-align: center; font-size: 1.1rem; }
+
+        .order-history-item { 
+            background: var(--glass); border-radius: 15px; padding: 15px; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        /* The Bright Yellow Icon Box */
+        .gold-icon-box { 
+            width: 45px; height: 45px; background: var(--pi-gold); color: var(--pi-purple); 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-right: 15px;
+        }
+
+        .order-details { flex: 1; }
+        .order-details h4 { font-size: 0.95rem; color: var(--pi-gold); font-weight: bold; }
+        .order-details p { font-size: 0.75rem; opacity: 0.6; }
+
+        .order-pi { font-weight: 900; color: var(--pi-gold); font-size: 0.9rem; }
+
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-gold); color: var(--pi-purple); padding: 12px 30px; border-radius: 50px; font-weight: bold; display: none; z-index: 9999; }
     </style>
 </head>
 <body>
 
+    <div id="toast"></div>
+
     <header>
-        <h1 class="logo-text">Bridge Freelance</h1>
-        <button class="user-badge" id="authButton" onclick="handleLogin()">
-            <i class="fas fa-user-check"></i> Verify Identity
-        </button>
+        <h1 class="logo">Bridge Freelance</h1>
+        <div class="status-badge" id="userBadge">Verify Pi Identity ✅</div>
     </header>
 
-    <div class="services-grid">
-        <div class="category-card">
+    <div class="order-grid">
+        <div class="order-card" onclick="processOrder(1.0, 'Programming')">
             <i class="fas fa-code"></i>
             <h3>Programming</h3>
-            <span class="price-badge">1.0 Pi</span>
+            <span class="price-label">1.0 Pi</span>
         </div>
-        <div class="category-card">
+        <div class="order-card" onclick="processOrder(0.8, 'Design')">
             <i class="fas fa-palette"></i>
             <h3>Design</h3>
-            <span class="price-badge">0.8 Pi</span>
+            <span class="price-label">0.8 Pi</span>
         </div>
     </div>
 
-    <div class="recent-section">
-        <div class="section-header">
-            <i class="fas fa-bolt"></i> Recent Services
-        </div>
-        <div id="services-list">
+    <div class="recent-orders">
+        <div class="section-title">📦 Recent Orders</div>
+        <div id="ordersList">
             </div>
     </div>
 
-    <button class="publish-fab">
-        <i class="fas fa-plus-circle"></i> Post Service (0.1 Pi)
-    </button>
-
     <script>
-        // Supabase Configuration
-        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-        const _db = supabase.createClient(supabaseUrl, supabaseKey);
+        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
 
-        async function getServices() {
-            const { data, error } = await _db.from('services').select('*').order('id', { ascending: false });
+        function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
+
+        async function processOrder(amount, service) {
+            showMsg("Processing " + service + " order...");
+            // Pi Payment logic would trigger here
+        }
+
+        async function loadHistory() {
+            const { data } = await _supabase.from('services').select('*').limit(5).order('id', { ascending: false });
             if (data) {
-                const list = document.getElementById('services-list');
-                list.innerHTML = data.map(doc => `
-                    <div class="order-row">
+                document.getElementById('ordersList').innerHTML = data.map(o => `
+                    <div class="order-history-item">
                         <div style="display: flex; align-items: center;">
-                            <div class="yellow-icon-container">
-                                <i class="fas ${getIcon(doc.title)}"></i>
+                            <div class="gold-icon-box">
+                                <i class="fas ${o.title.toLowerCase().includes('design') ? 'fa-palette' : 'fa-code'}"></i>
                             </div>
-                            <div class="order-content">
-                                <h4>${doc.title}</h4>
-                                <p>Freelancer: ${doc.user_pi || 'Ateya'}</p>
+                            <div class="order-details">
+                                <h4>${o.title}</h4>
+                                <p>Requested by: ${o.user_pi || 'User'}</p>
                             </div>
                         </div>
-                        <div class="order-value">0.1</div>
+                        <div class="order-pi">Pi ${o.id % 2 === 0 ? '1.0' : '0.8'}</div>
                     </div>
                 `).join('');
             }
         }
 
-        function getIcon(title) {
-            const t = title.toLowerCase();
-            if(t.includes('code') || t.includes('prog')) return 'fa-code';
-            if(t.includes('design')) return 'fa-palette';
-            if(t.includes('translate')) return 'fa-language';
-            return 'fa-briefcase';
-        }
-
-        async function handleLogin() {
-            try {
-                await window.Pi.init({ version: "2.0", sandbox: true });
-                const auth = await window.Pi.authenticate(['username', 'payments'], (onIncomplete)=>{});
-                document.getElementById('authButton').innerHTML = `<i class="fas fa-check-circle"></i> ${auth.user.username}`;
-            } catch (err) {
-                console.error("Pi Login Error");
-            }
-        }
-
-        window.onload = getServices;
+        window.onload = loadHistory;
     </script>
 </body>
 </html>
