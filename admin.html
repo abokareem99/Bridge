@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم Bridge Freelance</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; background: #4a148c; color: white; padding: 20px; text-align: center; }
+        .container { max-width: 500px; margin: 0 auto; background: white; color: #333; padding: 20px; border-radius: 15px; }
+        input, select { width: 90%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
+        button { background: #ffb74d; color: #4a148c; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 95%; }
+        .service-item { border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-delete { background: #ff5252; color: white; padding: 5px 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <h2>لوحة تحكم المدير 🛠️</h2>
+    
+    <div class="container" id="loginBox">
+        <h3>تسجيل الدخول</h3>
+        <input type="password" id="adminPass" placeholder="أدخل كلمة المرور">
+        <button onclick="checkPass()">دخول</button>
+    </div>
+
+    <div class="container" id="adminContent" style="display:none;">
+        <h3>إضافة خدمة جديدة</h3>
+        <input type="text" id="title" placeholder="اسم الخدمة (مثلاً: ترجمة)">
+        <input type="number" step="0.1" id="price" placeholder="السعر بـ Pi">
+        <button onclick="addService()">إضافة الخدمة فوراً</button>
+        
+        <hr>
+        <h3>الخدمات الحالية</h3>
+        <div id="servicesList"></div>
+    </div>
+
+    <script>
+        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
+
+        function checkPass() {
+            if(document.getElementById('adminPass').value === "ateya2026") {
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadAdminServices();
+            } else {
+                alert("كلمة مرور خاطئة");
+            }
+        }
+
+        async function loadAdminServices() {
+            const { data } = await _supabase.from('services').select('*');
+            const list = document.getElementById('servicesList');
+            list.innerHTML = data.map(s => `
+                <div class="service-item">
+                    <span>${s.title} (${s.price} Pi)</span>
+                    <button class="btn-delete" onclick="deleteService(${s.id})">حذف</button>
+                </div>
+            `).join('');
+        }
+
+        async function addService() {
+            const t = document.getElementById('title').value;
+            const p = document.getElementById('price').value;
+            await _supabase.from('services').insert([{ title: t, price: p, status: 'active' }]);
+            alert("تمت الإضافة");
+            loadAdminServices();
+        }
+
+        async function deleteService(id) {
+            if(confirm("هل أنت متأكد من الحذف؟")) {
+                await _supabase.from('services').delete().eq('id', id);
+                loadAdminServices();
+            }
+        }
+    </script>
+</body>
+</html>
