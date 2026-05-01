@@ -12,152 +12,197 @@
         (function() { emailjs.init("aRCAx1NwvATaC4F-m"); })();
     </script>
     <style>
-        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--pi-d); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-        .hero { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 5px; font-weight: 800; }
-        .welcome-msg { font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; font-weight: bold; border: 2px solid var(--pi-g); }
-        .btn-auth { background: #2ecc71; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .categories { padding: 15px; max-width: 450px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-        .cat-card { background: var(--pi-g); padding: 12px 5px; border-radius: 18px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.1rem; margin: 0 auto 8px; }
-        .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px; }
-        .price-badge { font-size: 0.75rem; color: #fff; font-weight: bold; background: var(--pi-d); padding: 2px 8px; border-radius: 5px; }
-        .orders-section { padding: 10px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
-        .section-title { color: var(--pi-g); margin-bottom: 10px; text-align: center; font-size: 0.95rem; font-weight: bold; }
-        .order-item { background: var(--pi-g); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-right: 4px solid var(--pi-d); color: var(--pi-d); }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: var(--pi-g); width: 90%; max-width: 380px; padding: 25px 20px; border-radius: 20px; text-align: right; color: var(--pi-d); }
-        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--pi-d); color: var(--pi-g); padding: 10px 25px; border-radius: 30px; display: none; z-index: 5000; font-size: 0.85rem; font-weight: bold; border: 2px solid var(--pi-g); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
-        textarea, input { background: rgba(255,255,255,0.3); border: 1px solid var(--pi-d); color: var(--pi-d); font-weight: bold; width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; }
+        :root { 
+            --pi-p: #6a1b9a;
+            --pi-d: #4a148c; /* لون باي الغامق */
+            --pi-g: #ffb74d; /* اللون الأصفر */
+            --white: #ffffff;
+        }
+        * [span_4](start_span){ margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;[span_4](end_span) }
         
-        /* تصميم أيقونة النشر الجديدة */
-        .publish-btn { position: fixed; bottom: 20px; right: 20px; background: #2ecc71; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 3000; cursor: pointer; border: 2px solid white; }
+        [span_5](start_span)body { background-color: var(--pi-d); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;[span_5](end_span) }
+        
+        /* تحسين الهيرو */
+        [span_6](start_span).hero { padding: 30px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);[span_6](end_span) }
+        [span_7](start_span).hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 8px; font-weight: 800;[span_7](end_span) }
+        
+        [span_8](start_span).welcome-msg { font-size: 0.9rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 6px 18px; border-radius: 25px; margin-bottom: 12px; font-weight: bold; border: 2px solid var(--pi-g);[span_8](end_span) }
+        
+        [span_9](start_span).btn-auth { background: #2ecc71; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.3s;[span_9](end_span) }
+        .btn-auth:active { transform: scale(0.95); }
+
+        /* تحسين شبكة البطاقات */
+        [span_10](start_span).categories { padding: 20px 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;[span_10](end_span) }
+        
+        .cat-card { 
+            background: var(--white); 
+            padding: 20px 10px; 
+            border-radius: 24px; 
+            text-align: center; 
+            cursor: pointer; 
+            color: var(--pi-d); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
+            transition: transform 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .cat-card:active { transform: scale(0.95); border-color: var(--pi-g); }
+        
+        .cat-card i { 
+            color: var(--pi-g); 
+            background: var(--pi-d); 
+            width: 45px; 
+            height: 45px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 14px; 
+            font-size: 1.3rem; 
+            margin: 0 auto 12px;
+            [span_11](start_span)
+        }
+        
+        .cat-card span { font-weight: 800; font-size: 0.95rem; display: block; margin-bottom: 8px;[span_11](end_span) }
+        
+        .price-badge { 
+            font-size: 0.8rem; 
+            color: var(--pi-d); 
+            font-weight: bold; 
+            background: rgba(255, 183, 77, 0.2); 
+            padding: 4px 12px; 
+            border-radius: 10px; 
+            border: 1px solid var(--pi-g);
+            [span_12](start_span)
+        }
+        
+        /* تحسين الطلبات */
+        .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%;[span_12](end_span) }
+        [span_13](start_span).section-title { color: var(--pi-g); margin-bottom: 15px; text-align: center; font-size: 1.1rem; font-weight: bold;[span_13](end_span) }
+        
+        .order-item { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 12px; 
+            border-radius: 15px; 
+            margin-bottom: 10px; 
+            border-right: 4px solid var(--pi-g); 
+            color: white; 
+            backdrop-filter: blur(5px);
+        }
+
+        [span_14](start_span).modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000;[span_14](end_span) }
+        [span_15](start_span).modal-content { background: var(--white); width: 90%; max-width: 380px; padding: 25px 20px; border-radius: 25px; text-align: right; color: var(--pi-d); box-shadow: 0 10px 30px rgba(0,0,0,0.5);[span_15](end_span) }
+        
+        #toast { 
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
+            background: var(--pi-d); color: var(--pi-g); padding: 12px 25px;
+            border-radius: 30px; display: none; z-index: 5000; font-size: 0.9rem; 
+            font-weight: bold; border: 2px solid var(--pi-g); box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            [span_16](start_span)
+        }
+        
+        textarea, input { background: #f8f9fa; border: 1px solid #ddd; color: var(--pi-d); font-weight: 600; width: 100%; padding: 12px; border-radius: 10px; margin-top: 10px;[span_16](end_span) }
     </style>
 </head>
 <body>
     <section class="hero">
         <h1 class="hero-title">جسر التواصل</h1>
-        <div class="welcome-msg">مرحباً بك في منصة abokareem 🌐</div>
-        <p style="font-size: 0.75rem; margin-bottom: 12px; color: var(--pi-g); opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network</button>
+        [span_17](start_span)<div class="welcome-msg">مرحباً بك في منصة abokareem 🌐[span_17](end_span)</div>
+        <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--pi-g); opacity: 0.9;">بوابتك لخدمات العمل الحر عبر Pi Network</p>
+        [span_18](start_span)<button id="authBtn" class="btn-auth" onclick="startApp()">دخول عبر Pi Network[span_18](end_span)</button>
     </section>
 
-    <section class="categories" id="mainMarket">
-        </section>
+    <section class="categories">
+        <div class="cat-card" onclick="processPayment(1.0, 'Programming')">
+            <i class="fas fa-laptop-code"></i><span>البرمجة</span><span class="price-badge">1.0 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.8, 'Design')">
+            <i class="fas fa-wand-magic-sparkles"></i><span>التصميم</span><span class="price-badge">0.8 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.7, 'Marketing')">
+            <i class="fas fa-chart-line"></i><span>التسويق</span><span class="price-badge">0.7 Pi</span>
+        </div>
+        <div class="cat-card" onclick="processPayment(0.5, 'Translation')">
+            <i class="fas fa-language"></i><span>الترجمة</span><span class="price-badge">0.5 Pi</span>
+        </div>
+    </section>
 
     <section class="orders-section">
-        <div class="section-title">📦 الطلبات الأخيرة</div>
+        [span_19](start_span)<div class="section-title">📦 الطلبات الأخيرة[span_19](end_span)</div>
         <div id="ordersList"></div>
     </section>
 
-    <div class="publish-btn" onclick="openPublishModal()">
-        <i class="fas fa-plus"></i>
-    </div>
-
-    <div id="publishModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; margin-bottom:15px;">نشر خدمة جديدة 🚀</h3>
-            <input type="text" id="pTitle" placeholder="عنوان الخدمة (مثال: تصميم شعار)">
-            <input type="number" id="pPrice" placeholder="السعر بـ Pi">
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:8px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitNewService()">نشر الخدمة الآن</button>
-            <button style="width:100%; background:none; color:var(--pi-d); border:none; margin-top:10px; font-size:0.8rem;" onclick="closePublishModal()">إلغاء</button>
-        </div>
-    </div>
-
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center; margin-bottom:10px;">اكتمل الدفع! 🎉</h2>
+            <h2 style="text-align:center; margin-bottom:15px;">اكتمل الدفع! [span_20](start_span)🎉</h2>
             <textarea id="orderDetail" rows="3" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
             <input type="email" id="contactInfo" placeholder="بريدك الإلكتروني">
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:8px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب</button>
+            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:14px; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">إرسال الطلب[span_20](end_span)</button>
         </div>
     </div>
+
+    <footer style="text-align: center; padding: 30px;">
+        <div style="display: flex; justify-content: center; gap: 20px; font-size: 0.85rem;">
+            [span_21](start_span)<a href="#" style="color: var(--pi-g); text-decoration: none;">الخصوصية[span_21](end_span)</a>
+            [span_22](start_span)<a href="#" style="color: var(--pi-g); text-decoration: none;">الشروط[span_22](end_span)</a>
+        </div>
+    </footer>
 
     <div id="toast"></div>
 
     <script>
         const toast = document.getElementById('toast');
         let currentTxId = "", currentPrice = 0, currentCategory = "";
-        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
+        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function showMsg(m) { 
-            toast.innerText = m; toast.style.display = 'block'; 
+        [span_23](start_span)function showMsg(m) {[span_23](end_span)
+            toast.innerText = m; 
+            toast.style.display = 'block'; 
             setTimeout(() => toast.style.display='none', 3000); 
         }
 
         async function startApp() {
             try {
                 showMsg("جاري الاتصال...");
-                await window.Pi.init({ version: "2.0", sandbox: true });
+                [span_24](start_span)await window.Pi.init({ version: "2.0", sandbox: true });[span_24](end_span)
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                window.currentUser = auth.user.username;
+                [span_25](start_span)window.currentUser = auth.user.username;[span_25](end_span)
                 document.getElementById('authBtn').innerHTML = "تم التحقق ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
                 showMsg("مرحباً " + auth.user.username);
-                loadMarket();
-            } catch (e) { showMsg("فشل الدخول: تأكد من متصفح Pi"); }
+            } catch (e) { 
+                [span_26](start_span)showMsg("فشل الدخول: تأكد من متصفح Pi");[span_26](end_span)
+            }
         }
 
-        // دالة الدفع (كما هي في كودك الأصلي)
         async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول أولاً"); return; }
+            if(!window.currentUser) { showMsg("يرجى تسجيل الدخول أولاً"); return; [span_27](start_span)}
             currentPrice = amt; currentCategory = name;
             try {
                 showMsg("بدء عملية الدفع...");
-                await window.Pi.createPayment({
+                await window.Pi.createPayment({[span_27](end_span)
                     amount: amt, memo: "طلب خدمة: " + name, metadata: { service: name }
                 }, {
                     onReadyForServerApproval: (id) => {
                         return fetch('/api/payment-handler', { 
-                            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
                             body: JSON.stringify({ paymentId: id, action: 'approve' }) 
                         }).then(r => r.json());
                     },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
                         await fetch('/api/payment-handler', { 
-                            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
                             body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
-                        });
-                        document.getElementById('reqModal').style.display = 'flex';
-                        showMsg("تم الدفع بنجاح! أكمل بياناتك");
+                        [span_28](start_span)});[span_28](end_span)
+                        [span_29](start_span)document.getElementById('reqModal').style.display = 'flex';[span_29](end_span)
                     },
                     onError: (e) => showMsg("فشل الدفع"),
                     onCancel: () => showMsg("تم إلغاء الدفع")
                 });
             } catch (e) { showMsg("حدث خطأ"); }
-        }
-
-        // دوال النشر الجديدة
-        function openPublishModal() { document.getElementById('publishModal').style.display = 'flex'; }
-        function closePublishModal() { document.getElementById('publishModal').style.display = 'none'; }
-
-        async function submitNewService() {
-            const t = document.getElementById('pTitle').value;
-            const p = document.getElementById('pPrice').value;
-            if(!t || !p || !window.currentUser) return showMsg("أكمل البيانات وسجل دخولك");
-            try {
-                showMsg("جاري النشر...");
-                await _supabase.from('services').insert([{ title: t, price: p, user_pi: window.currentUser }]);
-                showMsg("تم نشر خدمتك بنجاح! 🎉");
-                closePublishModal();
-                loadMarket();
-            } catch (e) { showMsg("خطأ في النشر"); }
-        }
-
-        async function loadMarket() {
-            try {
-                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false });
-                if (data) {
-                    document.getElementById('mainMarket').innerHTML = data.map(i => `
-                        <div class="cat-card" onclick="processPayment(${i.price}, '${i.title}')">
-                            <i class="fas fa-briefcase"></i><span>${i.title}</span><span class="price-badge">Pi ${i.price}</span>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) {}
         }
 
         async function submitOrder() {
@@ -166,33 +211,35 @@
             if(!detail || !contact) return showMsg("يرجى إكمال البيانات");
             try {
                 showMsg("جاري حفظ الطلب...");
-                await _supabase.from('services').insert([{ 
+                [span_30](start_span)await _supabase.from('services').insert([{[span_30](end_span)
                     title: currentCategory, description: detail, price: String(currentPrice),
-                    contact_info: contact, user_pi: window.currentUser, txid: currentTxId
+                    category: currentCategory, contact_info: contact,
+                    user_pi: window.currentUser, txid: currentTxId
                 }]);
-                await emailjs.send("service_vuti648", "template_m6rq1ab", {
+                [span_31](start_span)await emailjs.send("service_vuti648", "template_m6rq1ab", {[span_31](end_span)
                     username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice
                 });
-                showMsg("تم الإرسال بنجاح! ✅");
+                showMsg("تم الإرسال بنجاح!");
                 setTimeout(() => location.reload(), 2000);
             } catch (error) { showMsg("خطأ في الاتصال"); }
         }
 
         async function loadOrders() {
             try {
-                const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
+                [span_32](start_span)const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);[span_32](end_span)
                 if (data) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
                         <div class="order-item">
-                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.8rem;">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--pi-g);">
                                 <span>${o.title}</span><span>${o.price} Pi</span>
                             </div>
+                            <div style="font-size:0.75rem; opacity:0.9; margin-top:5px;">${o.description ? o.description.substring(0, 50) : ''}...</div>
                         </div>
                     `).join('');
                 }
             } catch (e) {}
         }
-        window.onload = () => { loadMarket(); loadOrders(); };
+        window.onload = loadOrders;
     </script>
 </body>
 </html>
