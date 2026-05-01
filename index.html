@@ -70,7 +70,7 @@
             background: var(--pi-d); padding: 3px 10px; border-radius: 8px; 
         }
         
-        .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
         .section-title { color: var(--pi-g); margin-bottom: 12px; text-align: center; font-size: 1rem; font-weight: bold; }
         
         .order-item { 
@@ -78,8 +78,8 @@
             border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--pi-g);
         }
 
-        /* Footer Policy Styling */
-        footer { padding: 20px; text-align: center; border-top: 1px solid rgba(255,183,77,0.1); margin-top: 20px; }
+        /* Footer Policy - Removed extra spacing and flex growth */
+        footer { padding: 15px; text-align: center; border-top: 1px solid rgba(255,183,77,0.1); margin-top: 5px; }
         .policy-links { font-size: 0.75rem; color: var(--pi-g); display: flex; justify-content: center; gap: 20px; }
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; }
         .policy-links a:hover { opacity: 1; text-decoration: underline; }
@@ -137,7 +137,7 @@
             <a href="#" onclick="alert('Privacy Policy: We protect your Pi data.')">Privacy Policy</a>
             <a href="#" onclick="alert('Terms of Use: Use this platform for legal services.')">Terms of Use</a>
         </div>
-        <p style="font-size: 0.65rem; color: white; opacity: 0.5; margin-top: 10px;">&copy; 2026 Bridge Freelance. All rights reserved.</p>
+        <p style="font-size: 0.65rem; color: white; opacity: 0.5; margin-top: 5px;">&copy; 2026 Bridge Freelance. All rights reserved.</p>
     </footer>
 
     <div id="reqModal" class="modal">
@@ -152,7 +152,6 @@
     <div id="toast"></div>
 
     <script>
-        // All JavaScript logic remains untouched as requested
         const toast = document.getElementById('toast');
         let currentTxId = "", currentPrice = 0, currentCategory = "";
         
@@ -175,9 +174,7 @@
                 document.getElementById('authBtn').innerHTML = "Verified ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
                 showMsg("Welcome " + auth.user.username);
-            } catch (e) { 
-                showMsg("Login failed: Use Pi Browser");
-            }
+            } catch (e) { showMsg("Login failed: Use Pi Browser"); }
         }
 
         async function processPayment(amt, name) {
