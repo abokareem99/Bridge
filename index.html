@@ -44,10 +44,8 @@
             background: var(--pi-g); color: var(--pi-d); border: none; 
             padding: 10px 25px; border-radius: 50px; font-weight: bold; 
             cursor: pointer; font-size: 0.9rem; display: block; margin: 0 auto;
-            transition: 0.3s;
         }
 
-        /* حاوية الخدمات الديناميكية */
         .categories { 
             padding: 15px; max-width: 450px; margin: 0 auto; 
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -57,10 +55,7 @@
             background: var(--pi-g); padding: 15px 5px; border-radius: 18px; 
             text-align: center; cursor: pointer; color: var(--pi-d);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
         }
-
-        .cat-card:active { transform: scale(0.95); }
         
         .cat-card i { 
             color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px;
@@ -83,9 +78,7 @@
             border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g);
         }
 
-        .skeleton { background: rgba(255,255,255,0.05); height: 80px; border-radius: 18px; animate: pulse 1.5s infinite; }
-
-        footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); }
+        footer { padding: 10px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); }
         .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; }
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; margin-top: 4px; }
@@ -99,10 +92,10 @@
             background: var(--white); width: 90%; max-width: 350px; padding: 20px; 
             border-radius: 15px; text-align: left; color: var(--pi-d); 
         }
-        
+
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
         
-        textarea, input { width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; border: 1px solid #ddd; outline: none; }
+        textarea, input { width: 100%; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -114,9 +107,7 @@
     </section>
 
     <section class="categories" id="servicesContainer">
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-    </section>
+        </section>
 
     <section class="orders-section">
         <div class="section-title">📦 Recent Orders</div>
@@ -134,9 +125,8 @@
     <div id="reqModal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; font-size: 1.2rem; margin-bottom:10px; color: var(--pi-d)">Payment Complete! 🎉</h2>
-            <p id="selectedServiceLabel" style="font-size: 0.8rem; text-align: center; margin-bottom: 10px; color: #666;"></p>
-            <textarea id="orderDetail" rows="3" placeholder="Enter order details (e.g. your requirements)..."></textarea>
-            <input type="email" id="contactInfo" placeholder="Your Email Address">
+            <textarea id="orderDetail" rows="3" placeholder="Enter order details..."></textarea>
+            <input type="email" id="contactInfo" placeholder="Your Email">
             <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">Submit Order</button>
         </div>
     </div>
@@ -147,8 +137,7 @@
             <h2 style="color: var(--pi-d); margin-bottom: 10px;">Order Received!</h2>
             <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">
                 Thank you for choosing <b>Bridge Freelance</b>. <br>
-                Your request has been successfully sent to <b>abokareem</b>. <br>
-                Check your email for further instructions.
+                We will contact you via email shortly.
             </p>
             <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="location.reload()">Back to Home</button>
         </div>
@@ -175,44 +164,36 @@
             } catch (e) { showMsg("Login failed"); }
         }
 
-        // جلب الخدمات من Supabase
         async function loadServices() {
+            const container = document.getElementById('servicesContainer');
             try {
-                const { data: services, error } = await _supabase
-                    .from('services')
-                    .select('*')
-                    .eq('status', 'active');
+                // تعديل ذكي: سيجلب الخدمات التي تحتوي على active سواء بعلامات تنصيص أو بدونها
+                const { data } = await _supabase.from('services').select('*');
+                
+                // تصفية النتائج برمجياً لضمان الدقة
+                const activeOnes = data.filter(s => s.status.includes('active'));
 
-                const container = document.getElementById('servicesContainer');
-                container.innerHTML = '';
-
-                if (services && services.length > 0) {
-                    services.forEach(s => {
-                        // تعيين الأيقونات بناءً على اسم الخدمة (اختياري)
-                        let icon = 'fa-briefcase';
-                        if(s.title.includes('Program')) icon = 'fa-code';
-                        if(s.title.includes('Design')) icon = 'fa-palette';
-                        if(s.title.includes('Market')) icon = 'fa-bullhorn';
-
-                        container.innerHTML += `
+                if (activeOnes.length > 0) {
+                    container.innerHTML = activeOnes.map(s => {
+                        let icon = s.title.includes('Design') ? 'fa-palette' : 
+                                   s.title.includes('Program') ? 'fa-code' : 'fa-briefcase';
+                        return `
                             <div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
                                 <i class="fas ${icon}"></i>
                                 <span>${s.title}</span>
                                 <span class="price-badge">${s.price} Pi</span>
                             </div>
                         `;
-                    });
+                    }).join('');
                 } else {
-                    container.innerHTML = '<p style="grid-column: 1/3; font-size:0.7rem; opacity:0.5;">No active services available.</p>';
+                    container.innerHTML = "<p style='grid-column:1/3; font-size:0.7rem; opacity:0.5;'>Setup services in Supabase first.</p>";
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.log(e); }
         }
 
         async function processPayment(amt, name) {
             if(!window.currentUser) { showMsg("Please login first"); return; }
             currentPrice = amt; currentCategory = name;
-            document.getElementById('selectedServiceLabel').innerText = "Service: " + name;
-
             try {
                 showMsg("Starting payment...");
                 await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
@@ -234,20 +215,8 @@
             if(!detail || !contact) return showMsg("Fill all fields");
             try {
                 showMsg("Sending Request...");
-                // حفظ الطلب في جدول الطلبات (يفضل أن يكون له جدول منفصل مستقبلاً، حالياً يستخدم جدول خدماتك)
-                await _supabase.from('services').insert([{ 
-                    title: currentCategory, 
-                    description: detail, 
-                    price: String(currentPrice), 
-                    category: 'Order', 
-                    contact_info: contact, 
-                    user_pi: window.currentUser, 
-                    txid: currentTxId,
-                    status: 'active' 
-                }]);
-                
+                await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: 'Order', contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'active' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
-                
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
             } catch (error) { showMsg("Error sending request"); }
@@ -255,7 +224,6 @@
 
         async function loadOrders() {
             try {
-                // جلب الطلبات الأخيرة (نفلتر حسب الفئة 'Order' إذا كنت تستخدم نفس الجدول)
                 const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
                 if (data) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
@@ -263,17 +231,13 @@
                             <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.7rem; color:var(--pi-g);">
                                 <span>${o.title}</span><span>${o.price} Pi</span>
                             </div>
-                            <div style="font-size:0.65rem; opacity:0.8; margin-top:3px;">User: ${o.user_pi || 'Anonymous'}</div>
+                            <div style="font-size:0.65rem; opacity:0.8; margin-top:3px;">User: ${o.user_pi || 'Guest'}</div>
                         </div>
                     `).join('');
                 }
             } catch (e) {}
         }
-
-        window.onload = () => {
-            loadServices();
-            loadOrders();
-        };
+        window.onload = () => { loadServices(); loadOrders(); };
     </script>
 </body>
 </html>
