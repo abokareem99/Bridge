@@ -27,80 +27,80 @@
         body { 
             background-color: var(--pi-d); 
             min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden; 
             color: var(--white);
+            display: block; /* الغاء الفليكس لتسهيل رفع العناصر */
         }
         
-        .hero { padding: 30px 15px; text-align: center; border-bottom: 1px solid rgba(255,183,77,0.1); }
-        .hero-title { font-size: 2rem; color: var(--pi-g); margin-bottom: 10px; font-weight: 800; }
+        .hero { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,183,77,0.1); }
+        .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 8px; font-weight: 800; }
         
         .welcome-msg { 
-            font-size: 0.85rem; background: var(--pi-g); color: var(--pi-d); 
-            display: inline-block; padding: 8px 20px; border-radius: 25px; 
-            margin-bottom: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(255,183,77,0.3);
+            font-size: 0.75rem; background: var(--pi-g); color: var(--pi-d); 
+            display: inline-block; padding: 6px 15px; border-radius: 20px; 
+            margin-bottom: 10px; font-weight: bold;
         }
         
         .btn-auth { 
             background: var(--pi-g); color: var(--pi-d); border: none; 
-            padding: 12px 30px; border-radius: 50px; font-weight: bold; 
-            cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(255,183,77,0.3);
+            padding: 10px 25px; border-radius: 50px; font-weight: bold; 
+            cursor: pointer; font-size: 0.9rem; display: block; margin: 0 auto;
         }
 
         .categories { 
-            padding: 20px 15px; max-width: 450px; margin: 0 auto; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; 
+            padding: 15px; max-width: 450px; margin: 0 auto; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
         }
         
         .cat-card { 
-            background: var(--pi-g); padding: 15px 5px; border-radius: 20px; 
-            text-align: center; cursor: pointer; color: var(--pi-d); font-weight: bold;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3); transition: 0.2s;
+            background: var(--pi-g); padding: 12px 5px; border-radius: 18px; 
+            text-align: center; cursor: pointer; color: var(--pi-d);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
+        /* تصغير الكتابة داخل الأيقونات للنصف كما طلبت */
         .cat-card i { 
-            color: var(--pi-g); background: var(--pi-d); width: 40px; height: 40px;
+            color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px;
             display: flex; align-items: center; justify-content: center; 
-            border-radius: 12px; font-size: 1.2rem; margin: 0 auto 10px;
+            border-radius: 10px; font-size: 1rem; margin: 0 auto 8px;
         }
+        
+        .cat-card span { font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 4px; }
         
         .price-badge { 
-            font-size: 0.8rem; color: #fff; font-weight: bold; 
-            background: var(--pi-d); padding: 3px 10px; border-radius: 8px; 
+            font-size: 0.65rem; color: #fff; font-weight: bold; 
+            background: var(--pi-d); padding: 2px 8px; border-radius: 6px; 
         }
         
-        .orders-section { padding: 20px 15px; max-width: 450px; margin: 0 auto; width: 100%; }
-        .section-title { color: var(--pi-g); margin-bottom: 12px; text-align: center; font-size: 1rem; font-weight: bold; }
+        .orders-section { padding: 15px; max-width: 450px; margin: 0 auto; }
+        .section-title { color: var(--pi-g); margin-bottom: 10px; text-align: center; font-size: 0.9rem; font-weight: bold; }
         
         .order-item { 
-            background: rgba(255, 255, 255, 0.1); padding: 12px; 
-            border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--pi-g);
+            background: rgba(255, 255, 255, 0.1); padding: 10px; 
+            border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g);
         }
 
-        /* Footer Policy - Removed extra spacing and flex growth */
-        footer { padding: 15px; text-align: center; border-top: 1px solid rgba(255,183,77,0.1); margin-top: 5px; }
-        .policy-links { font-size: 0.75rem; color: var(--pi-g); display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; }
-        .policy-links a:hover { opacity: 1; text-decoration: underline; }
+        /* رفع شروط الاستخدام والخصوصية للأعلى */
+        footer { 
+            padding: 10px 0; 
+            text-align: center; 
+            margin-top: 0; /* الغاء الفراغ العلوي */
+            border-top: 1px solid rgba(255,183,77,0.05);
+        }
+        .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; }
+        .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; }
+        
+        .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; margin-top: 4px; }
 
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); display: none; align-items: center; 
             justify-content: center; z-index: 4000; 
         }
-        .modal-content { 
-            background: var(--white); width: 90%; max-width: 380px; padding: 25px; 
-            border-radius: 20px; text-align: left; color: var(--pi-d);
-        }
+        .modal-content { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; text-align: left; color: var(--pi-d); }
         
-        #toast { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            background: var(--pi-g); color: var(--pi-d); padding: 12px 25px;
-            border-radius: 30px; display: none; z-index: 5000; font-size: 0.9rem; font-weight: bold;
-        }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
         
-        textarea, input { width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; font-weight: bold; border: 1px solid #ddd; }
+        textarea, input { width: 100%; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -108,7 +108,6 @@
     <section class="hero">
         <h1 class="hero-title">Bridge Freelance</h1>
         <div class="welcome-msg">Welcome to abokareem Platform 🌐</div>
-        <p style="font-size: 0.8rem; color: var(--pi-g); margin-bottom: 15px;">Your Gateway to Freelance Services via Pi Network</p>
         <button id="authBtn" class="btn-auth" onclick="startApp()">Login via Pi Network</button>
     </section>
 
@@ -137,15 +136,15 @@
             <a href="#" onclick="alert('Privacy Policy: We protect your Pi data.')">Privacy Policy</a>
             <a href="#" onclick="alert('Terms of Use: Use this platform for legal services.')">Terms of Use</a>
         </div>
-        <p style="font-size: 0.65rem; color: white; opacity: 0.5; margin-top: 5px;">&copy; 2026 Bridge Freelance. All rights reserved.</p>
+        <p class="copy-text">&copy; 2026 Bridge Freelance. All rights reserved.</p>
     </footer>
 
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center; margin-bottom:15px; color: var(--pi-d)">Payment Complete! 🎉</h2>
-            <textarea id="orderDetail" rows="3" placeholder="Enter your order details here..."></textarea>
-            <input type="email" id="contactInfo" placeholder="Your Email Address">
-            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:14px; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">Submit Order</button>
+            <h2 style="text-align:center; font-size: 1.2rem; margin-bottom:10px; color: var(--pi-d)">Payment Complete! 🎉</h2>
+            <textarea id="orderDetail" rows="3" placeholder="Enter order details..."></textarea>
+            <input type="email" id="contactInfo" placeholder="Your Email">
+            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="submitOrder()">Submit Order</button>
         </div>
     </div>
 
@@ -154,16 +153,9 @@
     <script>
         const toast = document.getElementById('toast');
         let currentTxId = "", currentPrice = 0, currentCategory = "";
-        
-        const supabaseUrl = "https://xolwuawlnruvzqowxxbh.supabase.co"; 
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w";
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
 
-        function showMsg(m) {
-            toast.innerText = m; 
-            toast.style.display = 'block'; 
-            setTimeout(() => toast.style.display='none', 3000); 
-        }
+        function showMsg(m) { toast.innerText = m; toast.style.display = 'block'; setTimeout(() => toast.style.display='none', 3000); }
 
         async function startApp() {
             try {
@@ -174,67 +166,38 @@
                 document.getElementById('authBtn').innerHTML = "Verified ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
                 showMsg("Welcome " + auth.user.username);
-            } catch (e) { showMsg("Login failed: Use Pi Browser"); }
+            } catch (e) { showMsg("Login failed"); }
         }
 
         async function processPayment(amt, name) {
             if(!window.currentUser) { showMsg("Please login first"); return; }
-            currentPrice = amt; 
-            currentCategory = name;
+            currentPrice = amt; currentCategory = name;
             try {
                 showMsg("Starting payment...");
-                await window.Pi.createPayment({
-                    amount: amt, 
-                    memo: "Service Order: " + name, 
-                    metadata: { service: name }
-                }, {
-                    onReadyForServerApproval: (id) => {
-                        return fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ paymentId: id, action: 'approve' }) 
-                        }).then(r => r.json());
-                    },
+                await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
-                        });
+                        await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("Payment Failed"),
-                    onCancel: () => showMsg("Payment Cancelled")
+                    onError: () => showMsg("Payment Failed"),
+                    onCancel: () => showMsg("Cancelled")
                 });
-            } catch (e) { showMsg("Payment error"); }
+            } catch (e) { showMsg("Error"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("Please fill all fields");
+            if(!detail || !contact) return showMsg("Fill all fields");
             try {
-                showMsg("Saving order...");
-                await _supabase.from('services').insert([{
-                    title: currentCategory, 
-                    description: detail, 
-                    price: String(currentPrice),
-                    category: currentCategory, 
-                    contact_info: contact,
-                    user_pi: window.currentUser, 
-                    txid: currentTxId
-                }]);
-                await emailjs.send("service_vuti648", "template_m6rq1ab", {
-                    username: window.currentUser, 
-                    service_detail: detail, 
-                    contact_info: contact, 
-                    order_id: currentTxId, 
-                    price: currentPrice
-                });
+                showMsg("Saving...");
+                await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: currentCategory, contact_info: contact, user_pi: window.currentUser, txid: currentTxId }]);
+                await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
                 showMsg("Submitted!");
                 setTimeout(() => location.reload(), 2000);
-            } catch (error) { showMsg("Connection error"); }
+            } catch (error) { showMsg("Error"); }
         }
 
         async function loadOrders() {
@@ -243,10 +206,10 @@
                 if (data) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
                         <div class="order-item">
-                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; color:var(--pi-g);">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.7rem; color:var(--pi-g);">
                                 <span>${o.title}</span><span>${o.price} Pi</span>
                             </div>
-                            <div style="font-size:0.75rem; opacity:0.9; margin-top:5px;">${o.description ? o.description.substring(0, 40) : ''}...</div>
+                            <div style="font-size:0.65rem; opacity:0.8; margin-top:3px;">${o.description ? o.description.substring(0, 30) : ''}...</div>
                         </div>
                     `).join('');
                 }
