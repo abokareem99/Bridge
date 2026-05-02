@@ -137,7 +137,7 @@
         async function loadServices() {
             try {
                 const { data } = await _supabase.from('services').select('*');
-                const activeOnes = data.filter(s => s.status && s.status.includes('active'));
+                const activeOnes = data.filter(s => s.status && s.status.includes('active') && s.category === 'Service');
                 document.getElementById('servicesContainer').innerHTML = activeOnes.map(s => {
                     let icon = s.title.includes('Design') ? 'fa-palette' : 
                                s.title.includes('Program') ? 'fa-code' : 
@@ -190,16 +190,32 @@
             if(!detail || !contact) return showMsg("Fill all fields");
             try {
                 showMsg("Sending Request...");
-                // تم تعديل الجدول هنا إلى orders لضمان وصول الطلب إليه
-                await _supabase.from('orders').insert([{ title: currentCategory, description: detail, price: String(currentPrice), contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
-                await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
+                // تم التعديل للإرسال لجدول orders لضمان الفصل التام عن جدول الخدمات
+                await _supabase.from('orders').insert([{ 
+                    title: currentCategory, 
+                    description: detail, 
+                    price: String(currentPrice), 
+                    contact_info: contact, 
+                    user_pi: window.currentUser, 
+                    txid: currentTxId, 
+                    status: 'pending' 
+                }]);
+                
+                await emailjs.send("service_vuti648", "template_m6rq1ab", { 
+                    username: window.currentUser, 
+                    service_detail: detail, 
+                    contact_info: contact, 
+                    order_id: currentTxId, 
+                    price: currentPrice 
+                });
+                
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
-            } catch (e) { showMsg("Error"); }
+            } catch (e) { showMsg("Error saving order"); }
         }
 
         async function loadOrders() {
-            // تم تعديل الجدول هنا إلى orders لعرض الطلبات المخزنة فيه بدلاً من Guest
+            // تم التعديل لجلب البيانات من جدول orders لعرض الأسماء الحقيقية بدلاً من Guest
             const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false }).limit(4);
             if (data) {
                 document.getElementById('ordersList').innerHTML = data.map(o => `
