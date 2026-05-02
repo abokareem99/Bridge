@@ -30,7 +30,6 @@
         .admin-btn:hover { opacity: 1; }
         .order-item { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g); }
         
-        /* التعديل هنا لرفع التذييل للأعلى */
         footer { padding: 10px 0 40px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 10px; }
         .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; cursor: pointer; }
@@ -191,7 +190,8 @@
             if(!detail || !contact) return showMsg("Fill all fields");
             try {
                 showMsg("Sending Request...");
-                await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: 'Order', contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
+                // تم تعديل الجدول هنا إلى orders لضمان وصول الطلب إليه
+                await _supabase.from('orders').insert([{ title: currentCategory, description: detail, price: String(currentPrice), contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
@@ -199,7 +199,8 @@
         }
 
         async function loadOrders() {
-            const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
+            // تم تعديل الجدول هنا إلى orders لعرض الطلبات المخزنة فيه بدلاً من Guest
+            const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false }).limit(4);
             if (data) {
                 document.getElementById('ordersList').innerHTML = data.map(o => `
                     <div class="order-item">
