@@ -30,10 +30,7 @@
         .admin-btn:hover { opacity: 1; }
         .order-item { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g); }
         footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 20px; }
-        
-        /* التعديل هنا: رفع الروابط قليلاً عن طريق زيادة الهامش السفلي */
         .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; } 
-        
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; cursor: pointer; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
@@ -67,7 +64,7 @@
                 <button onclick="checkAdmin()" style="width:100%; padding:12px; margin-top:10px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:8px; font-weight:bold">Login</button>
             </div>
             <div id="adminTools" style="display:none">
-                <input type="text" id="newSTitle" placeholder="Service Name (e.g. Logo Design)">
+                <input type="text" id="newSTitle" placeholder="Service Name">
                 <input type="number" id="newSPrice" placeholder="Price in Pi">
                 <button onclick="addService()" style="width:100%; padding:12px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:8px; font-weight:bold">Add Service</button>
                 <button onclick="closeAdmin()" style="width:100%; padding:10px; margin-top:10px; background:#eee; border:none; border-radius:8px">Close</button>
@@ -110,16 +107,19 @@
 
         function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
         function closeAdmin() { document.getElementById('adminModal').style.display='none'; }
+        
         function checkAdmin() {
             if(document.getElementById('adminPass').value === "ateya2026") {
                 document.getElementById('adminAuth').style.display='none';
                 document.getElementById('adminTools').style.display='block';
             } else { showMsg("Incorrect Password"); }
         }
+
         async function addService() {
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
             if(!t || !p) return;
+            // يتم إضافة الخدمات إلى جدول services
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
             showMsg("Success!");
             location.reload();
@@ -191,15 +191,26 @@
             if(!detail || !contact) return showMsg("Fill all fields");
             try {
                 showMsg("Sending Request...");
-                await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: 'Order', contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
+                // تم التعديل هنا: إرسال البيانات إلى جدول orders
+                await _supabase.from('orders').insert([{ 
+                    title: currentCategory, 
+                    description: detail, 
+                    price: String(currentPrice), 
+                    contact_info: contact, 
+                    user_pi: window.currentUser, 
+                    txid: currentTxId, 
+                    status: 'pending' 
+                }]);
+                
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
-            } catch (e) { showMsg("Error"); }
+            } catch (e) { showMsg("Error saving order"); }
         }
 
         async function loadOrders() {
-            const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
+            // يتم عرض الطلبات الأخيرة من جدول orders
+            const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false }).limit(4);
             if (data) {
                 document.getElementById('ordersList').innerHTML = data.map(o => `
                     <div class="order-item">
