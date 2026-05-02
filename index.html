@@ -29,10 +29,13 @@
         .admin-btn { color: var(--pi-g); cursor: pointer; font-size: 0.9rem; opacity: 0.4; transition: 0.3s; }
         .admin-btn:hover { opacity: 1; }
         .order-item { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g); }
-        footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 20px; }
-        .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 5px; }
+        
+        /* التعديل هنا لرفع التذييل للأعلى */
+        footer { padding: 10px 0 40px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 10px; }
+        .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
         .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; cursor: pointer; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
         .modal-content { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; color: var(--pi-d); }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
@@ -118,12 +121,13 @@
             const p = document.getElementById('newSPrice').value;
             if(!t || !p) return;
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            showMsg("Success!"); location.reload();
+            showMsg("Success!");
+            location.reload();
         }
 
         async function startApp() {
             try {
-                await window.Pi.init({ version: "2.0", sandbox: true }); 
+                await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Verified ✅";
