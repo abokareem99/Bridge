@@ -18,13 +18,11 @@
 
         .hero { padding: 15px 10px; text-align: center; }
         .hero-title { font-size: 1.5rem; color: var(--pi-g); font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); color: #FFFF00; font-weight: bold; }
         
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        
         .btn-auth { background: #8A2BE2; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: background 0.3s; }
-        .btn-auth:hover { background: #6A1B9A; color: white; }
+        .btn-auth:hover { background: #6A1B9A; }
 
         .btn-free-post { background: var(--glass); color: var(--pi-g); border: 1px solid var(--pi-g); padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
 
@@ -40,8 +38,7 @@
 
         footer { text-align: center; padding: 10px 0; margin-top: 10px; }
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: none; font-weight: 600; cursor: pointer; padding: 5px; z-index: 110; position: relative; transition: 0.3s; }
-        .policy-links a:hover { opacity: 0.7; text-decoration: underline; }
+        .policy-links a { color: var(--pi-g); text-decoration: none; font-weight: 600; cursor: pointer; padding: 5px; z-index: 110; }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
@@ -50,9 +47,17 @@
         #profileSection { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
         .profile-card { background: var(--glass); border-radius: 22px; padding: 20px; text-align: center; border: 1px solid rgba(255,183,77,0.2); }
 
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); }
-        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; }
+        /* تعديل تصميم النافذة لتشبه الصورة التي أرفقتها */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--white); width: 90%; max-width: 340px; padding: 30px 20px; border-radius: 28px; color: var(--pi-d); text-align: center; position: relative; animation: popIn 0.3s ease-out; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .success-icon { width: 80px; height: 80px; background: #2ecc71; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3); }
+        .modal-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; color: #2d0a4e; }
+        .modal-text { font-size: 0.95rem; color: #666; line-height: 1.5; margin-bottom: 25px; }
+        .btn-modal-close { background: #6a1b9a; color: white; border: none; width: 100%; padding: 14px; border-radius: 15px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+
+        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -92,6 +97,34 @@
         </footer>
     </div>
 
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h2 class="modal-title">Order Received!</h2>
+            <p class="modal-text">Thank you for choosing <b>Bridge Freelance</b>.<br>We will contact you via email shortly.</p>
+            <button class="btn-modal-close" onclick="closeModal('successModal')">Back to Home</button>
+        </div>
+    </div>
+
+    <div id="reqModal" class="modal">
+        <div class="modal-content" style="text-align: left;">
+            <h3 style="text-align:center; color:#2d0a4e; margin-bottom: 15px;">Order Details</h3>
+            <textarea id="orderDetail" rows="4" placeholder="Describe your request..." style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd; margin-bottom: 10px;"></textarea>
+            <input type="text" id="contactInfo" placeholder="Your Email or Telegram" style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd; margin-bottom: 15px;">
+            <button onclick="submitOrder()" style="width:100%; padding:14px; background:#ffb74d; border:none; border-radius:12px; font-weight:bold; color:#2d0a4e;">Send My Order</button>
+        </div>
+    </div>
+
+    <div id="freeModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:15px;">Post Free Service</h3>
+            <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-bottom:10px; padding:12px; border-radius:12px; border:1px solid #ddd;">
+            <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-bottom:15px; padding:12px; border-radius:12px; border:1px solid #ddd;"></textarea>
+            <button onclick="submitFreeService()" style="width:100%; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
+            <button onclick="closeModal('freeModal')" style="background:none; border:none; color:#999; margin-top:10px; width:100%;">Cancel</button>
+        </div>
+    </div>
+
     <section id="profileSection">
         <div class="profile-card">
             <div style="width:70px; height:70px; background:var(--pi-g); color:var(--pi-d); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 12px; font-weight:bold;" id="userInitial">?</div>
@@ -101,7 +134,7 @@
                 <div><b id="totalSpent" style="color:var(--pi-g); font-size: 1.2rem;">0</b><p style="font-size:0.65rem;">Pi Spent</p></div>
             </div>
         </div>
-        <h3 style="color: var(--pi-g); margin: 20px 0 10px; text-align: right;">سجل طلباتي</h3>
+        <h3 style="color: var(--pi-g); margin: 20px 0 10px; text-align: right; padding-right: 10px;">سجل طلباتي</h3>
         <div id="userOrdersList"></div>
     </section>
 
@@ -110,28 +143,9 @@
         <div class="nav-item" id="profileNav" onclick="showTab('profile')"><i class="fas fa-user-astronaut"></i></div>
     </div>
 
-    <div id="reqModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Payment Success!</h3>
-            <textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <input type="text" id="contactInfo" placeholder="Contact Info" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <button onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button>
-        </div>
-    </div>
-
-    <div id="freeModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
-            <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
-            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
-        </div>
-    </div>
-
     <div id="adminModal" class="modal">
         <div class="modal-content">
-            <h4 style="text-align:center;">Admin Panel</h4>
+            <h4>Admin Panel</h4>
             <div id="adminAuth">
                 <input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0; border-radius:10px;">
                 <button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:10px;">Unlock</button>
@@ -139,8 +153,8 @@
             <div id="adminTools" style="display:none">
                 <input type="text" id="newSTitle" placeholder="Name" style="width:100%; padding:10px; margin-top:10px;">
                 <input type="number" id="newSPrice" placeholder="Price" style="width:100%; padding:10px; margin-top:10px;">
-                <button onclick="addService()" style="width:100%; padding:12px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:10px;">Add</button>
-                <div id="adminServiceList" style="margin-top:15px; max-height:120px; overflow-y:auto; color:#333;"></div>
+                <button onclick="addService()" style="width:100%; padding:12px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:10px;">Add Service</button>
+                <div id="adminServiceList" style="margin-top:15px; max-height:120px; overflow-y:auto;"></div>
                 <button onclick="closeModal('adminModal')" style="width:100%; padding:10px; margin-top:15px; background:#eee; border:none; border-radius:10px;">Close</button>
             </div>
         </div>
@@ -176,11 +190,10 @@
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
-                document.getElementById('authBtn').style.background = "#8A2BE2"; 
                 document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
                 document.getElementById('profileName').innerText = auth.user.username;
                 loadServices(); loadOrders();
-            } catch (e) { showMsg("Pi Error"); }
+            } catch (e) { showMsg("Pi Connection Error"); }
         }
 
         async function loadServices() {
@@ -198,7 +211,7 @@
             if(!window.currentUser) { showMsg("Login Pi first"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                showMsg("جاري فتح المحفظة...");
+                showMsg("Opening Pi Wallet...");
                 await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
                     onReadyForServerApproval: (id) => { return fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()); },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
@@ -207,36 +220,34 @@
                         document.getElementById('reqModal').style.display = 'flex';
                     },
                     onError: (e) => showMsg("Payment Error"),
-                    onCancel: () => showMsg("Cancelled")
+                    onCancel: () => showMsg("Payment Cancelled")
                 });
-            } catch (e) { showMsg("Payment Error"); }
+            } catch (e) { showMsg("Payment System Error"); }
         }
 
         async function submitOrder() {
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
-            if(!d || !c) return showMsg("Fill details");
+            if(!d || !c) return showMsg("Please fill details");
             
             try {
                 await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
                 
                 document.getElementById('reqModal').style.display = 'none';
-                // إظهار رسالة النجاح الخضراء
-                showMsg("✅ تم استلام طلبك بنجاح! سنتواصل معك قريباً.");
+                // إظهار النافذة الجديدة بدلاً من الـ Toast
+                document.getElementById('successModal').style.display = 'flex';
                 loadOrders();
-            } catch (e) {
-                showMsg("Error submitting order");
-            }
+            } catch (e) { showMsg("Error saving order"); }
         }
 
         async function submitFreeService() {
             const t = document.getElementById('freeTitle').value;
             const d = document.getElementById('freeDesc').value;
-            if(!t || !d) return showMsg("Fill details");
+            if(!t || !d) return showMsg("Details required");
             await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
-            closeModal('freeModal'); 
-            showMsg("✅ Posted successfully!"); 
+            closeModal('freeModal');
+            document.getElementById('successModal').style.display = 'flex';
             loadOrders();
         }
 
@@ -262,12 +273,12 @@
                 document.getElementById('adminAuth').style.display='none';
                 document.getElementById('adminTools').style.display='block';
                 loadAdminList();
-            } else { showMsg("Wrong!"); }
+            } else { showMsg("Wrong Code"); }
         }
         async function loadAdminList() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
-                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;"><span>${s.title}</span><i class="fas fa-trash-alt" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
+                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; color:#333;"><span>${s.title}</span><i class="fas fa-trash-alt" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
             }
         }
         async function deleteService(id) { if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); } }
@@ -276,7 +287,7 @@
             const p = document.getElementById('newSPrice').value;
             if(!t || !p) return;
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            showMsg("Added!"); loadAdminList(); loadServices();
+            showMsg("Service Added!"); loadAdminList(); loadServices();
         }
 
         window.onload = () => { loadServices(); loadOrders(); };
