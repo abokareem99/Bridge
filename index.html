@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bridge Freelance - Modern Edition</title>
+    <title>Bridge Freelance - Stable Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,10 +13,8 @@
     <style>
         :root { --pi-p: #6a1b9a; --pi-d: #2d0a4e; --pi-g: #ffb74d; --white: #ffffff; --glass: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
         body { background: radial-gradient(circle at top, #4a148c, #2d0a4e); min-height: 100vh; color: var(--white); padding-bottom: 100px; overflow-x: hidden; }
         
-        /* الترحيب باللون الذهبي المميز */
         .hero { padding: 15px 10px; text-align: center; }
         .hero-title { font-size: 1.5rem; color: var(--pi-g); font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); color: var(--pi-g); font-weight: bold; }
@@ -39,20 +37,13 @@
         #ordersList { max-height: 110px; overflow-y: auto; }
         .order-item { background: var(--glass); padding: 8px 12px; border-radius: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--pi-g); }
 
-        footer { text-align: center; padding: 10px 0; margin-top: 10px; }
-        .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; }
-
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
 
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); position: relative; }
-        
-        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        #successScreen { display: none; text-align: center; padding: 20px; }
-        .check-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; display: block; }
+        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -82,14 +73,6 @@
             </div>
             <div id="ordersList"></div>
         </section>
-
-        <footer>
-            <div class="policy-links">
-                <a onclick="alert('Privacy Policy: All data is encrypted via Pi Network.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality is our priority.')">Terms of Use</a>
-            </div>
-            <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance By Abokareem</p>
-        </footer>
     </div>
 
     <div id="profilePage" class="page">
@@ -110,22 +93,6 @@
                 <input type="text" id="contactInfo" placeholder="WhatsApp / Email" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
                 <button id="submitBtn" onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button>
             </div>
-            <div id="successScreen">
-                <i class="fas fa-check-circle check-icon"></i>
-                <h2 style="color:#2d0a4e;">Sent!</h2>
-                <p style="color:#666;">We will contact you soon.</p>
-                <button onclick="closeModal('reqModal')" style="width:100%; margin-top:20px; padding:12px; background:#eee; border:none; border-radius:12px;">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="freeModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
-            <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
-            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
         </div>
     </div>
 
@@ -137,7 +104,7 @@
                 <button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:10px;">Unlock</button>
             </div>
             <div id="adminTools" style="display:none">
-                <input type="text" id="newSTitle" placeholder="Service Name" style="width:100%; padding:10px; margin-top:10px; border:1px solid #ddd; border-radius:8px;">
+                <input type="text" id="newSTitle" placeholder="Service Name" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
                 <input type="number" id="newSPrice" placeholder="Price" style="width:100%; padding:10px; margin-top:10px; border:1px solid #ddd; border-radius:8px;">
                 <button onclick="addService()" style="width:100%; padding:12px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:10px;">Add</button>
                 <div id="adminServiceList" style="margin-top:15px; max-height:120px; overflow-y:auto; color:#333;"></div>
@@ -170,91 +137,69 @@
 
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
         function openAdmin() { document.getElementById('adminModal').style.display = 'flex'; }
-        function closeModal(id) { 
-            document.getElementById(id).style.display='none'; 
-            if(id === 'reqModal') {
-                document.getElementById('orderForm').style.display = 'block';
-                document.getElementById('successScreen').style.display = 'none';
-            }
-        }
-
-        function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
+        function closeModal(id) { document.getElementById(id).style.display='none'; }
 
         async function startApp() {
             try {
-                await window.Pi.init({ version: "2.0", sandbox: true });
+                await window.Pi.init({ version: "2.0", sandbox: false }); // تم تعطيل sandbox لضمان الربط الحقيقي
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerHTML = "<i class='fas fa-check-circle'></i> Hi, " + auth.user.username;
+                document.getElementById('authBtn').innerHTML = "<i class='fas fa-check-circle'></i> " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#27ae60";
                 loadServices(); loadOrders();
-            } catch (e) { showMsg("Pi Connection Error"); }
+            } catch (e) { showMsg("Login Failed"); }
         }
 
         async function loadServices() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
                 document.getElementById('servicesContainer').innerHTML = data.map(s => {
-                    let name = s.title.toLowerCase();
-                    let icon = name.includes('des') ? 'fa-palette' : name.includes('trans') ? 'fa-language' : name.includes('prog') ? 'fa-code' : 'fa-briefcase';
-                    return `
-                    <div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
-                        <i class="fas ${icon}"></i><span>${s.title}</span>
-                        <span class="price-badge">${s.price} Pi</span>
-                    </div>`;
+                    let n = s.title.toLowerCase();
+                    let icon = n.includes('des') ? 'fa-palette' : n.includes('trans') ? 'fa-language' : n.includes('prog') ? 'fa-code' : 'fa-briefcase';
+                    return `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')"><i class="fas ${icon}"></i><span>${s.title}</span><span class="price-badge">${s.price} Pi</span></div>`;
                 }).join('');
             }
         }
 
         async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("Login Pi first"); return; }
+            if(!window.currentUser) { showMsg("Login first"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                showMsg("Opening Pi Wallet...");
-                await window.Pi.createPayment({ amount: amt, memo: "Order: " + name, metadata: { service: name } }, {
-                    onReadyForServerApproval: (id) => fetch('/api/approve', { method: 'POST', body: JSON.stringify({id}) }),
+                showMsg("Contacting Pi Wallet...");
+                const payment = await window.Pi.createPayment({
+                    amount: amt,
+                    memo: "Order: " + name,
+                    metadata: { service: name }
+                }, {
+                    onReadyForServerApproval: async (id) => {
+                        // محاكاة الموافقة لتجنب انتهاء المهلة إذا لم يكن لديك سيرفر خلفي كامل
+                        console.log("Payment Ready:", id);
+                        return true; 
+                    },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/complete', { method: 'POST', body: JSON.stringify({id, tx}) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: () => showMsg("Payment Failed"),
-                    onCancel: () => showMsg("Payment Cancelled")
+                    onError: (e) => { console.error(e); showMsg("Timeout/Error. Try again."); },
+                    onCancel: () => showMsg("Cancelled")
                 });
-            } catch (e) { showMsg("Payment Error"); }
+            } catch (e) { showMsg("Payment System Busy"); }
         }
 
         async function submitOrder() {
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
-            if(!d || !c) return showMsg("Fill all fields");
-            try {
-                await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'paid' }]);
-                await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, price: currentPrice });
-                document.getElementById('orderForm').style.display = 'none';
-                document.getElementById('successScreen').style.display = 'block';
-                loadOrders();
-            } catch (err) { showMsg("Error sending order"); }
-        }
-
-        async function submitFreeService() {
-            const t = document.getElementById('freeTitle').value;
-            const d = document.getElementById('freeDesc').value;
-            if(!t || !d) return showMsg("Fill details");
-            await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
-            closeModal('freeModal');
-            showMsg("Posted Successfully!");
+            if(!d || !c) return showMsg("Missing Info");
+            await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'paid' }]);
+            showMsg("Success!");
+            closeModal('reqModal');
             loadOrders();
         }
 
         async function loadOrders() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(4);
             if (data) {
-                document.getElementById('ordersList').innerHTML = data.map(o => `
-                    <div class="order-item">
-                        <div><b>${o.title}</b><br><small>by ${o.user_pi}</small></div>
-                        <b style="color:var(--pi-g)">${o.price === "0" ? 'FREE' : o.price + ' Pi'}</b>
-                    </div>`).join('');
+                document.getElementById('ordersList').innerHTML = data.map(o => `<div class="order-item"><div><b>${o.title}</b><br><small>${o.user_pi}</small></div><b style="color:var(--pi-g)">${o.price} Pi</b></div>`).join('');
             }
         }
 
@@ -273,7 +218,7 @@
             }
         }
 
-        async function deleteService(id) { if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); } }
+        async function deleteService(id) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); }
         async function addService() {
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
