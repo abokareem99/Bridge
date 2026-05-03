@@ -11,168 +11,224 @@
     <script type="text/javascript">(function() { emailjs.init("aRCAx1NwvATaC4F-m"); })();</script>
 
     <style>
-        :root { --pi-p: #6a1b9a; --pi-d: #4a148c; --pi-g: #ffb74d; --white: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--pi-d); min-height: 100vh; color: var(--white); display: block; }
-        .hero { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,183,77,0.1); }
-        .hero-title { font-size: 1.8rem; color: var(--pi-g); margin-bottom: 8px; font-weight: 800; }
-        .welcome-msg { font-size: 0.75rem; background: var(--pi-g); color: var(--pi-d); display: inline-block; padding: 6px 15px; border-radius: 20px; margin-bottom: 10px; font-weight: bold; }
-        .btn-auth { background: var(--pi-g); color: var(--pi-d); border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.9rem; display: block; margin: 0 auto; }
-        .categories { padding: 15px; max-width: 450px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .cat-card { background: var(--pi-g); padding: 15px 5px; border-radius: 18px; text-align: center; cursor: pointer; color: var(--pi-d); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .cat-card i { color: var(--pi-g); background: var(--pi-d); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1rem; margin: 0 auto 8px; }
-        .cat-card span { font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 4px; }
-        .price-badge { font-size: 0.65rem; color: #fff; font-weight: bold; background: var(--pi-d); padding: 2px 8px; border-radius: 6px; }
-        .orders-section { padding: 15px; max-width: 450px; margin: 0 auto; }
-        .section-header { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .section-title { color: var(--pi-g); font-size: 0.9rem; font-weight: bold; }
-        .admin-btn { color: var(--pi-g); cursor: pointer; font-size: 0.9rem; opacity: 0.4; transition: 0.3s; }
-        .order-item { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g); }
-        footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 20px; }
-        .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 5px; }
-        .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; cursor: pointer; }
-        .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; }
+        :root { 
+            --pi-p: #6a1b9a; 
+            --pi-d: #2d0a4e; /* أغمق قليلاً للفخامة */
+            --pi-g: #ffb74d; 
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
         
-        /* تنسيقات إضافية للوحة التحكم الجديدة */
-        .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; }
-        .del-btn { color: #e74c3c; cursor: pointer; margin-left: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top, #4a148c, #2d0a4e); 
+            min-height: 100vh; 
+            color: var(--white); 
+            padding-bottom: 30px;
+        }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        .modal-content { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; color: var(--pi-d); max-height: 80vh; overflow-y: auto; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
-        textarea, input { width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; }
+        /* Hero Section */
+        .hero { padding: 40px 20px; text-align: center; }
+        .hero-title { font-size: 2.2rem; color: var(--pi-g); text-shadow: 0 2px 10px rgba(0,0,0,0.3); font-weight: 900; letter-spacing: -1px; }
+        .welcome-msg { font-size: 0.8rem; background: var(--glass); border: 1px solid rgba(255,183,77,0.3); color: var(--pi-g); padding: 6px 18px; border-radius: 50px; margin-top: 10px; display: inline-block; }
+        
+        .btn-auth { 
+            background: linear-gradient(45deg, var(--pi-g), #ffa726); 
+            color: var(--pi-d); border: none; padding: 12px 30px; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; font-size: 1rem; margin: 25px auto; 
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,183,77,0.4);
+            transition: transform 0.2s;
+        }
+        .btn-auth:active { transform: scale(0.95); }
+
+        /* Grid Services */
+        .categories { padding: 15px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .cat-card { 
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); padding: 20px 10px; border-radius: 24px; 
+            text-align: center; cursor: pointer; transition: 0.3s;
+        }
+        .cat-card:hover { border-color: var(--pi-g); background: rgba(255,255,255,0.15); }
+        .cat-card i { 
+            color: var(--pi-d); background: var(--pi-g); width: 45px; height: 45px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 14px; font-size: 1.2rem; margin: 0 auto 12px; 
+        }
+        .cat-card span { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 6px; }
+        .price-badge { font-size: 0.75rem; color: var(--pi-g); font-weight: 800; border: 1px solid var(--pi-g); padding: 2px 10px; border-radius: 8px; }
+
+        /* Orders Section */
+        .orders-section { padding: 20px; max-width: 500px; margin: 20px auto; background: rgba(0,0,0,0.2); border-radius: 25px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
+        .section-title { color: var(--pi-g); font-size: 1rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .admin-btn { color: white; cursor: pointer; opacity: 0.3; font-size: 1.1rem; }
+
+        .order-item { 
+            background: var(--glass); padding: 12px; border-radius: 15px; margin-bottom: 10px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 4px solid var(--pi-g);
+        }
+
+        /* Modals & Inputs */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 4000; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--white); width: 90%; max-width: 380px; padding: 25px; border-radius: 25px; color: var(--pi-d); }
+        
+        input, textarea { 
+            width: 100%; padding: 12px; border-radius: 12px; margin-top: 12px; 
+            border: 1px solid #ddd; background: #f9f9f9; font-size: 1rem;
+        }
+
+        #toast { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+            background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; 
+            border-radius: 50px; display: none; z-index: 5000; font-weight: bold; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        footer { text-align: center; margin-top: 40px; opacity: 0.6; }
+        .policy-links { font-size: 0.75rem; margin-bottom: 10px; display: flex; justify-content: center; gap: 20px; }
+        .policy-links a { color: var(--pi-g); text-decoration: none; }
     </style>
 </head>
 <body>
+
+    <div id="toast"></div>
+
     <section class="hero">
         <h1 class="hero-title">Bridge Freelance</h1>
         <div class="welcome-msg">Welcome to abokareem Platform 🌐</div>
-        <button id="authBtn" class="btn-auth" onclick="startApp()">Login via Pi Network</button>
+        <button id="authBtn" class="btn-auth" onclick="startApp()">
+            <i class="fab fa-ethereum"></i> Login via Pi Network
+        </button>
     </section>
 
-    <section class="categories" id="servicesContainer"></section>
+    <section class="categories" id="servicesContainer">
+        </section>
 
     <section class="orders-section">
         <div class="section-header">
-            <div class="section-title">📦 Recent Orders</div>
-            <i class="fas fa-cog admin-btn" onclick="openAdmin()"></i>
+            <div class="section-title"><i class="fas fa-bolt"></i> Recent Activity</div>
+            <i class="fas fa-user-shield admin-btn" onclick="openAdmin()"></i>
         </div>
         <div id="ordersList"></div>
     </section>
 
     <div id="adminModal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center">Admin Panel</h3>
+            <h3 style="text-align:center; margin-bottom:15px;">Admin Shield</h3>
             <div id="adminAuth">
-                <input type="password" id="adminPass" placeholder="Enter Admin Password">
-                <button onclick="checkAdmin()" style="width:100%; padding:12px; margin-top:10px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:8px; font-weight:bold">Login</button>
+                <input type="password" id="adminPass" placeholder="Admin Key">
+                <button onclick="checkAdmin()" style="width:100%; padding:14px; margin-top:15px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:12px; font-weight:bold">Verify Access</button>
+                <button onclick="closeAdmin()" style="width:100%; background:none; border:none; margin-top:10px; color:#666;">Cancel</button>
             </div>
             <div id="adminTools" style="display:none">
-                <h4 style="margin-top:10px; border-bottom: 2px solid var(--pi-g);">Add New</h4>
-                <input type="text" id="newSTitle" placeholder="Service Name">
+                <h4 style="border-bottom: 1px solid #eee; padding-bottom:10px;">Create Service</h4>
+                <input type="text" id="newSTitle" placeholder="What is the service?">
                 <input type="number" id="newSPrice" placeholder="Price in Pi">
-                <button onclick="addService()" style="width:100%; padding:12px; margin-top:10px; background:#27ae60; color:white; border:none; border-radius:8px; font-weight:bold">Add Service</button>
+                <button onclick="addService()" style="width:100%; padding:14px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:12px; font-weight:bold">Publish Now</button>
                 
-                <h4 style="margin-top:20px; border-bottom: 2px solid var(--pi-g);">Manage Services</h4>
-                <div id="adminServiceList" style="margin-top:10px;">
-                    </div>
+                <h4 style="margin-top:25px; border-bottom: 1px solid #eee; padding-bottom:10px;">Active Services</h4>
+                <div id="adminServiceList" style="max-height: 200px; overflow-y: auto;"></div>
                 
-                <button onclick="closeAdmin()" style="width:100%; padding:10px; margin-top:20px; background:#eee; border:none; border-radius:8px">Close</button>
+                <button onclick="closeAdmin()" style="width:100%; padding:12px; margin-top:20px; background:#f0f0f0; border:none; border-radius:12px; color:#555">Exit Panel</button>
             </div>
         </div>
     </div>
 
-    <footer>
-        <div class="policy-links">
-            <a onclick="alert('Privacy Policy: We protect your Pi data and ensure secure transactions.')">Privacy Policy</a>
-            <a onclick="alert('Terms of Use: Use this platform for legal freelance services.')">Terms of Use</a>
-        </div>
-        <p class="copy-text">&copy; 2026 Bridge Freelance. All rights reserved.</p>
-    </footer>
-
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center; font-size: 1.2rem; color: var(--pi-d)">Payment Complete! 🎉</h2>
-            <textarea id="orderDetail" rows="3" placeholder="Order details..."></textarea>
-            <input type="email" id="contactInfo" placeholder="Your Email">
-            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold" onclick="submitOrder()">Submit Order</button>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div style="background: #e8f5e9; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                    <i class="fas fa-check" style="color: #2ecc71; font-size: 1.5rem;"></i>
+                </div>
+                <h2 style="font-size: 1.2rem;">Payment Success!</h2>
+                <p style="font-size: 0.8rem; color: #666;">Please provide execution details</p>
+            </div>
+            <textarea id="orderDetail" rows="4" placeholder="Describe what you need exactly..."></textarea>
+            <input type="email" id="contactInfo" placeholder="Email or Telegram">
+            <button style="width:100%; background:var(--pi-g); color:var(--pi-d); border:none; padding:15px; border-radius:12px; margin-top:15px; font-weight:900" onclick="submitOrder()">SEND REQUEST</button>
         </div>
     </div>
 
     <div id="autoReplyModal" class="modal">
         <div class="modal-content" style="text-align: center;">
-            <i class="fas fa-check-circle" style="font-size: 3rem; color: #2ecc71; margin-bottom: 15px;"></i>
-            <h2 style="color: var(--pi-d)">Order Received!</h2>
-            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:12px; border-radius:10px; margin-top:20px; font-weight:bold" onclick="location.reload()">Back</button>
+            <i class="fas fa-paper-plane" style="font-size: 3rem; color: var(--pi-p); margin-bottom: 15px;"></i>
+            <h2>On It! 🚀</h2>
+            <p style="color: #666; margin-top: 10px;">Your request was sent to abokareem. We will contact you soon.</p>
+            <button style="width:100%; background:var(--pi-d); color:var(--pi-g); border:none; padding:14px; border-radius:12px; margin-top:25px; font-weight:bold" onclick="location.reload()">Back to Home</button>
         </div>
     </div>
 
-    <div id="toast"></div>
+    <footer>
+        <div class="policy-links">
+            <a onclick="alert('Privacy Policy: All transactions are encrypted via Pi Network.')">Privacy</a>
+            <a onclick="alert('Terms: Quality and commitment are our standards.')">Terms</a>
+        </div>
+        <p style="font-size: 0.6rem; opacity: 0.5;">&copy; 2026 Bridge Freelance. Powered by Pi Network.</p>
+    </footer>
 
     <script>
+        // --- الأساسات كما هي بدون تغيير في المنطق ---
         const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
         let currentTxId = "", currentPrice = 0, currentCategory = "";
 
-        function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
+        function showMsg(m) { 
+            const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; 
+            setTimeout(()=>t.style.display='none',3000); 
+        }
         function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
         function closeAdmin() { document.getElementById('adminModal').style.display='none'; }
 
-        // وظيفة التحقق من كلمة المرور وعرض قائمة الإدارة
         async function checkAdmin() {
             if(document.getElementById('adminPass').value === "ateya2026") {
                 document.getElementById('adminAuth').style.display='none';
                 document.getElementById('adminTools').style.display='block';
-                loadAdminList(); // جلب قائمة الخدمات للحذف عند تسجيل الدخول
-            } else { showMsg("Incorrect Password"); }
+                loadAdminList();
+            } else { showMsg("Access Denied"); }
         }
 
-        // جلب قائمة الخدمات داخل لوحة التحكم فقط
         async function loadAdminList() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
                 document.getElementById('adminServiceList').innerHTML = data.map(s => `
-                    <div class="admin-list-item">
-                        <span>${s.title} (${s.price} Pi)</span>
-                        <i class="fas fa-trash del-btn" onclick="deleteService(${s.id})"></i>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #eee;">
+                        <span style="font-size:0.8rem; font-weight:bold;">${s.title}</span>
+                        <i class="fas fa-trash-alt" style="color:#ff5252; cursor:pointer;" onclick="deleteService(${s.id})"></i>
                     </div>
                 `).join('');
             }
         }
 
-        // وظيفة الحذف (جديدة ومؤمنة)
         async function deleteService(id) {
-            if(confirm("Are you sure you want to delete this service?")) {
+            if(confirm("Remove this service?")) {
                 const { error } = await _supabase.from('services').delete().eq('id', id);
-                if(!error) { showMsg("Deleted!"); loadAdminList(); loadServices(); }
-                else { showMsg("Error deleting"); }
+                if(!error) { showMsg("Removed"); loadAdminList(); loadServices(); }
             }
         }
 
         async function addService() {
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
-            if(!t || !p) return showMsg("Please fill all fields");
+            if(!t || !p) return showMsg("Missing Data");
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            showMsg("Success!"); loadAdminList(); loadServices();
+            showMsg("Published!"); loadAdminList(); loadServices();
         }
 
-        // وظائف Pi Network والربط (بقيت كما هي تماماً)
         async function startApp() {
             try {
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerHTML = "Verified ✅";
+                document.getElementById('authBtn').innerHTML = "<i class='fas fa-check-circle'></i> " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#2ecc71";
-            } catch (e) { showMsg("Login failed"); }
+            } catch (e) { showMsg("Pi Connection Error"); }
         }
 
         async function loadServices() {
-            try {
-                const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
+            const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
+            if(data) {
                 const activeOnes = data.filter(s => s.status && s.status.includes('active'));
                 document.getElementById('servicesContainer').innerHTML = activeOnes.map(s => {
-                    // ذكاء اصطناعي بسيط للأيقونات حتى لو وجد خطأ إملائي
                     let t = s.title.toLowerCase();
                     let icon = (t.includes('des') || t.includes('logo')) ? 'fa-palette' : 
                                (t.includes('prog') || t.includes('code')) ? 'fa-code' : 
@@ -184,14 +240,14 @@
                             <span class="price-badge">${s.price} Pi</span>
                         </div>`;
                 }).join('');
-            } catch (e) {}
+            }
         }
 
         async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("Please login first"); return; }
+            if(!window.currentUser) { showMsg("Login via Pi first"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                showMsg("Starting payment...");
+                showMsg("Contacting Pi Wallet...");
                 await window.Pi.createPayment({ 
                     amount: amt, memo: "Service: " + name, metadata: { service: name } 
                 }, {
@@ -209,35 +265,35 @@
                         });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: () => showMsg("Payment Failed"),
-                    onCancel: () => showMsg("Payment Cancelled")
+                    onError: () => showMsg("Payment Error"),
+                    onCancel: () => showMsg("Transaction Cancelled")
                 });
-            } catch (e) { showMsg("Payment error"); }
+            } catch (e) { showMsg("Error"); }
         }
 
         async function submitOrder() {
             const detail = document.getElementById('orderDetail').value;
             const contact = document.getElementById('contactInfo').value;
-            if(!detail || !contact) return showMsg("Fill all fields");
+            if(!detail || !contact) return showMsg("Please fill details");
             try {
-                showMsg("Sending Request...");
+                showMsg("Finalizing Order...");
                 await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: 'Order', contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
-                loadOrders();
-            } catch (e) { showMsg("Error"); }
+            } catch (e) { showMsg("Error sending order"); }
         }
 
         async function loadOrders() {
-            const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(4);
+            const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(3);
             if (data) {
                 document.getElementById('ordersList').innerHTML = data.map(o => `
                     <div class="order-item">
-                        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.7rem; color:var(--pi-g);">
-                            <span>${o.title}</span><span>${o.price} Pi</span>
+                        <div>
+                            <div style="font-weight:bold; font-size:0.8rem; color:var(--pi-g);">${o.title}</div>
+                            <div style="font-size:0.6rem; opacity:0.6;">by ${o.user_pi || 'Pi User'}</div>
                         </div>
-                        <div style="font-size:0.65rem; opacity:0.8;">User: ${o.user_pi || 'Guest'}</div>
+                        <div style="font-weight:bold; font-size:0.75rem;">${o.price} Pi</div>
                     </div>
                 `).join('');
             }
