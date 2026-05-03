@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bridge Freelance - Premium Edition</title>
+    <title>Bridge Freelance - Final Premium Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -74,15 +74,15 @@
         <section class="orders-section">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size: 0.85rem;">
                 <span style="color:var(--pi-g); font-weight:bold;"><i class="fas fa-history"></i> Global Activity</span>
-                <i class="fas fa-cog" style="opacity:0.4; padding: 5px;" onclick="openAdmin()"></i>
+                <i class="fas fa-cog" style="opacity:0.4; padding: 5px; cursor:pointer;" onclick="openAdmin()"></i>
             </div>
             <div id="ordersList"></div>
         </section>
 
         <footer>
             <div class="policy-links">
-                <a onclick="alert('Privacy Policy: Encrypted via Pi Network.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality Guaranteed.')">Terms of Use</a>
+                <a onclick="alert('Privacy Policy: All data is encrypted and handled via Pi Network secure authentication.')">Privacy Policy</a>
+                <a onclick="alert('Terms of Use: Quality of service is guaranteed. All transactions are final.')">Terms of Use</a>
             </div>
             <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
         </footer>
@@ -93,8 +93,8 @@
             <div id="orderForm">
                 <h3 style="text-align:center; color:#2d0a4e; margin-bottom:10px;">Payment Success! 🎉</h3>
                 <p style="font-size:0.8rem; text-align:center; color:#666; margin-bottom:15px;">Please provide details for the admin to contact you.</p>
-                <textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-                <input type="text" id="contactInfo" placeholder="Contact (WhatsApp/Email)" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
+                <textarea id="orderDetail" rows="4" placeholder="Describe your request..." style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
+                <input type="text" id="contactInfo" placeholder="Your WhatsApp / Email / Telegram" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
                 <button id="submitBtn" onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">
                     <i class="fas fa-paper-plane"></i> Send Order
                 </button>
@@ -103,7 +103,7 @@
             <div id="successScreen">
                 <i class="fas fa-check-circle check-icon"></i>
                 <h2 style="color:#2d0a4e; margin-bottom:10px;">Order Received!</h2>
-                <p style="font-size:0.9rem; color:#555; line-height:1.4;">Thank you! Your request has been sent. We will contact you soon on your provided info.</p>
+                <p style="font-size:0.9rem; color:#555; line-height:1.4;">Thank you! Your request has been sent to the admin. We will contact you soon on your provided info.</p>
                 <button onclick="closeModal('reqModal')" style="width:100%; margin-top:20px; padding:12px; background:#f0f0f0; border:none; border-radius:12px; font-weight:bold; color:#666;">Close Window</button>
             </div>
         </div>
@@ -113,7 +113,7 @@
         <div class="modal-content">
             <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
             <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Service Details & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
+            <textarea id="freeDesc" rows="4" placeholder="Details and how to contact you..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
             <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
             <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
         </div>
@@ -147,6 +147,9 @@
         let currentTxId = "", currentPrice = 0, currentCategory = "";
 
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
+        
+        function openAdmin() { document.getElementById('adminModal').style.display = 'flex'; }
+
         function closeModal(id) { 
             document.getElementById(id).style.display='none'; 
             if(id === 'reqModal') {
@@ -154,6 +157,7 @@
                 document.getElementById('successScreen').style.display = 'none';
             }
         }
+
         function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
 
         async function startApp() {
@@ -250,18 +254,23 @@
                 loadAdminList();
             } else { showMsg("Wrong Code!"); }
         }
+
         async function loadAdminList() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
                 document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; color:#333;"><span>${s.title}</span><i class="fas fa-trash-alt" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
             }
         }
+
         async function deleteService(id) { if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); } }
+        
         async function addService() {
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
             if(t && p) { await _supabase.from('services').insert([{ title: t, price: p, category: 'Service' }]); loadAdminList(); loadServices(); }
         }
+
+        function showTab(t) { /* Navigation logic for future expansions */ }
 
         window.onload = () => { loadServices(); loadOrders(); };
     </script>
