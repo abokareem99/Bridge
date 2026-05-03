@@ -30,10 +30,13 @@
         .admin-btn { color: var(--pi-g); cursor: pointer; font-size: 0.9rem; opacity: 0.4; transition: 0.3s; }
         .admin-btn:hover { opacity: 1; }
         .order-item { background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--pi-g); }
-        footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 20px; }
-        .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 5px; }
-        .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; cursor: pointer; }
+        
+        /* تنسيق قسم التذييل (Footer) ليكون بارزاً */
+        footer { padding: 40px 0 60px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.1); margin-top: 30px; }
+        .policy-links { font-size: 0.8rem; color: var(--pi-g); display: flex; justify-content: center; gap: 25px; margin-bottom: 15px; }
+        .policy-links a { color: var(--pi-g); text-decoration: underline; opacity: 0.9; font-weight: bold; cursor: pointer; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; }
+
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
         .modal-content { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; color: var(--pi-d); }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
@@ -60,6 +63,14 @@
             <p style="text-align: center; opacity: 0.5; font-size: 0.7rem;">Loading Orders...</p>
         </div>
     </section>
+
+    <footer>
+        <div class="policy-links">
+            <a onclick="alert('Privacy Policy: We protect your Pi data and ensure secure transactions.')">Privacy Policy</a>
+            <a onclick="alert('Terms of Use: Use this platform for legal freelance services.')">Terms of Use</a>
+        </div>
+        <p class="copy-text">&copy; 2026 Bridge Freelance. All rights reserved.</p>
+    </footer>
 
     <div id="adminModal" class="modal">
         <div class="modal-content">
@@ -97,15 +108,12 @@
     <div id="toast"></div>
 
     <script>
-        // إعداد Supabase
         const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
         let currentTxId = "", currentPrice = 0, currentCategory = "";
 
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
-
         function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
         function closeAdmin() { document.getElementById('adminModal').style.display='none'; }
-   
         function checkAdmin() {
             if(document.getElementById('adminPass').value === "ateya2026") {
                 document.getElementById('adminAuth').style.display='none';
@@ -117,11 +125,8 @@
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
             if(!t || !p) return showMsg("Please fill all fields");
-            try {
-                await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-                showMsg("Success!");
-                location.reload();
-            } catch (e) { showMsg("Error adding service"); }
+            await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
+            showMsg("Success!"); location.reload();
         }
 
         async function startApp() {
@@ -131,21 +136,13 @@
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Verified ✅";
                 document.getElementById('authBtn').style.background = "#2ecc71";
-                showMsg("Welcome " + window.currentUser);
             } catch (e) { showMsg("Login failed"); }
         }
 
         async function loadServices() {
             try {
-                const { data, error } = await _supabase.from('services').select('*').eq('category', 'Service');
-                if (error) throw error;
+                const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
                 const activeOnes = data.filter(s => s.status && s.status.includes('active'));
-                
-                if (activeOnes.length === 0) {
-                    document.getElementById('servicesContainer').innerHTML = "<p style='grid-column: 1/3; text-align: center;'>No services available.</p>";
-                    return;
-                }
-
                 document.getElementById('servicesContainer').innerHTML = activeOnes.map(s => {
                     let icon = s.title.includes('Design') ? 'fa-palette' : 
                                s.title.includes('Program') ? 'fa-code' : 
@@ -157,14 +154,12 @@
                             <span class="price-badge">${s.price} Pi</span>
                         </div>`;
                 }).join('');
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
         async function loadOrders() {
             try {
-                const { data, error } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(6);
-                if (error) throw error;
-
+                const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(6);
                 if (data && data.length > 0) {
                     document.getElementById('ordersList').innerHTML = data.map(o => `
                         <div class="order-item">
@@ -174,10 +169,8 @@
                             <div style="font-size:0.65rem; opacity:0.8;">Ordered by: ${o.user_pi || 'Guest'}</div>
                         </div>
                     `).join('');
-                } else {
-                    document.getElementById('ordersList').innerHTML = "<p style='text-align: center; font-size: 0.7rem;'>No recent orders.</p>";
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
         async function processPayment(amt, name) {
@@ -186,27 +179,23 @@
             try {
                 showMsg("Starting payment...");
                 await window.Pi.createPayment({ 
-                    amount: amt, 
-                    memo: "Service: " + name, 
-                    metadata: { service: name } 
+                    amount: amt, memo: "Service: " + name, metadata: { service: name } 
                 }, {
                     onReadyForServerApproval: (id) => {
                         return fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
+                            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
                             body: JSON.stringify({ paymentId: id, action: 'approve' }) 
                         }).then(r => r.json());
                     },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
                         await fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
+                            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
                             body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
                         });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (error) => showMsg("Payment Failed"),
+                    onError: () => showMsg("Payment Failed"),
                     onCancel: () => showMsg("Payment Cancelled")
                 });
             } catch (e) { showMsg("Payment error"); }
@@ -217,35 +206,20 @@
             const contact = document.getElementById('contactInfo').value;
             if(!detail || !contact) return showMsg("Fill all fields");
             try {
-                showMsg("Sending Request...");
                 await _supabase.from('services').insert([{ 
-                    title: currentCategory, 
-                    description: detail, 
-                    price: String(currentPrice), 
-                    category: 'Order', 
-                    contact_info: contact, 
-                    user_pi: window.currentUser, 
-                    txid: currentTxId, 
-                    status: 'order' 
+                    title: currentCategory, description: detail, price: String(currentPrice), 
+                    category: 'Order', contact_info: contact, user_pi: window.currentUser, 
+                    txid: currentTxId, status: 'order' 
                 }]);
-                
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { 
-                    username: window.currentUser, 
-                    service_detail: detail, 
-                    contact_info: contact, 
-                    order_id: currentTxId, 
-                    price: currentPrice 
+                    username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice 
                 });
-                
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
-            } catch (e) { showMsg("Error submitting order"); }
+            } catch (e) { showMsg("Error"); }
         }
 
-        window.onload = () => { 
-            loadServices(); 
-            loadOrders(); 
-        };
+        window.onload = () => { loadServices(); loadOrders(); };
     </script>
 </body>
 </html>
