@@ -29,10 +29,13 @@
         .admin-btn { color: var(--pi-g); cursor: pointer; font-size: 0.9rem; opacity: 0.4; transition: 0.3s; }
         .admin-btn:hover { opacity: 1; }
         .order-item { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--pi-g); }
-        footer { padding: 20px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.05); margin-top: 20px; }
-        .policy-links { font-size: 0.7rem; color: var(--pi-g); display: flex; justify-content: center; gap: 15px; margin-bottom: 5px; }
-        .policy-links a { color: var(--pi-g); text-decoration: none; opacity: 0.8; font-weight: bold; cursor: pointer; }
+        
+        /* التعديل هنا لرفع الروابط للأعلى */
+        footer { padding: 40px 0 60px 0; text-align: center; border-top: 1px solid rgba(255,183,77,0.1); margin-top: 30px; }
+        .policy-links { font-size: 0.8rem; color: var(--pi-g); display: flex; justify-content: center; gap: 25px; margin-bottom: 15px; }
+        .policy-links a { color: var(--pi-g); text-decoration: underline; opacity: 0.9; font-weight: bold; cursor: pointer; }
         .copy-text { font-size: 0.6rem; color: white; opacity: 0.4; }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 4000; }
         .modal-content { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; color: var(--pi-d); }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 10px 20px; border-radius: 20px; display: none; z-index: 5000; font-size: 0.8rem; font-weight: bold; }
@@ -113,17 +116,19 @@
                 document.getElementById('adminTools').style.display='block';
             } else { showMsg("Incorrect Password"); }
         }
+        
         async function addService() {
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
             if(!t || !p) return;
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            showMsg("Success!"); location.reload();
+            showMsg("Success!");
+            location.reload();
         }
 
         async function startApp() {
             try {
-                await window.Pi.init({ version: "2.0", sandbox: true }); 
+                await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Verified ✅";
@@ -134,19 +139,19 @@
         async function loadServices() {
             try {
                 const { data } = await _supabase.from('services').select('*');
-                const activeOnes = data.filter(s => s.status && s.status.includes('active'));
+                const activeOnes = data.filter(s => s.status && s.status.includes('active') && s.category === 'Service');
                 document.getElementById('servicesContainer').innerHTML = activeOnes.map(s => {
-                    let icon = s.title.includes('Design') ? 'fa-palette' : 
-                               s.title.includes('Program') ? 'fa-code' : 
-                               s.title.includes('Market') ? 'fa-bullhorn' : 
-                               s.title.includes('Translat') ? 'fa-language' : 'fa-briefcase';
+                    let icon = s.title.includes('Design') || s.title.includes('تصميم') ? 'fa-palette' : 
+                               s.title.includes('Program') || s.title.includes('برمج') ? 'fa-code' : 
+                               s.title.includes('Market') || s.title.includes('تسويق') ? 'fa-bullhorn' : 
+                               s.title.includes('Translat') || s.title.includes('ترجم') ? 'fa-language' : 'fa-briefcase';
                     return `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
                             <i class="fas ${icon}"></i>
                             <span>${s.title}</span>
                             <span class="price-badge">${s.price} Pi</span>
                         </div>`;
                 }).join('');
-            } catch (e) {}
+            } catch (e) { console.error(e); }
         }
 
         async function processPayment(amt, name) {
@@ -187,20 +192,39 @@
             if(!detail || !contact) return showMsg("Fill all fields");
             try {
                 showMsg("Sending Request...");
-                await _supabase.from('services').insert([{ title: currentCategory, description: detail, price: String(currentPrice), category: 'Order', contact_info: contact, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
-                await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: detail, contact_info: contact, order_id: currentTxId, price: currentPrice });
+                await _supabase.from('orders').insert([{ 
+                    service: currentCategory, 
+                    description: detail, 
+                    price: String(currentPrice), 
+                    contact_info: contact, 
+                    user_pi: window.currentUser, 
+                    txid: currentTxId, 
+                    status: 'pending' 
+                }]);
+                
+                await emailjs.send("service_vuti648", "template_m6rq1ab", { 
+                    username: window.currentUser, 
+                    service_detail: detail, 
+                    contact_info: contact, 
+                    order_id: currentTxId, 
+                    price: currentPrice 
+                });
+                
                 document.getElementById('reqModal').style.display = 'none';
                 document.getElementById('autoReplyModal').style.display = 'flex';
-            } catch (e) { showMsg("Error"); }
+            } catch (e) { 
+                console.error(e);
+                showMsg("Database Error - Check RLS Policies"); 
+            }
         }
 
         async function loadOrders() {
-            const { data } = await _supabase.from('services').select('*').order('id', { ascending: false }).limit(4);
+            const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false }).limit(4);
             if (data) {
                 document.getElementById('ordersList').innerHTML = data.map(o => `
                     <div class="order-item">
                         <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.7rem; color:var(--pi-g);">
-                            <span>${o.title}</span><span>${o.price} Pi</span>
+                            <span>${o.service || o.title}</span><span>${o.price} Pi</span>
                         </div>
                         <div style="font-size:0.65rem; opacity:0.8;">User: ${o.user_pi || 'Guest'}</div>
                     </div>
