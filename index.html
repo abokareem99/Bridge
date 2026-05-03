@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bridge Freelance - Final Premium Edition</title>
+    <title>Bridge Freelance - Fixed Navigation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,12 +19,17 @@
         .hero-title { font-size: 1.5rem; color: var(--pi-g); font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); }
         
+        /* Pages Visibility */
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .btn-auth { background: linear-gradient(45deg, var(--pi-g), #ffa726); color: var(--pi-d); border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .btn-free-post { background: var(--glass); color: var(--pi-g); border: 1px solid var(--pi-g); padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
 
-        .categories { padding: 10px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 100; }
-        .cat-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 18px 5px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .categories { padding: 10px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .cat-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 18px 5px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
         .cat-card i { color: var(--pi-d); background: var(--pi-g); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.1rem; margin: 0 auto 10px; }
         .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 5px; }
         .price-badge { font-size: 0.75rem; color: var(--pi-g); font-weight: 800; border: 1px solid var(--pi-g); padding: 2px 10px; border-radius: 8px; }
@@ -36,12 +41,14 @@
 
         footer { text-align: center; padding: 10px 0; margin-top: 10px; }
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
+        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; }
 
+        /* Navigation Bar */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
 
+        /* Modals */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); position: relative; }
         
@@ -55,7 +62,7 @@
 
     <div id="toast"></div>
 
-    <div id="homePage">
+    <div id="homePage" class="page active">
         <section class="hero">
             <h1 class="hero-title">Bridge Freelance</h1>
             <div class="welcome-msg">Welcome to abokareem Platform 🌐</div>
@@ -81,30 +88,41 @@
 
         <footer>
             <div class="policy-links">
-                <a onclick="alert('Privacy Policy: All data is encrypted and handled via Pi Network secure authentication.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality of service is guaranteed. All transactions are final.')">Terms of Use</a>
+                <a onclick="alert('Privacy Policy: All data is encrypted and handled via Pi Network.')">Privacy Policy</a>
+                <a onclick="alert('Terms of Use: Quality of service is guaranteed.')">Terms of Use</a>
             </div>
             <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
         </footer>
+    </div>
+
+    <div id="profilePage" class="page">
+        <section style="padding: 40px 20px; text-align: center;">
+            <div style="background: var(--glass); padding: 30px; border-radius: 30px; border: 1px solid var(--pi-g);">
+                <i class="fas fa-user-circle" style="font-size: 5rem; color: var(--pi-g); margin-bottom: 15px;"></i>
+                <h2 id="profileUser">Not Logged In</h2>
+                <p style="margin-top: 10px; opacity: 0.7;">Your Bridge Freelance Account</p>
+                <hr style="margin: 20px 0; opacity: 0.1;">
+                <div style="text-align: left; font-size: 0.9rem;">
+                    <p><i class="fas fa-wallet"></i> Pi Balance: Verified by App</p>
+                    <p style="margin-top: 10px;"><i class="fas fa-check-decagram"></i> Status: Member</p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <div id="reqModal" class="modal">
         <div class="modal-content">
             <div id="orderForm">
                 <h3 style="text-align:center; color:#2d0a4e; margin-bottom:10px;">Payment Success! 🎉</h3>
-                <p style="font-size:0.8rem; text-align:center; color:#666; margin-bottom:15px;">Please provide details for the admin to contact you.</p>
                 <textarea id="orderDetail" rows="4" placeholder="Describe your request..." style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-                <input type="text" id="contactInfo" placeholder="Your WhatsApp / Email / Telegram" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-                <button id="submitBtn" onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">
-                    <i class="fas fa-paper-plane"></i> Send Order
-                </button>
+                <input type="text" id="contactInfo" placeholder="WhatsApp / Email" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
+                <button id="submitBtn" onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button>
             </div>
-            
             <div id="successScreen">
                 <i class="fas fa-check-circle check-icon"></i>
-                <h2 style="color:#2d0a4e; margin-bottom:10px;">Order Received!</h2>
-                <p style="font-size:0.9rem; color:#555; line-height:1.4;">Thank you! Your request has been sent to the admin. We will contact you soon on your provided info.</p>
-                <button onclick="closeModal('reqModal')" style="width:100%; margin-top:20px; padding:12px; background:#f0f0f0; border:none; border-radius:12px; font-weight:bold; color:#666;">Close Window</button>
+                <h2>Order Received!</h2>
+                <p>We will contact you soon on your provided info.</p>
+                <button onclick="closeModal('reqModal')" style="width:100%; margin-top:20px; padding:12px; background:#f0f0f0; border:none; border-radius:12px;">Close</button>
             </div>
         </div>
     </div>
@@ -113,7 +131,7 @@
         <div class="modal-content">
             <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
             <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Details and how to contact you..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
+            <textarea id="freeDesc" rows="4" placeholder="Contact details..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
             <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
             <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
         </div>
@@ -125,7 +143,6 @@
             <div id="adminAuth">
                 <input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0; border-radius:10px;">
                 <button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:10px;">Unlock</button>
-                <button onclick="closeModal('adminModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999;">Cancel</button>
             </div>
             <div id="adminTools" style="display:none">
                 <input type="text" id="newSTitle" placeholder="Name" style="width:100%; padding:10px; margin-top:10px;">
@@ -143,13 +160,26 @@
     </div>
 
     <script>
-        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
+        const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
         let currentTxId = "", currentPrice = 0, currentCategory = "";
 
-        function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
-        
-        function openAdmin() { document.getElementById('adminModal').style.display = 'flex'; }
+        // التعديل الرئيسي: تفعيل أزرار التنقل
+        function showTab(tab) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            if(tab === 'home') {
+                document.getElementById('homePage').classList.add('active');
+                document.getElementById('homeNav').classList.add('active');
+            } else {
+                document.getElementById('profilePage').classList.add('active');
+                document.getElementById('profileNav').classList.add('active');
+                if(window.currentUser) document.getElementById('profileUser').innerText = window.currentUser;
+            }
+        }
 
+        function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
+        function openAdmin() { document.getElementById('adminModal').style.display = 'flex'; }
         function closeModal(id) { 
             document.getElementById(id).style.display='none'; 
             if(id === 'reqModal') {
@@ -165,7 +195,7 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
+                document.getElementById('authBtn').innerHTML = "Hi, " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#27ae60";
                 loadServices(); loadOrders();
             } catch (e) { showMsg("Pi Error"); }
@@ -174,14 +204,11 @@
         async function loadServices() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
-                document.getElementById('servicesContainer').innerHTML = data.map(s => {
-                    let t = s.title.toLowerCase();
-                    let icon = t.includes('des') ? 'fa-palette' : t.includes('prog') ? 'fa-code' : t.includes('trans') ? 'fa-language' : 'fa-briefcase';
-                    return `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
-                            <i class="fas ${icon}"></i><span>${s.title}</span>
-                            <span class="price-badge">${s.price} Pi</span>
-                        </div>`;
-                }).join('');
+                document.getElementById('servicesContainer').innerHTML = data.map(s => `
+                    <div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
+                        <i class="fas fa-briefcase"></i><span>${s.title}</span>
+                        <span class="price-badge">${s.price} Pi</span>
+                    </div>`).join('');
             }
         }
 
@@ -197,7 +224,7 @@
                         await fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("Payment Error"),
+                    onError: () => showMsg("Payment Error"),
                     onCancel: () => showMsg("Cancelled")
                 });
             } catch (e) { showMsg("Payment Error"); }
@@ -206,21 +233,15 @@
         async function submitOrder() {
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
-            const btn = document.getElementById('submitBtn');
-            if(!d || !c) return showMsg("Please fill all details");
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            btn.disabled = true;
+            if(!d || !c) return showMsg("Fill details");
+            document.getElementById('submitBtn').disabled = true;
             try {
                 await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successScreen').style.display = 'block';
                 loadOrders();
-            } catch (err) {
-                showMsg("Network Error");
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Try Again';
-                btn.disabled = false;
-            }
+            } catch (err) { showMsg("Error"); document.getElementById('submitBtn').disabled = false; }
         }
 
         async function submitFreeService() {
@@ -229,7 +250,7 @@
             if(!t || !d) return showMsg("Fill details");
             await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free_service' }]);
             closeModal('freeModal');
-            showMsg("Post Successful!");
+            showMsg("Success!");
             loadOrders();
         }
 
@@ -238,11 +259,8 @@
             if (data) {
                 document.getElementById('ordersList').innerHTML = data.map(o => `
                     <div class="order-item">
-                        <div>
-                            <b>${o.title}</b> ${o.price === "0" ? '<span class="free-tag">Free</span>' : ''}
-                            <br><small>by ${o.user_pi}</small>
-                        </div>
-                        <b>${o.price === "0" ? 'Post' : o.price + ' Pi'}</b>
+                        <div><b>${o.title}</b><br><small>by ${o.user_pi}</small></div>
+                        <b>${o.price === "0" ? 'Free' : o.price + ' Pi'}</b>
                     </div>`).join('');
             }
         }
@@ -252,25 +270,22 @@
                 document.getElementById('adminAuth').style.display='none';
                 document.getElementById('adminTools').style.display='block';
                 loadAdminList();
-            } else { showMsg("Wrong Code!"); }
+            } else { showMsg("Wrong!"); }
         }
 
         async function loadAdminList() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
-                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; color:#333;"><span>${s.title}</span><i class="fas fa-trash-alt" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
+                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:5px 0; color:#333;"><span>${s.title}</span><i class="fas fa-trash" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
             }
         }
 
-        async function deleteService(id) { if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); } }
-        
+        async function deleteService(id) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); }
         async function addService() {
             const t = document.getElementById('newSTitle').value;
             const p = document.getElementById('newSPrice').value;
             if(t && p) { await _supabase.from('services').insert([{ title: t, price: p, category: 'Service' }]); loadAdminList(); loadServices(); }
         }
-
-        function showTab(t) { /* Navigation logic for future expansions */ }
 
         window.onload = () => { loadServices(); loadOrders(); };
     </script>
