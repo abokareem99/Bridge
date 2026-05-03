@@ -19,12 +19,10 @@
         .hero { padding: 15px 10px; text-align: center; }
         .hero-title { font-size: 1.5rem; color: var(--pi-g); font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         
-        /* التعديل الأول: رسالة الترحيب باللون الأصفر وبدون ذكر أبو كريم */
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); color: #FFFF00; font-weight: bold; }
         
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         
-        /* التعديل الثاني: زر الدخول باللون البنفسجي فقط وبدون تحول للأخضر */
         .btn-auth { background: #8A2BE2; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: background 0.3s; }
         .btn-auth:hover { background: #6A1B9A; color: white; }
 
@@ -42,7 +40,9 @@
 
         footer { text-align: center; padding: 10px 0; margin-top: 10px; }
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
+        /* تحديث لون الروابط لسهولة القراءة */
+        .policy-links a { color: var(--pi-g); text-decoration: none; font-weight: 600; cursor: pointer; padding: 5px; z-index: 110; position: relative; border-bottom: 1px solid transparent; transition: 0.3s; }
+        .policy-links a:hover { border-bottom: 1px solid var(--pi-g); opacity: 0.8; }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
@@ -86,8 +86,8 @@
 
         <footer>
             <div class="policy-links">
-                <a onclick="alert('Privacy Policy: Encrypted via Pi Network.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality Guaranteed.')">Terms of Use</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Use</a>
             </div>
             <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
         </footer>
@@ -176,11 +176,8 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                
-                /* تم تعديل النص عند الدخول مع الحفاظ على اللون البنفسجي */
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#8A2BE2"; 
-                
                 document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
                 document.getElementById('profileName').innerText = auth.user.username;
                 loadServices(); loadOrders();
