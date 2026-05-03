@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bridge Freelance - Final Confirmation Edition</title>
+    <title>Bridge Freelance - Premium Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,6 +34,10 @@
         .order-item { background: var(--glass); padding: 8px 12px; border-radius: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--pi-g); }
         .free-tag { background: #27ae60; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
 
+        footer { text-align: center; padding: 10px 0; margin-top: 10px; }
+        .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
+        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
+
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
@@ -43,7 +47,6 @@
         
         #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        /* Success Message Styling */
         #successScreen { display: none; text-align: center; padding: 20px; }
         .check-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; display: block; }
     </style>
@@ -76,7 +79,11 @@
             <div id="ordersList"></div>
         </section>
 
-        <footer style="text-align:center; padding:10px;">
+        <footer>
+            <div class="policy-links">
+                <a onclick="alert('Privacy Policy: Encrypted via Pi Network.')">Privacy Policy</a>
+                <a onclick="alert('Terms of Use: Quality Guaranteed.')">Terms of Use</a>
+            </div>
             <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
         </footer>
     </div>
@@ -86,8 +93,8 @@
             <div id="orderForm">
                 <h3 style="text-align:center; color:#2d0a4e; margin-bottom:10px;">Payment Success! 🎉</h3>
                 <p style="font-size:0.8rem; text-align:center; color:#666; margin-bottom:15px;">Please provide details for the admin to contact you.</p>
-                <textarea id="orderDetail" rows="4" placeholder="Order details (What do you need?)" style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-                <input type="text" id="contactInfo" placeholder="WhatsApp / Telegram / Email" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
+                <textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
+                <input type="text" id="contactInfo" placeholder="Contact (WhatsApp/Email)" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
                 <button id="submitBtn" onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">
                     <i class="fas fa-paper-plane"></i> Send Order
                 </button>
@@ -96,7 +103,7 @@
             <div id="successScreen">
                 <i class="fas fa-check-circle check-icon"></i>
                 <h2 style="color:#2d0a4e; margin-bottom:10px;">Order Received!</h2>
-                <p style="font-size:0.9rem; color:#555; line-height:1.4;">Thank you! Your request has been sent to the admin. We will contact you soon on your provided info.</p>
+                <p style="font-size:0.9rem; color:#555; line-height:1.4;">Thank you! Your request has been sent. We will contact you soon on your provided info.</p>
                 <button onclick="closeModal('reqModal')" style="width:100%; margin-top:20px; padding:12px; background:#f0f0f0; border:none; border-radius:12px; font-weight:bold; color:#666;">Close Window</button>
             </div>
         </div>
@@ -142,7 +149,6 @@
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
         function closeModal(id) { 
             document.getElementById(id).style.display='none'; 
-            // Reset modal state if it's the order modal
             if(id === 'reqModal') {
                 document.getElementById('orderForm').style.display = 'block';
                 document.getElementById('successScreen').style.display = 'none';
@@ -193,22 +199,16 @@
             } catch (e) { showMsg("Payment Error"); }
         }
 
-        // الوظيفة المحدثة لإظهار النجاح
         async function submitOrder() {
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
             const btn = document.getElementById('submitBtn');
-
             if(!d || !c) return showMsg("Please fill all details");
-
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             btn.disabled = true;
-
             try {
                 await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
                 await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
-                
-                // الانتقال لشاشة النجاح داخل المودال
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successScreen').style.display = 'block';
                 loadOrders();
@@ -243,7 +243,6 @@
             }
         }
 
-        function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
         async function checkAdmin() {
             if(document.getElementById('adminPass').value === "ateya2026") {
                 document.getElementById('adminAuth').style.display='none';
@@ -263,8 +262,6 @@
             const p = document.getElementById('newSPrice').value;
             if(t && p) { await _supabase.from('services').insert([{ title: t, price: p, category: 'Service' }]); loadAdminList(); loadServices(); }
         }
-
-        function showTab(t) { /* Navigation logic placeholder */ }
 
         window.onload = () => { loadServices(); loadOrders(); };
     </script>
