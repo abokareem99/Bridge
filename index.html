@@ -40,9 +40,8 @@
 
         footer { text-align: center; padding: 10px 0; margin-top: 10px; }
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        /* تحديث لون الروابط لسهولة القراءة */
-        .policy-links a { color: var(--pi-g); text-decoration: none; font-weight: 600; cursor: pointer; padding: 5px; z-index: 110; position: relative; border-bottom: 1px solid transparent; transition: 0.3s; }
-        .policy-links a:hover { border-bottom: 1px solid var(--pi-g); opacity: 0.8; }
+        .policy-links a { color: var(--pi-g); text-decoration: none; font-weight: 600; cursor: pointer; padding: 5px; z-index: 110; position: relative; transition: 0.3s; }
+        .policy-links a:hover { opacity: 0.7; text-decoration: underline; }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
@@ -53,7 +52,7 @@
 
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); }
-        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; }
     </style>
 </head>
 <body>
@@ -217,10 +216,18 @@
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
             if(!d || !c) return showMsg("Fill details");
-            await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
-            await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
-            document.getElementById('reqModal').style.display = 'none';
-            showMsg("Submitted!"); loadOrders();
+            
+            try {
+                await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
+                await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
+                
+                document.getElementById('reqModal').style.display = 'none';
+                // إظهار رسالة النجاح الخضراء
+                showMsg("✅ تم استلام طلبك بنجاح! سنتواصل معك قريباً.");
+                loadOrders();
+            } catch (e) {
+                showMsg("Error submitting order");
+            }
         }
 
         async function submitFreeService() {
@@ -228,7 +235,9 @@
             const d = document.getElementById('freeDesc').value;
             if(!t || !d) return showMsg("Fill details");
             await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
-            closeModal('freeModal'); showMsg("Posted!"); loadOrders();
+            closeModal('freeModal'); 
+            showMsg("✅ Posted successfully!"); 
+            loadOrders();
         }
 
         async function loadUserProfile() {
