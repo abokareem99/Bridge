@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bridge Freelance - Premium Edition</title>
+    <title>Bridge Freelance - Final Confirmation Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,41 +14,17 @@
         :root { --pi-p: #6a1b9a; --pi-d: #2d0a4e; --pi-g: #ffb74d; --white: #ffffff; --glass: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            background: radial-gradient(circle at top, #4a148c, #2d0a4e); 
-            min-height: 100vh; color: var(--white); 
-            padding-bottom: 100px; 
-            overflow-x: hidden;
-        }
-
+        body { background: radial-gradient(circle at top, #4a148c, #2d0a4e); min-height: 100vh; color: var(--white); padding-bottom: 100px; overflow-x: hidden; }
         .hero { padding: 15px 10px; text-align: center; }
         .hero-title { font-size: 1.5rem; color: var(--pi-g); font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); }
         
-        /* Container for Auth and Free Post Buttons */
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-
-        .btn-auth { 
-            background: linear-gradient(45deg, var(--pi-g), #ffa726); 
-            color: var(--pi-d); border: none; padding: 10px 20px; border-radius: 50px; 
-            font-weight: bold; cursor: pointer; font-size: 0.8rem;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn-free-post {
-            background: var(--glass); color: var(--pi-g); border: 1px solid var(--pi-g);
-            padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .btn-auth { background: linear-gradient(45deg, var(--pi-g), #ffa726); color: var(--pi-d); border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn-free-post { background: var(--glass); color: var(--pi-g); border: 1px solid var(--pi-g); padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
 
         .categories { padding: 10px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 100; }
-        .cat-card { 
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.1); 
-            padding: 18px 5px; border-radius: 20px; text-align: center; 
-            cursor: pointer; transition: 0.2s; position: relative;
-        }
-        .cat-card:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
+        .cat-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 18px 5px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
         .cat-card i { color: var(--pi-d); background: var(--pi-g); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.1rem; margin: 0 auto 10px; }
         .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 5px; }
         .price-badge { font-size: 0.75rem; color: var(--pi-g); font-weight: 800; border: 1px solid var(--pi-g); padding: 2px 10px; border-radius: 8px; }
@@ -58,21 +34,18 @@
         .order-item { background: var(--glass); padding: 8px 12px; border-radius: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--pi-g); }
         .free-tag { background: #27ae60; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
 
-        footer { text-align: center; padding: 10px 0; margin-top: 10px; }
-        .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
-
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
 
-        #profileSection { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
-        .profile-card { background: var(--glass); border-radius: 22px; padding: 20px; text-align: center; border: 1px solid rgba(255,183,77,0.2); }
-
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); }
+        .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); position: relative; }
         
         #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        
+        /* Success Message Styling */
+        #successScreen { display: none; text-align: center; padding: 20px; }
+        .check-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; display: block; }
     </style>
 </head>
 <body>
@@ -103,31 +76,30 @@
             <div id="ordersList"></div>
         </section>
 
-        <footer>
-            <div class="policy-links">
-                <a onclick="alert('Privacy Policy: Encrypted via Pi Network.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality Guaranteed.')">Terms of Use</a>
-            </div>
+        <footer style="text-align:center; padding:10px;">
             <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
         </footer>
     </div>
 
-    <section id="profileSection">
-        <div class="profile-card">
-            <div style="width:70px; height:70px; background:var(--pi-g); color:var(--pi-d); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 12px; font-weight:bold;" id="userInitial">?</div>
-            <h2 id="profileName" style="font-size: 1.3rem; margin-bottom:15px; color: var(--pi-g);">Guest</h2>
-            <div style="display:flex; justify-content:center; gap:25px;">
-                <div><b id="totalOrders" style="color:var(--pi-g); font-size: 1.2rem;">0</b><p style="font-size:0.65rem;">Orders</p></div>
-                <div><b id="totalSpent" style="color:var(--pi-g); font-size: 1.2rem;">0</b><p style="font-size:0.65rem;">Pi Spent</p></div>
+    <div id="reqModal" class="modal">
+        <div class="modal-content">
+            <div id="orderForm">
+                <h3 style="text-align:center; color:#2d0a4e; margin-bottom:10px;">Payment Success! 🎉</h3>
+                <p style="font-size:0.8rem; text-align:center; color:#666; margin-bottom:15px;">Please provide details for the admin to contact you.</p>
+                <textarea id="orderDetail" rows="4" placeholder="Order details (What do you need?)" style="width:100%; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
+                <input type="text" id="contactInfo" placeholder="WhatsApp / Telegram / Email" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
+                <button id="submitBtn" onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">
+                    <i class="fas fa-paper-plane"></i> Send Order
+                </button>
+            </div>
+            
+            <div id="successScreen">
+                <i class="fas fa-check-circle check-icon"></i>
+                <h2 style="color:#2d0a4e; margin-bottom:10px;">Order Received!</h2>
+                <p style="font-size:0.9rem; color:#555; line-height:1.4;">Thank you! Your request has been sent to the admin. We will contact you soon on your provided info.</p>
+                <button onclick="closeModal('reqModal')" style="width:100%; margin-top:20px; padding:12px; background:#f0f0f0; border:none; border-radius:12px; font-weight:bold; color:#666;">Close Window</button>
             </div>
         </div>
-        <h3 style="color: var(--pi-g); margin: 20px 0 10px; text-align: right;">سجل طلباتي</h3>
-        <div id="userOrdersList"></div>
-    </section>
-
-    <div class="nav-bar">
-        <div class="nav-item active" id="homeNav" onclick="showTab('home')"><i class="fas fa-layer-group"></i></div>
-        <div class="nav-item" id="profileNav" onclick="showTab('profile')"><i class="fas fa-user-astronaut"></i></div>
     </div>
 
     <div id="freeModal" class="modal">
@@ -140,31 +112,27 @@
         </div>
     </div>
 
-    <div id="reqModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Payment Success!</h3>
-            <textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <input type="text" id="contactInfo" placeholder="Contact Info" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <button onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button>
-        </div>
-    </div>
-
     <div id="adminModal" class="modal">
         <div class="modal-content">
             <h4 style="text-align:center;">Admin Panel</h4>
             <div id="adminAuth">
                 <input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0; border-radius:10px;">
                 <button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:10px;">Unlock</button>
-                <button onclick="closeAdmin()" style="width:100%; margin-top:10px; background:none; border:none; color:#999;">Cancel</button>
+                <button onclick="closeModal('adminModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999;">Cancel</button>
             </div>
             <div id="adminTools" style="display:none">
                 <input type="text" id="newSTitle" placeholder="Name" style="width:100%; padding:10px; margin-top:10px;">
                 <input type="number" id="newSPrice" placeholder="Price" style="width:100%; padding:10px; margin-top:10px;">
                 <button onclick="addService()" style="width:100%; padding:12px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:10px;">Add</button>
                 <div id="adminServiceList" style="margin-top:15px; max-height:120px; overflow-y:auto;"></div>
-                <button onclick="closeAdmin()" style="width:100%; padding:10px; margin-top:15px; background:#eee; border:none; border-radius:10px;">Close</button>
+                <button onclick="closeModal('adminModal')" style="width:100%; padding:10px; margin-top:15px; background:#eee; border:none; border-radius:10px;">Close</button>
             </div>
         </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active" id="homeNav" onclick="showTab('home')"><i class="fas fa-layer-group"></i></div>
+        <div class="nav-item" id="profileNav" onclick="showTab('profile')"><i class="fas fa-user-astronaut"></i></div>
     </div>
 
     <script>
@@ -172,24 +140,15 @@
         let currentTxId = "", currentPrice = 0, currentCategory = "";
 
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
-        function closeModal(id) { document.getElementById(id).style.display='none'; }
-        function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
-        
-        function showTab(tab) {
-            if(tab === 'profile') {
-                if(!window.currentUser) { showMsg("Login Pi first"); return; }
-                document.getElementById('homePage').style.display = 'none';
-                document.getElementById('profileSection').style.display = 'block';
-                document.getElementById('profileNav').classList.add('active');
-                document.getElementById('homeNav').classList.remove('active');
-                loadUserProfile();
-            } else {
-                document.getElementById('homePage').style.display = 'block';
-                document.getElementById('profileSection').style.display = 'none';
-                document.getElementById('homeNav').classList.add('active');
-                document.getElementById('profileNav').classList.remove('active');
+        function closeModal(id) { 
+            document.getElementById(id).style.display='none'; 
+            // Reset modal state if it's the order modal
+            if(id === 'reqModal') {
+                document.getElementById('orderForm').style.display = 'block';
+                document.getElementById('successScreen').style.display = 'none';
             }
         }
+        function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
 
         async function startApp() {
             try {
@@ -198,7 +157,7 @@
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#27ae60";
-                loadServices();
+                loadServices(); loadOrders();
             } catch (e) { showMsg("Pi Error"); }
         }
 
@@ -207,7 +166,7 @@
             if(data) {
                 document.getElementById('servicesContainer').innerHTML = data.map(s => {
                     let t = s.title.toLowerCase();
-                    let icon = t.includes('des') ? 'fa-palette' : t.includes('prog') ? 'fa-code' : 'fa-briefcase';
+                    let icon = t.includes('des') ? 'fa-palette' : t.includes('prog') ? 'fa-code' : t.includes('trans') ? 'fa-language' : 'fa-briefcase';
                     return `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')">
                             <i class="fas ${icon}"></i><span>${s.title}</span>
                             <span class="price-badge">${s.price} Pi</span>
@@ -221,25 +180,11 @@
             currentPrice = amt; currentCategory = name;
             try {
                 showMsg("Opening Wallet...");
-                await window.Pi.createPayment({ 
-                    amount: amt, 
-                    memo: "Service: " + name, 
-                    metadata: { service: name } 
-                }, {
-                    onReadyForServerApproval: (id) => {
-                        return fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId: id, action: 'approve' }) 
-                        }).then(r => r.json());
-                    },
+                await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
+                    onReadyForServerApproval: (id) => fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()),
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
                     onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
-                        });
+                        await fetch('/api/payment-handler', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
                     onError: (e) => showMsg("Payment Error"),
@@ -248,15 +193,30 @@
             } catch (e) { showMsg("Payment Error"); }
         }
 
+        // الوظيفة المحدثة لإظهار النجاح
         async function submitOrder() {
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
-            if(!d || !c) return showMsg("Fill details");
-            await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
-            await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
-            document.getElementById('reqModal').style.display = 'none';
-            showMsg("Submitted!");
-            loadOrders();
+            const btn = document.getElementById('submitBtn');
+
+            if(!d || !c) return showMsg("Please fill all details");
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+
+            try {
+                await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
+                await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
+                
+                // الانتقال لشاشة النجاح داخل المودال
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
+                loadOrders();
+            } catch (err) {
+                showMsg("Network Error");
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Try Again';
+                btn.disabled = false;
+            }
         }
 
         async function submitFreeService() {
@@ -267,41 +227,6 @@
             closeModal('freeModal');
             showMsg("Post Successful!");
             loadOrders();
-        }
-
-        function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
-        function closeAdmin() { document.getElementById('adminModal').style.display='none'; }
-        async function checkAdmin() {
-            if(document.getElementById('adminPass').value === "ateya2026") {
-                document.getElementById('adminAuth').style.display='none';
-                document.getElementById('adminTools').style.display='block';
-                loadAdminList();
-            } else { showMsg("Wrong!"); }
-        }
-        async function loadAdminList() {
-            const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
-            if(data) {
-                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;"><span>${s.title}</span><i class="fas fa-trash-alt" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
-            }
-        }
-        async function deleteService(id) {
-            if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); }
-        }
-        async function addService() {
-            const t = document.getElementById('newSTitle').value;
-            const p = document.getElementById('newSPrice').value;
-            if(!t || !p) return;
-            await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            showMsg("Added!"); loadAdminList(); loadServices();
-        }
-
-        async function loadUserProfile() {
-            const { data } = await _supabase.from('services').select('*').eq('user_pi', window.currentUser).eq('category', 'Order').order('id', { ascending: false });
-            if (data) {
-                document.getElementById('totalOrders').innerText = data.length;
-                document.getElementById('totalSpent').innerText = data.reduce((acc, curr) => acc + parseFloat(curr.price || 0), 0).toFixed(3);
-                document.getElementById('userOrdersList').innerHTML = data.map(o => `<div class="order-item" style="text-align: right;"><div><b>${o.title}</b></div><b>${o.price} Pi</b></div>`).join('');
-            }
         }
 
         async function loadOrders() {
@@ -317,6 +242,29 @@
                     </div>`).join('');
             }
         }
+
+        function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
+        async function checkAdmin() {
+            if(document.getElementById('adminPass').value === "ateya2026") {
+                document.getElementById('adminAuth').style.display='none';
+                document.getElementById('adminTools').style.display='block';
+                loadAdminList();
+            } else { showMsg("Wrong Code!"); }
+        }
+        async function loadAdminList() {
+            const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
+            if(data) {
+                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; color:#333;"><span>${s.title}</span><i class="fas fa-trash-alt" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
+            }
+        }
+        async function deleteService(id) { if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); } }
+        async function addService() {
+            const t = document.getElementById('newSTitle').value;
+            const p = document.getElementById('newSPrice').value;
+            if(t && p) { await _supabase.from('services').insert([{ title: t, price: p, category: 'Service' }]); loadAdminList(); loadServices(); }
+        }
+
+        function showTab(t) { /* Navigation logic placeholder */ }
 
         window.onload = () => { loadServices(); loadOrders(); };
     </script>
