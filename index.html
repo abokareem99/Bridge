@@ -26,9 +26,11 @@
         .cat-card i { color: var(--pi-d); background: var(--pi-g); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.1rem; margin: 0 auto 10px; }
         .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 5px; }
         .price-badge { font-size: 0.75rem; color: var(--pi-g); font-weight: 800; border: 1px solid var(--pi-g); padding: 2px 10px; border-radius: 8px; }
+        
         .orders-section { padding: 12px; max-width: 500px; margin: 10px auto; background: rgba(0,0,0,0.2); border-radius: 22px; }
-        #ordersList { max-height: 110px; overflow-y: auto; }
-        .order-item { background: var(--glass); padding: 8px 12px; border-radius: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--pi-g); }
+        #ordersList { max-height: 250px; overflow-y: auto; }
+        .order-item { background: var(--glass); padding: 10px 15px; border-radius: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--pi-g); }
+        
         footer { text-align: center; padding: 10px 0; margin-top: 10px; }
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
         .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
@@ -37,13 +39,12 @@
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
         #profileSection { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
         .profile-card { background: var(--glass); border-radius: 22px; padding: 20px; text-align: center; border: 1px solid rgba(255,183,77,0.2); }
+        
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); text-align: center; }
         #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        /* تصميم الصح الأخضر */
-        .success-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; animation: scaleUp 0.3s ease; }
-        @keyframes scaleUp { from {transform: scale(0);} to {transform: scale(1);} }
+        .success-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -68,7 +69,7 @@
 
         <section class="orders-section">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size: 0.85rem;">
-                <span style="color:var(--pi-g); font-weight:bold;"><i class="fas fa-history"></i> Global Activity</span>
+                <span style="color:var(--pi-g); font-weight:bold;"><i class="fas fa-history"></i> Latest 4 Activity</span>
                 <i class="fas fa-cog" style="opacity:0.4; padding: 5px; cursor:pointer;" onclick="openAdmin()"></i>
             </div>
             <div id="ordersList"></div>
@@ -125,7 +126,7 @@
             <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
             <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
             <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
-            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
+            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999;">Cancel</button>
         </div>
     </div>
 
@@ -159,14 +160,10 @@
                 if(!window.currentUser) { showMsg("Login Pi first"); return; }
                 document.getElementById('homePage').style.display = 'none';
                 document.getElementById('profileSection').style.display = 'block';
-                document.getElementById('profileNav').classList.add('active');
-                document.getElementById('homeNav').classList.remove('active');
                 loadUserProfile();
             } else {
                 document.getElementById('homePage').style.display = 'block';
                 document.getElementById('profileSection').style.display = 'none';
-                document.getElementById('homeNav').classList.add('active');
-                document.getElementById('profileNav').classList.remove('active');
             }
         }
 
@@ -176,7 +173,6 @@
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
-                document.getElementById('authBtn').style.background = "#8A2BE2"; 
                 document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
                 document.getElementById('profileName').innerText = auth.user.username;
                 loadServices(); loadOrders();
@@ -198,7 +194,6 @@
             if(!window.currentUser) { showMsg("Login Pi first"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                showMsg("جاري فتح المحفظة...");
                 await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
                     onReadyForServerApproval: (id) => { return fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()); },
                     onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
@@ -206,7 +201,7 @@
                         await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("Payment Error"),
+                    onError: () => showMsg("Payment Error"),
                     onCancel: () => showMsg("Cancelled")
                 });
             } catch (e) { showMsg("Payment Error"); }
@@ -219,7 +214,6 @@
             await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
             await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
             document.getElementById('reqModal').style.display = 'none';
-            // إظهار نافذة النجاح بالصح الأخضر
             document.getElementById('successModal').style.display = 'flex';
             loadOrders();
         }
@@ -230,7 +224,6 @@
             if(!t || !d) return showMsg("Fill details");
             await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
             closeModal('freeModal'); 
-            // إظهار نافذة النجاح بالصح الأخضر
             document.getElementById('successModal').style.display = 'flex';
             loadOrders();
         }
@@ -240,14 +233,28 @@
             if (data) {
                 document.getElementById('totalOrders').innerText = data.length;
                 document.getElementById('totalSpent').innerText = data.reduce((acc, curr) => acc + parseFloat(curr.price || 0), 0).toFixed(3);
-                document.getElementById('userOrdersList').innerHTML = data.map(o => `<div class="order-item" style="text-align: right;"><div><b>${o.title}</b></div><b>${o.price} Pi</b></div>`).join('');
+                document.getElementById('userOrdersList').innerHTML = data.map(o => `<div class="order-item"><div><b>${o.title}</b></div><b>${o.price} Pi</b></div>`).join('');
             }
         }
 
+        /* التعديل هنا: جلب آخر 4 طلبات فقط للعرض في الواجهة */
         async function loadOrders() {
-            const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(4);
-            if (data) {
-                document.getElementById('ordersList').innerHTML = data.map(o => `<div class="order-item"><div><b>${o.title}</b><br><small>by ${o.user_pi}</small></div><b>${o.price} Pi</b></div>`).join('');
+            const { data } = await _supabase.from('services')
+                .select('*')
+                .eq('category', 'Order')
+                .order('id', { ascending: false })
+                .limit(4);
+            
+            const list = document.getElementById('ordersList');
+            if (data && data.length > 0) {
+                list.innerHTML = data.map(o => `
+                    <div class="order-item">
+                        <div><b>${o.title}</b><br><small>by ${o.user_pi}</small></div>
+                        <div style="text-align:right"><b>${o.price} Pi</b><br><small style="color:#27ae60">${o.status === 'free' ? 'Free' : 'Paid'}</small></div>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p style="text-align:center; font-size:0.7rem; opacity:0.5; padding:20px;">No recent activity.</p>';
             }
         }
 
