@@ -24,8 +24,7 @@
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         
         .btn-auth { background: #8A2BE2; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: background 0.3s; }
-        .btn-auth:hover { background: #6A1B9A; color: white; }
-
+        
         .btn-free-post { background: var(--glass); color: var(--pi-g); border: 1px solid var(--pi-g); padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
 
         .categories { padding: 10px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 100; }
@@ -52,6 +51,8 @@
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); }
         #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        
+        .success-icon { font-size: 60px; color: #2ecc71; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -128,6 +129,20 @@
         </div>
     </div>
 
+    <div id="successModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 style="color: #2d0a4e; margin-bottom: 10px;">Order Received!</h2>
+            <p style="color: #666; font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px;">
+                Thank you for choosing <b>Bridge Freelance</b>.<br>
+                We will contact you via email shortly.
+            </p>
+            <button onclick="closeModal('successModal')" style="width: 100%; padding: 15px; background: #4a148c; border: none; border-radius: 12px; font-weight: bold; color: white;">
+                Back to Home
+            </button>
+        </div>
+    </div>
+
     <div id="adminModal" class="modal">
         <div class="modal-content">
             <h4 style="text-align:center;">Admin Panel</h4>
@@ -174,14 +189,11 @@
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
-                document.getElementById('authBtn').style.background = "#8A2BE2"; 
-                
                 document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
                 document.getElementById('profileName').innerText = auth.user.username;
                 loadServices(); loadOrders();
-            } catch (e) { showMsg("Pi Error"); }
+            } catch (e) { showMsg("Pi Connection Error"); }
         }
 
         async function loadServices() {
@@ -207,8 +219,8 @@
                         await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: (e) => showMsg("Payment Error"),
-                    onCancel: () => showMsg("Cancelled")
+                    onError: (e) => showMsg("Payment Failed"),
+                    onCancel: () => showMsg("Payment Cancelled")
                 });
             } catch (e) { showMsg("Payment Error"); }
         }
@@ -216,22 +228,24 @@
         async function submitOrder() {
             const d = document.getElementById('orderDetail').value;
             const c = document.getElementById('contactInfo').value;
-            if(!d || !c) return showMsg("Fill details");
+            if(!d || !c) return showMsg("Please fill details");
             await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
             await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
+            
             document.getElementById('reqModal').style.display = 'none';
-            // 2. تم تعديل رسالة النجاح لتكون بالإنجليزية مع الصح الأخضر
-            showMsg("Submitted Successfully! ✅"); loadOrders();
+            document.getElementById('successModal').style.display = 'flex'; // إظهار نافذة النجاح
+            loadOrders();
         }
 
         async function submitFreeService() {
             const t = document.getElementById('freeTitle').value;
             const d = document.getElementById('freeDesc').value;
-            if(!t || !d) return showMsg("Fill details");
+            if(!t || !d) return showMsg("Please fill details");
             await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
+            
             closeModal('freeModal'); 
-            // 2. تم تعديل رسالة النجاح لتكون بالإنجليزية مع الصح الأخضر
-            showMsg("Posted Successfully! ✅"); loadOrders();
+            document.getElementById('successModal').style.display = 'flex'; // إظهار نافذة النجاح
+            loadOrders();
         }
 
         async function loadUserProfile() {
@@ -256,7 +270,7 @@
                 document.getElementById('adminAuth').style.display='none';
                 document.getElementById('adminTools').style.display='block';
                 loadAdminList();
-            } else { showMsg("Wrong!"); }
+            } else { showMsg("Wrong Access Code!"); }
         }
         async function loadAdminList() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
@@ -270,7 +284,7 @@
             const p = document.getElementById('newSPrice').value;
             if(!t || !p) return;
             await _supabase.from('services').insert([{ title: t, price: p, status: 'active', category: 'Service' }]);
-            showMsg("Added!"); loadAdminList(); loadServices();
+            showMsg("Service Added!"); loadAdminList(); loadServices();
         }
 
         window.onload = () => { loadServices(); loadOrders(); };
