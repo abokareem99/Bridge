@@ -33,23 +33,15 @@
         #ordersList { max-height: 110px; overflow-y: auto; }
         .order-item { background: var(--glass); padding: 8px 12px; border-radius: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--pi-g); }
 
-        footer { text-align: center; padding: 10px 0; margin-top: 10px; }
-        .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
-        .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
-
-        /* أزرار التصفح في ذيل الصفحة */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); overflow-y: auto; max-height: 80vh; }
+        
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
         .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
-
-        /* تنسيقات البروفايل */
-        #profileSection { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
-        .profile-card { background: var(--glass); border-radius: 22px; padding: 20px; text-align: center; border: 1px solid rgba(255,183,77,0.2); }
-
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); }
+        
         #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .success-icon { font-size: 60px; color: #2ecc71; margin-bottom: 15px; text-align: center; }
+        input, textarea { width: 100%; margin-top: 10px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; }
     </style>
 </head>
 <body>
@@ -79,65 +71,57 @@
             </div>
             <div id="ordersList"></div>
         </section>
-
-        <footer>
-            <div class="policy-links">
-                <a onclick="alert('Privacy Policy: All data is encrypted and managed via Pi Network authentication.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality of freelance services is guaranteed through our platform verification.')">Terms of Use</a>
-            </div>
-            <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
-        </footer>
     </div>
 
-    <section id="profileSection">
-        <div class="profile-card">
-            <div style="width:70px; height:70px; background:var(--pi-g); color:var(--pi-d); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 12px; font-weight:bold;" id="userInitial">?</div>
-            <h2 id="profileName" style="font-size: 1.3rem; margin-bottom:15px; color: var(--pi-g);">Guest</h2>
-            <div style="display:flex; justify-content:center; gap:25px;">
-                <div><b id="totalOrders" style="color:var(--pi-g); font-size: 1.2rem;">0</b><p style="font-size:0.65rem;">Orders</p></div>
-                <div><b id="totalSpent" style="color:var(--pi-g); font-size: 1.2rem;">0</b><p style="font-size:0.65rem;">Pi Spent</p></div>
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div id="adminAuth">
+                <h3 style="text-align:center;">Admin Access</h3>
+                <input type="password" id="adminPass" placeholder="Enter Password">
+                <button onclick="checkAdmin()" style="width:100%; margin-top:15px; padding:12px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:10px; font-weight:bold;">Login</button>
             </div>
+            <div id="adminTools" style="display:none;">
+                <h3 style="margin-bottom:10px;">Add New Service</h3>
+                <input type="text" id="newSTitle" placeholder="Service Title">
+                <input type="text" id="newSPrice" placeholder="Price (Pi)">
+                <button onclick="addService()" style="width:100%; margin-top:10px; padding:10px; background:#27ae60; color:white; border:none; border-radius:10px;">Add Service</button>
+                <hr style="margin:20px 0;">
+                <div id="adminServiceList"></div>
+            </div>
+            <button onclick="closeModal('adminModal')" style="width:100%; margin-top:15px; background:none; border:none; color:#999;">Close</button>
         </div>
-        <h3 style="color: var(--pi-g); margin: 20px 0 10px; text-align: left;">My Orders History</h3>
-        <div id="userOrdersList"></div>
-    </section>
-
-    <div class="nav-bar">
-        <div class="nav-item active" id="homeNav" onclick="showTab('home')"><i class="fas fa-layer-group"></i></div>
-        <div class="nav-item" id="profileNav" onclick="showTab('profile')"><i class="fas fa-user-astronaut"></i></div>
     </div>
 
     <div id="successModal" class="modal">
         <div class="modal-content" style="text-align: center;">
-            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-            <h2 style="color: #2d0a4e; margin-bottom: 10px;">Order Received!</h2>
-            <p style="color: #666; font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px;">
-                Thank you for choosing <b>Bridge Freelance</b>.<br>
-                The transaction was successful.
-            </p>
-            <button onclick="closeModal('successModal')" style="width: 100%; padding: 15px; background: #4a148c; border: none; border-radius: 12px; font-weight: bold; color: white;">
-                Back to Home
-            </button>
+            <i class="fas fa-check-circle" style="font-size: 60px; color: #2ecc71; margin-bottom: 15px;"></i>
+            <h2 style="color: #2d0a4e; margin-bottom: 10px;">Success!</h2>
+            <p style="color: #666; font-size: 0.9rem;">Thank you! Your request has been received and added to Global Activity.</p>
+            <button onclick="closeModal('successModal')" style="width: 100%; margin-top: 20px; padding: 15px; background: #4a148c; border: none; border-radius: 12px; font-weight: bold; color: white;">Back to Home</button>
         </div>
     </div>
 
     <div id="reqModal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Payment Success!</h3>
-            <textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <input type="text" id="contactInfo" placeholder="Contact Info" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <button onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button>
+            <h3>Payment Successful!</h3>
+            <textarea id="orderDetail" rows="4" placeholder="Order details..."></textarea>
+            <input type="text" id="contactInfo" placeholder="Contact Info">
+            <button onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); color:var(--pi-d); border:none; border-radius:12px; font-weight:bold;">Send Order</button>
         </div>
     </div>
 
     <div id="freeModal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
-            <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
-            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
+            <h3>Post Free Service</h3>
+            <input type="text" id="freeTitle" placeholder="Service Name">
+            <textarea id="freeDesc" rows="4" placeholder="Description & Contact"></textarea>
+            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; color:white; border:none; border-radius:12px; font-weight:bold;">Post Now</button>
         </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="location.reload()"><i class="fas fa-layer-group"></i></div>
+        <div class="nav-item" onclick="showMsg('Profile Coming Soon')"><i class="fas fa-user-astronaut"></i></div>
     </div>
 
     <script>
@@ -145,100 +129,24 @@
         let currentTxId = "", currentPrice = 0, currentCategory = "";
 
         function showMsg(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
+        function openAdmin() { document.getElementById('adminModal').style.display='flex'; }
         function closeModal(id) { document.getElementById(id).style.display='none'; }
         function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
-
-        // التبديل بين التبويبات
-        function showTab(tab) {
-            if(tab === 'profile') {
-                if(!window.currentUser) { showMsg("Login Pi first"); return; }
-                document.getElementById('homePage').style.display = 'none';
-                document.getElementById('profileSection').style.display = 'block';
-                document.getElementById('profileNav').classList.add('active');
-                document.getElementById('homeNav').classList.remove('active');
-                loadUserProfile();
-            } else {
-                document.getElementById('homePage').style.display = 'block';
-                document.getElementById('profileSection').style.display = 'none';
-                document.getElementById('homeNav').classList.add('active');
-                document.getElementById('profileNav').classList.remove('active');
-            }
-        }
 
         async function startApp() {
             try {
                 await window.Pi.init({ version: "2.0", sandbox: true });
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
-                
-                // إعداد بيانات البروفايل
-                document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
-                document.getElementById('profileName').innerText = auth.user.username;
-
+                document.getElementById('authBtn').innerText = "Welcome, " + auth.user.username;
                 loadServices(); loadOrders();
-            } catch (e) { showMsg("Pi Connection Error"); }
+            } catch (e) { showMsg("Login Error"); }
         }
 
         async function loadServices() {
-            const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
+            const { data } = await _supabase.from('services').select('*').eq('category', 'Service').order('id', {ascending: false});
             if(data) {
-                document.getElementById('servicesContainer').innerHTML = data.map(s => {
-                    let t = s.title.toLowerCase();
-                    let icon = t.includes('des') ? 'fa-palette' : t.includes('prog') ? 'fa-code' : 'fa-briefcase';
-                    return `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')"><i class="fas ${icon}"></i><span>${s.title}</span><span class="price-badge">${s.price} Pi</span></div>`;
-                }).join('');
-            }
-        }
-
-        async function processPayment(amt, name) {
-            if(!window.currentUser) { showMsg("Login Pi first"); return; }
-            currentPrice = amt; currentCategory = name;
-            try {
-                showMsg("Opening wallet...");
-                await window.Pi.createPayment({ amount: amt, memo: "Order: " + name, metadata: { service: name } }, {
-                    onReadyForServerApproval: (id) => { return fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()); },
-                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
-                    onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
-                        document.getElementById('reqModal').style.display = 'flex';
-                    },
-                    onError: (e) => showMsg("Payment Failed"),
-                    onCancel: () => showMsg("Payment Cancelled")
-                });
-            } catch (e) { showMsg("Payment Error"); }
-        }
-
-        async function submitOrder() {
-            const d = document.getElementById('orderDetail').value;
-            const c = document.getElementById('contactInfo').value;
-            if(!d || !c) return showMsg("Please fill details");
-            
-            await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
-            
-            document.getElementById('reqModal').style.display = 'none';
-            document.getElementById('successModal').style.display = 'flex';
-            loadOrders();
-        }
-
-        async function submitFreeService() {
-            const t = document.getElementById('freeTitle').value;
-            const d = document.getElementById('freeDesc').value;
-            if(!t || !d) return showMsg("Please fill details");
-            
-            await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
-            
-            closeModal('freeModal'); 
-            document.getElementById('successModal').style.display = 'flex';
-            loadOrders();
-        }
-
-        async function loadUserProfile() {
-            const { data } = await _supabase.from('services').select('*').eq('user_pi', window.currentUser).eq('category', 'Order').order('id', { ascending: false });
-            if (data) {
-                document.getElementById('totalOrders').innerText = data.length;
-                document.getElementById('totalSpent').innerText = data.reduce((acc, curr) => acc + parseFloat(curr.price || 0), 0).toFixed(3);
-                document.getElementById('userOrdersList').innerHTML = data.map(o => `<div class="order-item"><div><b>${o.title}</b></div><b>${o.price} Pi</b></div>`).join('');
+                document.getElementById('servicesContainer').innerHTML = data.map(s => `<div class="cat-card" onclick="processPayment(${s.price}, '${s.title}')"><i class="fas fa-briefcase"></i><span>${s.title}</span><span class="price-badge">${s.price} Pi</span></div>`).join('');
             }
         }
 
@@ -248,6 +156,63 @@
                 document.getElementById('ordersList').innerHTML = data.map(o => `<div class="order-item"><div><b>${o.title}</b><br><small>by ${o.user_pi}</small></div><b>${o.price} Pi</b></div>`).join('');
             }
         }
+
+        async function processPayment(amt, name) {
+            if(!window.currentUser) return showMsg("Login first");
+            currentPrice = amt; currentCategory = name;
+            try {
+                await window.Pi.createPayment({ amount: amt, memo: "Order: " + name, metadata: { service: name } }, {
+                    onReadyForServerApproval: (id) => fetch('/api/approve', {method:'POST', body: JSON.stringify({id})}),
+                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
+                    onReadyForServerCompletion: (id, tx) => { document.getElementById('reqModal').style.display = 'flex'; },
+                    onError: (e) => showMsg("Failed")
+                });
+            } catch (e) { showMsg("Error"); }
+        }
+
+        async function submitOrder() {
+            const d = document.getElementById('orderDetail').value;
+            const c = document.getElementById('contactInfo').value;
+            await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', user_pi: window.currentUser, contact_info: c, status: 'paid' }]);
+            closeModal('reqModal');
+            document.getElementById('successModal').style.display = 'flex';
+            loadOrders();
+        }
+
+        async function submitFreeService() {
+            const t = document.getElementById('freeTitle').value;
+            const d = document.getElementById('freeDesc').value;
+            await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
+            closeModal('freeModal');
+            document.getElementById('successModal').style.display = 'flex';
+            loadOrders();
+        }
+
+        // منطق الأدمن المصلح
+        async function checkAdmin() {
+            if(document.getElementById('adminPass').value === "ateya2026") {
+                document.getElementById('adminAuth').style.display='none';
+                document.getElementById('adminTools').style.display='block';
+                loadAdminList();
+            } else { showMsg("Wrong Password!"); }
+        }
+
+        async function loadAdminList() {
+            const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
+            if(data) {
+                document.getElementById('adminServiceList').innerHTML = data.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; color: #333;"><span>${s.title}</span><i class="fas fa-trash" style="color:red" onclick="deleteService(${s.id})"></i></div>`).join('');
+            }
+        }
+
+        async function addService() {
+            const t = document.getElementById('newSTitle').value;
+            const p = document.getElementById('newSPrice').value;
+            if(!t || !p) return;
+            await _supabase.from('services').insert([{ title: t, price: p, category: 'Service', status: 'active' }]);
+            showMsg("Added!"); loadAdminList(); loadServices();
+        }
+
+        async function deleteService(id) { if(confirm("Delete?")) { await _supabase.from('services').delete().eq('id', id); loadAdminList(); loadServices(); } }
 
         window.onload = () => { loadServices(); loadOrders(); };
     </script>
