@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bridge Freelance - Premium Edition</title>
+    <title>Bridge Freelance - Chat Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -33,17 +33,28 @@
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
         .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
         
+        /* Navigation Bar */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
-        .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; }
+        .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
-        
+
+        /* Chat System Styling */
+        #chatSection { display: none; padding: 10px; max-width: 500px; margin: 0 auto; height: 80vh; flex-direction: column; }
+        #chatMessages { flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 8px 15px; border-radius: 15px; max-width: 80%; font-size: 0.85rem; line-height: 1.4; position: relative; }
+        .msg-sent { background: #6a1b9a; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
+        .msg-received { background: var(--pi-g); align-self: flex-start; color: var(--pi-d); border-bottom-left-radius: 2px; }
+        .msg-info { font-size: 0.6rem; opacity: 0.7; margin-bottom: 3px; display: block; }
+        .chat-input-area { display: flex; gap: 10px; background: var(--glass); padding: 10px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); }
+        .chat-input-area input { flex-grow: 1; background: none; border: none; color: white; padding: 5px 10px; outline: none; }
+        .btn-send { background: var(--pi-g); border: none; width: 40px; height: 40px; border-radius: 50%; color: var(--pi-d); cursor: pointer; }
+
         #profileSection { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
         .profile-card { background: var(--glass); border-radius: 22px; padding: 20px; text-align: center; border: 1px solid rgba(255,183,77,0.2); }
         
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); text-align: center; }
         #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; }
-        .success-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -63,9 +74,7 @@
                 </button>
             </div>
         </section>
-
         <section class="categories" id="servicesContainer"></section>
-
         <section class="orders-section">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size: 0.85rem;">
                 <span style="color:var(--pi-g); font-weight:bold;"><i class="fas fa-history"></i> Latest 4 Activity</span>
@@ -73,7 +82,6 @@
             </div>
             <div id="ordersList"></div>
         </section>
-
         <footer>
             <div class="policy-links">
                 <a onclick="showPolicy('privacy')">Privacy Policy</a>
@@ -83,13 +91,16 @@
         </footer>
     </div>
 
-    <div id="policyModal" class="modal">
-        <div class="modal-content">
-            <h3 id="policyTitle" style="margin-bottom:15px; color:var(--pi-d);"></h3>
-            <div id="policyBody" style="text-align:left; font-size:0.8rem; color:#444; max-height:250px; overflow-y:auto; margin-bottom:20px; line-height:1.6;"></div>
-            <button onclick="closeModal('policyModal')" style="width:100%; padding:12px; background:var(--pi-d); color:white; border:none; border-radius:12px; font-weight:bold;">Close</button>
+    <section id="chatSection">
+        <h3 style="color:var(--pi-g); text-align:center; margin-bottom:10px;"><i class="fas fa-comments"></i> Community Chat</h3>
+        <div id="chatMessages">
+            <p style="text-align:center; font-size:0.7rem; opacity:0.5; margin-top:20px;">Loading messages...</p>
         </div>
-    </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Write a message...">
+            <button class="btn-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </section>
 
     <section id="profileSection">
         <div class="profile-card">
@@ -104,55 +115,17 @@
         <div id="userOrdersList"></div>
     </section>
 
-    <div id="successModal" class="modal">
-        <div class="modal-content">
-            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-            <h2 style="margin-bottom:10px; color:#2d0a4e;">Success!</h2>
-            <p style="color:#666; margin-bottom:20px;">Your request has been submitted successfully.</p>
-            <button onclick="closeModal('successModal')" style="width:100%; padding:12px; background:var(--pi-d); color:white; border:none; border-radius:12px; font-weight:bold;">Close</button>
-        </div>
-    </div>
-
     <div class="nav-bar">
         <div class="nav-item active" id="homeNav" onclick="showTab('home')"><i class="fas fa-layer-group"></i></div>
+        <div class="nav-item" id="chatNav" onclick="showTab('chat')"><i class="fas fa-comments"></i></div>
         <div class="nav-item" id="profileNav" onclick="showTab('profile')"><i class="fas fa-user-astronaut"></i></div>
     </div>
 
-    <div id="reqModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Payment Success!</h3>
-            <textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <input type="text" id="contactInfo" placeholder="Contact Info" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <button onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button>
-        </div>
-    </div>
-
-    <div id="freeModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
-            <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
-            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999;">Cancel</button>
-        </div>
-    </div>
-
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <h4 style="text-align:center;">Admin Panel</h4>
-            <div id="adminAuth">
-                <input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0; border-radius:10px;">
-                <button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g); border:none; border-radius:10px;">Unlock</button>
-            </div>
-            <div id="adminTools" style="display:none">
-                <input type="text" id="newSTitle" placeholder="Name" style="width:100%; padding:10px; margin-top:10px;">
-                <input type="number" id="newSPrice" placeholder="Price" style="width:100%; padding:10px; margin-top:10px;">
-                <button onclick="addService()" style="width:100%; padding:12px; margin-top:15px; background:#27ae60; color:white; border:none; border-radius:10px;">Add</button>
-                <div id="adminServiceList" style="margin-top:15px; max-height:120px; overflow-y:auto; color:#333;"></div>
-                <button onclick="closeModal('adminModal')" style="width:100%; padding:10px; margin-top:15px; background:#eee; border:none; border-radius:10px;">Close</button>
-            </div>
-        </div>
-    </div>
+    <div id="policyModal" class="modal"><div class="modal-content"><h3 id="policyTitle" style="margin-bottom:15px; color:var(--pi-d);"></h3><div id="policyBody" style="text-align:left; font-size:0.8rem; color:#444; max-height:250px; overflow-y:auto; margin-bottom:20px; line-height:1.6;"></div><button onclick="closeModal('policyModal')" style="width:100%; padding:12px; background:var(--pi-d); color:white; border:none; border-radius:12px; font-weight:bold;">Close</button></div></div>
+    <div id="successModal" class="modal"><div class="modal-content"><div class="success-icon" style="font-size:3rem; color:green;"><i class="fas fa-check-circle"></i></div><h2 style="margin-bottom:10px; color:#2d0a4e;">Success!</h2><p style="color:#666; margin-bottom:20px;">Your request has been submitted.</p><button onclick="closeModal('successModal')" style="width:100%; padding:12px; background:var(--pi-d); color:white; border:none; border-radius:12px; font-weight:bold;">Close</button></div></div>
+    <div id="reqModal" class="modal"><div class="modal-content"><h3 style="text-align:center; color:#2d0a4e;">Payment Success!</h3><textarea id="orderDetail" rows="4" placeholder="Order details..." style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea><input type="text" id="contactInfo" placeholder="Contact Info" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"><button onclick="submitOrder()" style="width:100%; margin-top:15px; padding:14px; background:var(--pi-g); border:none; border-radius:12px; font-weight:bold; color:var(--pi-d);">Send Order</button></div></div>
+    <div id="freeModal" class="modal"><div class="modal-content"><h3>Post Free Service</h3><input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:10px;"><textarea id="freeDesc" rows="4" placeholder="Description" style="width:100%; margin-top:10px; padding:12px; border-radius:10px;"></textarea><button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; color:white; border:none; border-radius:10px;">Post Now</button></div></div>
+    <div id="adminModal" class="modal"><div class="modal-content"><h4>Admin Panel</h4><div id="adminAuth"><input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0;"><button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g);">Unlock</button></div><div id="adminTools" style="display:none"><input type="text" id="newSTitle" placeholder="Name"><input type="number" id="newSPrice" placeholder="Price"><button onclick="addService()" style="width:100%; margin-top:10px; background:green; color:white;">Add</button><div id="adminServiceList" style="margin-top:15px;"></div><button onclick="closeModal('adminModal')" style="margin-top:10px;">Close</button></div></div></div>
 
     <script>
         const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
@@ -162,7 +135,6 @@
         function closeModal(id) { document.getElementById(id).style.display='none'; }
         function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
 
-        // دالة عرض السياسات باحترافية
         function showPolicy(type) {
             const title = document.getElementById('policyTitle');
             const body = document.getElementById('policyBody');
@@ -177,18 +149,27 @@
         }
 
         function showTab(tab) {
-            if(tab === 'profile') {
-                if(!window.currentUser) { showMsg("Login Pi first"); return; }
-                document.getElementById('homePage').style.display = 'none';
+            const sections = ['homePage', 'profileSection', 'chatSection'];
+            const navs = ['homeNav', 'profileNav', 'chatNav'];
+            
+            if((tab === 'profile' || tab === 'chat') && !window.currentUser) {
+                showMsg("Login Pi first"); return;
+            }
+
+            sections.forEach(s => document.getElementById(s).style.display = 'none');
+            navs.forEach(n => document.getElementById(n).classList.remove('active'));
+
+            if(tab === 'home') {
+                document.getElementById('homePage').style.display = 'block';
+                document.getElementById('homeNav').classList.add('active');
+            } else if(tab === 'profile') {
                 document.getElementById('profileSection').style.display = 'block';
                 document.getElementById('profileNav').classList.add('active');
-                document.getElementById('homeNav').classList.remove('active');
                 loadUserProfile();
-            } else {
-                document.getElementById('homePage').style.display = 'block';
-                document.getElementById('profileSection').style.display = 'none';
-                document.getElementById('homeNav').classList.add('active');
-                document.getElementById('profileNav').classList.remove('active');
+            } else if(tab === 'chat') {
+                document.getElementById('chatSection').style.display = 'flex';
+                document.getElementById('chatNav').classList.add('active');
+                loadChatMessages();
             }
         }
 
@@ -200,10 +181,48 @@
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
                 document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
                 document.getElementById('profileName').innerText = auth.user.username;
-                loadServices(); loadOrders();
+                loadServices(); loadOrders(); subscribeToChat();
             } catch (e) { showMsg("Pi Error"); }
         }
 
+        // --- Chat Functions ---
+        async function loadChatMessages() {
+            const { data } = await _supabase.from('messages').select('*').order('created_at', { ascending: true }).limit(50);
+            if(data) {
+                const box = document.getElementById('chatMessages');
+                box.innerHTML = data.map(m => renderMessage(m)).join('');
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        function renderMessage(m) {
+            const isMe = m.sender_id === window.currentUser;
+            return `
+                <div class="message ${isMe ? 'msg-sent' : 'msg-received'}">
+                    <span class="msg-info">${isMe ? 'You' : m.sender_id}</span>
+                    ${m.content}
+                </div>
+            `;
+        }
+
+        async function sendChatMessage() {
+            const inp = document.getElementById('chatInput');
+            const val = inp.value.trim();
+            if(!val || !window.currentUser) return;
+            inp.value = '';
+            await _supabase.from('messages').insert([{ sender_id: window.currentUser, receiver_id: 'public', content: val }]);
+        }
+
+        function subscribeToChat() {
+            _supabase.channel('public:messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                const box = document.getElementById('chatMessages');
+                box.innerHTML += renderMessage(payload.new);
+                box.scrollTop = box.scrollHeight;
+            }).subscribe();
+        }
+
+        // --- Original Functions ---
         async function loadServices() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
