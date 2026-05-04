@@ -19,14 +19,12 @@
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); color: #FFFF00; font-weight: bold; }
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .btn-auth { background: #8A2BE2; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: background 0.3s; }
-        .btn-auth:hover { background: #6A1B9A; color: white; }
         .btn-free-post { background: var(--glass); color: var(--pi-g); border: 1px solid var(--pi-g); padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
         .categories { padding: 10px; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 100; }
-        .cat-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 18px 5px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .cat-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 18px 5px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
         .cat-card i { color: var(--pi-d); background: var(--pi-g); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.1rem; margin: 0 auto 10px; }
         .cat-card span { font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 5px; }
         .price-badge { font-size: 0.75rem; color: var(--pi-g); font-weight: 800; border: 1px solid var(--pi-g); padding: 2px 10px; border-radius: 8px; }
-        
         .orders-section { padding: 12px; max-width: 500px; margin: 10px auto; background: rgba(0,0,0,0.2); border-radius: 22px; }
         #ordersList { max-height: 250px; overflow-y: auto; }
         .order-item { background: var(--glass); padding: 10px 15px; border-radius: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--pi-g); }
@@ -34,16 +32,17 @@
         footer { text-align: center; padding: 10px 0; margin-top: 10px; }
         .policy-links { font-size: 0.7rem; margin-bottom: 8px; display: flex; justify-content: center; gap: 20px; }
         .policy-links a { color: var(--pi-g); text-decoration: underline; cursor: pointer; padding: 5px; z-index: 110; position: relative; }
+        
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a052e; display: flex; justify-content: space-around; padding: 12px 0 22px; border-top: 1px solid var(--glass); z-index: 9999; }
-        .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; transition: 0.3s; }
+        .nav-item { color: white; opacity: 0.4; font-size: 1.5rem; cursor: pointer; padding: 5px 25px; }
         .nav-item.active { color: var(--pi-g); opacity: 1; transform: translateY(-3px); }
+        
         #profileSection { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
         .profile-card { background: var(--glass); border-radius: 22px; padding: 20px; text-align: center; border: 1px solid rgba(255,183,77,0.2); }
         
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--white); width: 88%; max-width: 360px; padding: 25px; border-radius: 24px; color: var(--pi-d); text-align: center; }
-        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        
+        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: var(--pi-g); color: var(--pi-d); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10001; font-weight: 800; font-size: 0.85rem; }
         .success-icon { font-size: 4rem; color: #27ae60; margin-bottom: 15px; }
     </style>
 </head>
@@ -77,11 +76,19 @@
 
         <footer>
             <div class="policy-links">
-                <a onclick="alert('Privacy Policy: Encrypted via Pi Network.')">Privacy Policy</a>
-                <a onclick="alert('Terms of Use: Quality Guaranteed.')">Terms of Use</a>
+                <a onclick="showPolicy('privacy')">Privacy Policy</a>
+                <a onclick="showPolicy('terms')">Terms of Use</a>
             </div>
             <p style="font-size:0.6rem; opacity:0.3;">&copy; 2026 Bridge Freelance</p>
         </footer>
+    </div>
+
+    <div id="policyModal" class="modal">
+        <div class="modal-content">
+            <h3 id="policyTitle" style="margin-bottom:15px; color:var(--pi-d);"></h3>
+            <div id="policyBody" style="text-align:left; font-size:0.8rem; color:#444; max-height:250px; overflow-y:auto; margin-bottom:20px; line-height:1.6;"></div>
+            <button onclick="closeModal('policyModal')" style="width:100%; padding:12px; background:var(--pi-d); color:white; border:none; border-radius:12px; font-weight:bold;">Close</button>
+        </div>
     </div>
 
     <section id="profileSection">
@@ -155,15 +162,33 @@
         function closeModal(id) { document.getElementById(id).style.display='none'; }
         function openFreeModal() { if(!window.currentUser) { showMsg("Login Pi first"); return; } document.getElementById('freeModal').style.display='flex'; }
 
+        // دالة عرض السياسات باحترافية
+        function showPolicy(type) {
+            const title = document.getElementById('policyTitle');
+            const body = document.getElementById('policyBody');
+            if(type === 'privacy') {
+                title.innerText = "Privacy Policy";
+                body.innerHTML = "• We use Pi Network for secure authentication.<br>• Your data is encrypted and stored in our database.<br>• We do not share your contact info with third parties.<br>• Transactions are processed via Pi Blockchain.";
+            } else {
+                title.innerText = "Terms of Use";
+                body.innerHTML = "• Users must provide accurate service details.<br>• Payments in Pi are non-refundable once verified.<br>• Quality of service is guaranteed by Bridge Freelance.<br>• Any misuse of the platform leads to a permanent ban.";
+            }
+            document.getElementById('policyModal').style.display = 'flex';
+        }
+
         function showTab(tab) {
             if(tab === 'profile') {
                 if(!window.currentUser) { showMsg("Login Pi first"); return; }
                 document.getElementById('homePage').style.display = 'none';
                 document.getElementById('profileSection').style.display = 'block';
+                document.getElementById('profileNav').classList.add('active');
+                document.getElementById('homeNav').classList.remove('active');
                 loadUserProfile();
             } else {
                 document.getElementById('homePage').style.display = 'block';
                 document.getElementById('profileSection').style.display = 'none';
+                document.getElementById('homeNav').classList.add('active');
+                document.getElementById('profileNav').classList.remove('active');
             }
         }
 
@@ -237,14 +262,8 @@
             }
         }
 
-        /* التعديل هنا: جلب آخر 4 طلبات فقط للعرض في الواجهة */
         async function loadOrders() {
-            const { data } = await _supabase.from('services')
-                .select('*')
-                .eq('category', 'Order')
-                .order('id', { ascending: false })
-                .limit(4);
-            
+            const { data } = await _supabase.from('services').select('*').eq('category', 'Order').order('id', { ascending: false }).limit(4);
             const list = document.getElementById('ordersList');
             if (data && data.length > 0) {
                 list.innerHTML = data.map(o => `
