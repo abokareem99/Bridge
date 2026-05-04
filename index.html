@@ -19,12 +19,10 @@
         .hero { padding: 15px 10px; text-align: center; }
         .hero-title { font-size: 1.5rem; color: var(--pi-g); font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         
-        /* التعديل الأول: رسالة الترحيب باللون الأصفر وبدون ذكر أبو كريم */
         .welcome-msg { font-size: 0.65rem; background: var(--glass); padding: 4px 12px; border-radius: 50px; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,183,77,0.2); color: #FFFF00; font-weight: bold; }
         
         .auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         
-        /* التعديل الثاني: زر الدخول باللون البنفسجي فقط وبدون تحول للأخضر */
         .btn-auth { background: #8A2BE2; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: background 0.3s; }
         .btn-auth:hover { background: #6A1B9A; color: white; }
 
@@ -122,11 +120,11 @@
 
     <div id="freeModal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align:center; color:#2d0a4e;">Post Free Service</h3>
-            <input type="text" id="freeTitle" placeholder="Service Name" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
-            <textarea id="freeDesc" rows="4" placeholder="Description & Contact" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
-            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">Post Now</button>
-            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">Cancel</button>
+            <h3 style="text-align:center; color:#2d0a4e;">أضف خدمة مجانية</h3>
+            <input type="text" id="freeTitle" placeholder="اسم الخدمة" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;">
+            <textarea id="freeDesc" rows="4" placeholder="الوصف ووسيلة التواصل" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border: 1px solid #ddd;"></textarea>
+            <button onclick="submitFreeService()" style="width:100%; margin-top:15px; padding:14px; background:#27ae60; border:none; border-radius:12px; font-weight:bold; color:white;">انشر الآن</button>
+            <button onclick="closeModal('freeModal')" style="width:100%; margin-top:10px; background:none; border:none; color:#999; width:100%;">إلغاء</button>
         </div>
     </div>
 
@@ -177,7 +175,6 @@
                 const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
                 window.currentUser = auth.user.username;
                 
-                /* تم تعديل النص عند الدخول مع الحفاظ على اللون البنفسجي */
                 document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
                 document.getElementById('authBtn').style.background = "#8A2BE2"; 
                 
@@ -223,7 +220,7 @@
             await _supabase.from('services').insert([{ title: currentCategory, description: d, price: String(currentPrice), category: 'Order', contact_info: c, user_pi: window.currentUser, txid: currentTxId, status: 'order' }]);
             await emailjs.send("service_vuti648", "template_m6rq1ab", { username: window.currentUser, service_detail: d, contact_info: c, order_id: currentTxId, price: currentPrice });
             document.getElementById('reqModal').style.display = 'none';
-            showMsg("Submitted!"); loadOrders();
+            showMsg("تم الإرسال بنجاح ✅"); loadOrders();
         }
 
         async function submitFreeService() {
@@ -231,7 +228,8 @@
             const d = document.getElementById('freeDesc').value;
             if(!t || !d) return showMsg("Fill details");
             await _supabase.from('services').insert([{ title: t, description: d, price: "0", category: 'Order', user_pi: window.currentUser, status: 'free' }]);
-            closeModal('freeModal'); showMsg("Posted!"); loadOrders();
+            closeModal('freeModal'); 
+            showMsg("تم الإرسال بنجاح ✅"); loadOrders();
         }
 
         async function loadUserProfile() {
