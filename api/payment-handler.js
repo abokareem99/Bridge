@@ -3,13 +3,19 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { paymentId, txid, action } = req.body;
+    const { paymentId, txid, action, appType } = req.body;
 
-    // السيرفر سيحاول قراءة أحد المفتاحين المعتمدين لديك
-    const PI_API_KEY = process.env.BRIDGE_PI_API_KEY || process.env.PI_API_KEY;
+    // الفرز الديناميكي الذكي للمفاتيح بناءً على التطبيق المستدعي للرابط الخلفي
+    let PI_API_KEY;
+    if (appType === 'bridge') {
+        PI_API_KEY = process.env.BRIDGE_PI_API_KEY || process.env.PI_API_KEY;
+    } else {
+        // إذا كان الاستدعاء قادماً من لعبة الصياد أو تطبيق آخر، يتم التحويل للمفتاح الآخر
+        PI_API_KEY = process.env.PI_API_KEY || process.env.BRIDGE_PI_API_KEY;
+    }
 
     if (!PI_API_KEY) {
-        return res.status(500).json({ error: 'No API Key found. Ensure BRIDGE_PI_API_KEY or PI_API_KEY is set in Vercel.' });
+        return res.status(500).json({ error: 'No API Key found. Ensure BRIDGE_PI_API_KEY or PI_API_KEY is configured in Vercel.' });
     }
 
     if (!paymentId || !action) {
@@ -34,7 +40,7 @@ export default async function handler(req, res) {
         const data = await response.json();
         
         if (!response.ok) {
-            console.error(`Pi API Error (${action}):`, data);
+            console.error(`Pi API Error (${action}) for app [${appType}]:`, data);
             return res.status(400).json({ error: 'Failed to process payment via Pi API', details: data });
         }
 
