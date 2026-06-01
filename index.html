@@ -192,18 +192,22 @@
 
         async function startApp() {
             try {
+                showMsg("Authenticating...");
                 await window.Pi.init({ version: "2.0", sandbox: false });
                 const scopes = ['username'];
                 const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
                 
+                // إرسال الطلب للسيرفر والتحقق من صحة رد النتيجة بشكل فعلي ودقيق
                 const response = await fetch(`${API_BASE}/api/verify-user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ accessToken: authResult.accessToken, appType: 'bridge' })
                 });
 
+                const resData = await response.json();
+
                 if (!response.ok) {
-                    throw new Error("Backend authentication validation failed");
+                    throw new Error(resData.error || "Authentication failed on backend");
                 }
 
                 window.currentUser = authResult.user.username;
@@ -211,10 +215,11 @@
                 document.getElementById('userInitial').innerText = window.currentUser.charAt(0).toUpperCase();
                 document.getElementById('profileName').innerText = window.currentUser;
                 
+                showMsg("Logged in successfully!");
                 subscribeToChat();
             } catch (e) { 
                 console.error("Pi Auth Error:", e);
-                showMsg("Please Login via Pi Browser"); 
+                showMsg("Error: " + e.message); 
             }
         }
 
