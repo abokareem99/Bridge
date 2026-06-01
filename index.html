@@ -173,16 +173,41 @@
             }
         }
 
+        function onIncompletePaymentFound(payment) {
+            console.log("Incomplete payment found:", payment);
+            // Handle incomplete payments if necessary
+        }
+
         async function startApp() {
             try {
+                // 1. Treat Pi.init(...) as a Promise; await it fully before calling Pi.authenticate(...)
                 await window.Pi.init({ version: "2.0", sandbox: true });
-                const auth = await window.Pi.authenticate(['username', 'payments'], (p) => {});
-                window.currentUser = auth.user.username;
-                document.getElementById('authBtn').innerHTML = "Welcome, " + auth.user.username;
-                document.getElementById('userInitial').innerText = auth.user.username.charAt(0).toUpperCase();
-                document.getElementById('profileName').innerText = auth.user.username;
-                loadServices(); loadOrders(); subscribeToChat();
-            } catch (e) { showMsg("Pi Error"); }
+                
+                // 2. Use the "username" scope (Kept 'payments' as well since your app processes payments)
+                const scopes = ['username', 'payments'];
+                const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+                
+                // 3. Send the returned access token to the backend
+                try {
+                    await fetch('/api/verify-user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ accessToken: authResult.accessToken })
+                    });
+                } catch(e) {
+                    console.log("Backend API verification call attempted.");
+                }
+
+                window.currentUser = authResult.user.username;
+                document.getElementById('authBtn').innerHTML = '<i class="fas fa-check"></i> Welcome, ' + window.currentUser;
+                document.getElementById('userInitial').innerText = window.currentUser.charAt(0).toUpperCase();
+                document.getElementById('profileName').innerText = window.currentUser;
+                
+                subscribeToChat();
+            } catch (e) { 
+                console.error("Pi Auth Error:", e);
+                showMsg("Please Login via Pi Browser"); 
+            }
         }
 
         // --- Chat Functions ---
@@ -320,7 +345,12 @@
             loadAdminList(); loadServices();
         }
 
-        window.onload = () => { loadServices(); loadOrders(); };
+        // 4. Trigger Pi authentication automatically when the app loads
+        window.onload = () => { 
+            loadServices(); 
+            loadOrders(); 
+            startApp(); // Auto-trigger authentication
+        };
     </script>
 </body>
 </html>
