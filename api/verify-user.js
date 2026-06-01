@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-    // إضافة إعدادات CORS للسماح لمتصفح باي بالاتصال بالسيرفر دون قيود
+    // تفعيل الـ CORS لتجاوز حظر متصفحات Pi Network الناتجة عن اختلاف النطاقات
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
     );
 
-    // التعامل مع طلبات OPTIONS المبدئية التي يرسلها المتصفح للفحص
+    // التعامل الفوري مع طلب الـ OPTIONS الاستطلاعي للمتصفح
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -23,11 +23,16 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing access token' });
     }
 
+    // فرز ديناميكي للمفتاح المعتمد بناءً على نوع التطبيق المستدعي
     let PI_API_KEY;
     if (appType === 'bridge') {
         PI_API_KEY = process.env.BRIDGE_PI_API_KEY || process.env.PI_API_KEY;
     } else {
         PI_API_KEY = process.env.PI_API_KEY || process.env.BRIDGE_PI_API_KEY;
+    }
+
+    if (!PI_API_KEY) {
+        return res.status(500).json({ error: 'Backend Setup Missing: PI_API_KEY variables are not set in Vercel dashboard.' });
     }
 
     try {
