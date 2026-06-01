@@ -173,21 +173,27 @@
             }
         }
 
-        function onIncompletePaymentFound(payment) {
+        async function onIncompletePaymentFound(payment) {
             console.log("Incomplete payment found:", payment);
-            // Handle incomplete payments if necessary
+            if (payment && payment.identifier) {
+                try {
+                    await fetch('/api/payment-handler', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction?.txid, action: 'complete' })
+                    });
+                } catch (e) {
+                    console.error("Failed to complete in-flight payment:", e);
+                }
+            }
         }
 
         async function startApp() {
             try {
-                // 1. Treat Pi.init(...) as a Promise; await it fully before calling Pi.authenticate(...)
                 await window.Pi.init({ version: "2.0", sandbox: true });
-                
-                // 2. Use the "username" scope (Kept 'payments' as well since your app processes payments)
                 const scopes = ['username', 'payments'];
                 const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
                 
-                // 3. Send the returned access token to the backend
                 try {
                     await fetch('/api/verify-user', {
                         method: 'POST',
@@ -195,7 +201,7 @@
                         body: JSON.stringify({ accessToken: authResult.accessToken })
                     });
                 } catch(e) {
-                    console.log("Backend API verification call attempted.");
+                    console.log("Backend API verification call registered.");
                 }
 
                 window.currentUser = authResult.user.username;
@@ -263,11 +269,27 @@
             if(!window.currentUser) { showMsg("Login Pi first"); return; }
             currentPrice = amt; currentCategory = name;
             try {
-                await window.Pi.createPayment({ amount: amt, memo: "Service: " + name, metadata: { service: name } }, {
-                    onReadyForServerApproval: (id) => { return fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, action: 'approve' }) }).then(r => r.json()); },
-                    onConnectedToBlockchain: (id, tx) => { currentTxId = tx; },
+                await window.Pi.createPayment({ 
+                    amount: amt, 
+                    memo: "Freelance Service: " + name, 
+                    metadata: { service: name, category: "Bridge Freelance Project" } 
+                }, {
+                    onReadyForServerApproval: (id) => { 
+                        return fetch('/api/payment-handler', { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
+                            body: JSON.stringify({ paymentId: id, action: 'approve' }) 
+                        }).then(r => r.json()); 
+                    },
+                    onConnectedToBlockchain: (id, tx) => { 
+                        currentTxId = tx; 
+                    },
                     onReadyForServerCompletion: async (id, tx) => {
-                        await fetch('/api/payment-handler', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) });
+                        await fetch('/api/payment-handler', { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
+                            body: JSON.stringify({ paymentId: id, txid: tx, action: 'complete' }) 
+                        });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
                     onError: () => showMsg("Payment Error"),
@@ -345,11 +367,10 @@
             loadAdminList(); loadServices();
         }
 
-        // 4. Trigger Pi authentication automatically when the app loads
         window.onload = () => { 
             loadServices(); 
             loadOrders(); 
-            startApp(); // Auto-trigger authentication
+            startApp();
         };
     </script>
 </body>
