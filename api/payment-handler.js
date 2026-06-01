@@ -1,41 +1,47 @@
 export default async function handler(req, res) {
-    // إضافة ترويسات CORS لضمان قبول الطلبات القادمة من الـ Pi App Studio Sandbox دون مشاكل حظر
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*'); 
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-
-    // التعامل التلقائي مع طلبات الاستكشاف الجانبية للـ CORS
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
     const { paymentId, txid, action } = req.body;
-    const PI_API_KEY = process.env.PI_API_KEY;
+
+    // السيرفر سيحاول قراءة أحد المفتاحين المعتمدين لديك
+    const PI_API_KEY = process.env.BRIDGE_PI_API_KEY || process.env.PI_API_KEY;
+
+    if (!PI_API_KEY) {
+        return res.status(500).json({ error: 'No API Key found. Ensure BRIDGE_PI_API_KEY or PI_API_KEY is set in Vercel.' });
+    }
+
+    if (!paymentId || !action) {
+        return res.status(400).json({ error: 'Missing required parameters: paymentId or action' });
+    }
 
     try {
-        const url = action === 'approve' 
-            ? `https://api.minepi.com/v2/payments/${paymentId}/approve`
-            : `https://api.minepi.com/v2/payments/${paymentId}/complete`;
+        const baseUrl = "https://api.minepi.com/v2/payments";
+        const endpoint = action === 'approve' 
+            ? `${baseUrl}/${paymentId}/approve` 
+            : `${baseUrl}/${paymentId}/complete`;
 
-        const response = await fetch(url, {
+        const response = await fetch(endpoint, {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Authorization': `Key ${PI_API_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: action === 'complete' ? JSON.stringify({ txid }) : undefined
+            body: action === 'complete' ? JSON.stringify({ txid }) : null
         });
 
-        if (!response.ok) {
-            const errBody = await response.text();
-            throw new Error(`Pi API Error: ${errBody}`);
-        }
+        const data = await response.json();
         
-        return res.status(200).json({ success: true });
+        if (!response.ok) {
+            console.error(`Pi API Error (${action}):`, data);
+            return res.status(400).json({ error: 'Failed to process payment via Pi API', details: data });
+        }
+
+        return res.status(200).json(data);
+
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        console.error("Payment handler internal error:", error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
