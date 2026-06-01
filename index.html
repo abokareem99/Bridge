@@ -128,9 +128,8 @@
     <div id="adminModal" class="modal"><div class="modal-content"><h4>Admin Panel</h4><div id="adminAuth"><input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0;"><button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g);">Unlock</button></div><div id="adminTools" style="display:none"><input type="text" id="newSTitle" placeholder="Name"><input type="number" id="newSPrice" placeholder="Price"><button onclick="addService()" style="width:100%; margin-top:10px; background:green; color:white;">Add</button><div id="adminServiceList" style="margin-top:15px;"></div><button onclick="closeModal('adminModal')" style="margin-top:10px;">Close</button></div></div></div>
 
     <script>
-        // توحيد النطاق لتجنب مشاكل الربط في الـ App Studio
-        const VERCEL_PRODUCTION_URL = "https://bridge-freelance.vercel.app"; 
-        const API_BASE = window.location.origin.includes('vercel.app') ? '' : VERCEL_PRODUCTION_URL;
+        // تثبيت الرابط الأساسي للسيرفر بشكل مطلق لإنهاء مشاكل الأطر المخفية (iframes)
+        const API_BASE = "https://bridge-freelance.vercel.app";
 
         const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
         let currentTxId = "", currentPrice = 0, currentCategory = "";
@@ -194,11 +193,8 @@
 
         async function startApp() {
             try {
-                // تفعيل وضع الـ sandbox ديناميكياً بناءً على النطاق الحالي لمنع التعارض
-                const useSandboxMode = !window.location.origin.includes('pinet.com');
-                console.log("Initializing Pi SDK. Sandbox:", useSandboxMode);
-                
-                await window.Pi.init({ version: "2.0", sandbox: useSandboxMode });
+                // تفعيل وضع الفحص الإلزامي (true) لتقديمه للمراجعة بنجاح بـ Test Pi
+                await window.Pi.init({ version: "2.0", sandbox: true });
                 const scopes = ['username', 'payments'];
                 const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
                 
@@ -295,7 +291,13 @@
                             method: 'POST', 
                             headers: { 'Content-Type': 'application/json' }, 
                             body: JSON.stringify({ paymentId: id, action: 'approve' }) 
-                        }).then(r => r.json()); 
+                        }).then(res => {
+                            if (!res.ok) throw new Error("Backend Approval Failed");
+                            return res.json();
+                        }).catch(err => {
+                            console.error(err);
+                            showMsg("Server Timeout / Approval Error");
+                        }); 
                     },
                     onConnectedToBlockchain: (id, tx) => { 
                         currentTxId = tx; 
@@ -308,7 +310,7 @@
                         });
                         document.getElementById('reqModal').style.display = 'flex';
                     },
-                    onError: () => showMsg("Payment Error"),
+                    onError: (err) => { console.error(err); showMsg("Payment Error"); },
                     onCancel: () => showMsg("Cancelled")
                 });
             } catch (e) { showMsg("Payment Error"); }
@@ -386,7 +388,6 @@
         window.onload = () => { 
             loadServices(); 
             loadOrders(); 
-            // تم التعديل: تم حذف استدعاء دالة startApp() من هنا لكي لا يسجل الدخول تلقائياً
         };
     </script>
 </body>
