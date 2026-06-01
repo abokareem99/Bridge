@@ -5,12 +5,10 @@ export default async function handler(req, res) {
 
     const { paymentId, txid, action, appType } = req.body;
 
-    // الفرز الديناميكي الذكي للمفاتيح بناءً على التطبيق المستدعي للرابط الخلفي
     let PI_API_KEY;
     if (appType === 'bridge') {
         PI_API_KEY = process.env.BRIDGE_PI_API_KEY || process.env.PI_API_KEY;
     } else {
-        // إذا كان الاستدعاء قادماً من لعبة الصياد أو تطبيق آخر، يتم التحويل للمفتاح الآخر
         PI_API_KEY = process.env.PI_API_KEY || process.env.BRIDGE_PI_API_KEY;
     }
 
