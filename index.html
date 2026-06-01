@@ -128,7 +128,6 @@
     <div id="adminModal" class="modal"><div class="modal-content"><h4>Admin Panel</h4><div id="adminAuth"><input type="password" id="adminPass" placeholder="Access Code" style="width:100%; padding:12px; margin:15px 0;"><button onclick="checkAdmin()" style="width:100%; padding:12px; background:var(--pi-d); color:var(--pi-g);">Unlock</button></div><div id="adminTools" style="display:none"><input type="text" id="newSTitle" placeholder="Name"><input type="number" id="newSPrice" placeholder="Price"><button onclick="addService()" style="width:100%; margin-top:10px; background:green; color:white;">Add</button><div id="adminServiceList" style="margin-top:15px;"></div><button onclick="closeModal('adminModal')" style="margin-top:10px;">Close</button></div></div></div>
 
     <script>
-        // تثبيت الرابط الأساسي الفعال والمستقر لمعالجة عمليات الدفع على Vercel
         const API_BASE = "https://bridge-rust-seven.vercel.app";
 
         const _supabase = supabase.createClient("https://xolwuawlnruvzqowxxbh.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbHd1YXdsbnJ1dnpxb3d4eGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzgyNjEsImV4cCI6MjA5MjgxNDI2MX0.9ZbncYpfTr3qpFWZ-7yx8M_jf4MHpHzdp_mcuICS28w");
@@ -193,19 +192,18 @@
 
         async function startApp() {
             try {
-                // تم التعديل هنا بنجاح ليتوافق مع الرابط الرسمي .pinet.com ويختفي الـ Timeout
                 await window.Pi.init({ version: "2.0", sandbox: false });
-                const scopes = ['username', 'payments'];
+                const scopes = ['username'];
                 const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
                 
-                try {
-                    await fetch(`${API_BASE}/api/verify-user`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ accessToken: authResult.accessToken })
-                    });
-                } catch(e) {
-                    console.log("Backend API verification call registered.");
+                const response = await fetch(`${API_BASE}/api/verify-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accessToken: authResult.accessToken })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Backend authentication validation failed");
                 }
 
                 window.currentUser = authResult.user.username;
@@ -220,7 +218,6 @@
             }
         }
 
-        // --- Chat Functions ---
         async function loadChatMessages() {
             const { data } = await _supabase.from('messages').select('*').order('created_at', { ascending: true }).limit(50);
             if(data) {
@@ -257,7 +254,6 @@
             }).subscribe();
         }
 
-        // --- Original Functions ---
         async function loadServices() {
             const { data } = await _supabase.from('services').select('*').eq('category', 'Service');
             if(data) {
@@ -388,6 +384,7 @@
         window.onload = () => { 
             loadServices(); 
             loadOrders(); 
+            startApp();
         };
     </script>
 </body>
